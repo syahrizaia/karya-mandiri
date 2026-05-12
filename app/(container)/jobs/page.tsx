@@ -6,7 +6,7 @@ import {
   FiMapPin, 
   FiFilter, 
   FiUsers, 
-  FiClock 
+  FiClock
 } from 'react-icons/fi';
 import { Job } from '../types';
 
