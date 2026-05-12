@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { FiUsers, FiBriefcase, FiTrendingUp, FiPlus } from 'react-icons/fi';
 import { EmployerData, ProjectStats } from '../types';

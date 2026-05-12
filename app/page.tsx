@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FiLayers } from "react-icons/fi";
 import { MdWork } from "react-icons/md";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
 export default function Home() {
   const text = "Selamat Datang di\nKaryaMandiri!";
@@ -11,7 +11,7 @@ export default function Home() {
   // Mengubah kalimat menjadi array karakter agar bisa dianimasikan satu per satu
   const letters = Array.from(text);
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: (i: number = 1) => ({
       opacity: 1,
@@ -22,7 +22,7 @@ export default function Home() {
     }),
   };
 
-  const childVariants = {
+  const childVariants: Variants = {
     visible: {
       opacity: 1,
       y: 0,

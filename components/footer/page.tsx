@@ -109,11 +109,11 @@ const FooterLink = ({ href, children }: { href: string; children: React.ReactNod
   </Link>
 );
 
-const SocialIcon = ({ icon, href }: { icon: React.ReactNode; href: string }) => (
+const SocialIcon = ({ icon, href, target }: { icon: React.ReactNode; href: string; target?: string }) => (
   <a 
     href={href} 
+    target={target} // Masukkan variabel target ke sini
     className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300"
-    target="_blank"
     rel="noopener noreferrer"
   >
     {icon}
