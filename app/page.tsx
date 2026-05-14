@@ -37,7 +37,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-700 font-sans p-4 relative overflow-hidden">
+    <div className="flex flex-col min-h-screen items-center justify-center bg-linear-to-r from-blue-600 to-indigo-700 font-sans p-4 relative overflow-hidden">
       {/* Container Utama: Ukuran lebar dinamis sesuai layar */}
       <main className="z-10 flex w-full max-w-3xl flex-col items-center justify-between text-center py-12 px-6 md:py-24 md:px-16 bg-white rounded-3xl shadow-2xl">
         
