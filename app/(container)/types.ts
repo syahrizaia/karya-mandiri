@@ -1,11 +1,11 @@
 // types/employer
-export interface ProjectStats {
-  id: string;
-  title: string;
-  status: 'active' | 'completed' | 'pending';
-  contributors: number;
-  budget: number;
-}
+// export interface ProjectStats {
+//   id: string;
+//   title: string;
+//   status: 'active' | 'completed' | 'pending';
+//   contributors: number;
+//   budget: number;
+// }
 
 export interface EmployerData {
   name: string;
@@ -49,21 +49,20 @@ export interface UserProfile {
   balance: number;
 }
 
-// types/job
-export interface Job {
-  id: string;
-  title: string;
-  employer: string;
-  category: 'Logistik' | 'Produksi' | 'Jasa' | 'Konstruksi';
-  location: string;
-  reward: number;
-  type: 'Crowdsourcing' | 'Individu';
-  slots: {
-    taken: number;
-    total: number;
-  };
-  postedAt: string;
-}
+// export interface Job {
+//   id: string;
+//   title: string;
+//   employer: string;
+//   category: 'Logistik' | 'Produksi' | 'Jasa' | 'Konstruksi';
+//   location: string;
+//   reward: number;
+//   type: 'Crowdsourcing' | 'Individu';
+//   slots: {
+//     taken: number;
+//     total: number;
+//   };
+//   postedAt: string;
+// }
 
 // types/settings
 export interface UserSettings {
@@ -88,14 +87,14 @@ export interface GeneralStats {
   growthRate: number; // Persentase
 }
 
-export interface ActivityFeed {
-  id: string;
-  user: string;
-  action: string;
-  target: string;
-  time: string;
-  type: 'project' | 'payment' | 'user';
-}
+// export interface EcosystemActivities {
+//   id: string;
+//   user: string;
+//   action: string;
+//   target: string;
+//   time: string;
+//   type: 'project' | 'payment' | 'user';
+// }
 
 // types/history
 export interface TransactionHistory {

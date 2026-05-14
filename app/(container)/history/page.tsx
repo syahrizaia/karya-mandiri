@@ -9,9 +9,11 @@ import {
   FiClock 
 } from 'react-icons/fi';
 import { TransactionHistory } from '../types';
+import SubscriptionDialog from '../subscription/page';
 
 const History: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'income' | 'withdrawal'>('all');
+  const [showSubModal, setShowSubModal] = useState(false);
 
   // Mock Data Riwayat
   const historyData: TransactionHistory[] = [
@@ -33,7 +35,10 @@ const History: React.FC = () => {
           <h1 className="text-3xl font-bold text-slate-900">Riwayat Aktivitas</h1>
           <p className="text-slate-500">Pantau semua transaksi dan pengerjaan tugas Anda.</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition">
+        <button
+          className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition"
+          onClick={() => setShowSubModal(true)}
+        >
           <FiDownload /> Unduh Laporan
         </button>
       </section>
@@ -114,6 +119,7 @@ const History: React.FC = () => {
           </table>
         </div>
       </div>
+      <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
     </div>
   );
 };

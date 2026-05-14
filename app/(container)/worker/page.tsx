@@ -1,4 +1,6 @@
-import React from 'react';
+"use client";
+
+import React, { useState } from 'react';
 import { 
   FiDollarSign, 
   FiCheckCircle, 
@@ -8,8 +10,11 @@ import {
   FiSearch 
 } from 'react-icons/fi';
 import { Task, WorkerStats } from '../types';
+import SubscriptionDialog from '../subscription/page';
 
 const WorkerDashboard: React.FC = () => {
+  const [showSubModal, setShowSubModal] = useState(false);
+
   // Mock Data
   const profile: WorkerStats = {
     name: "Syahriza",
@@ -88,7 +93,9 @@ const WorkerDashboard: React.FC = () => {
                   <p className="text-xs text-slate-400">Upah</p>
                   <p className="font-bold text-green-600 italic">Rp{task.reward.toLocaleString()}</p>
                 </div>
-                <button className={`px-5 py-2 rounded-lg font-bold transition ${
+                <button
+                  onClick={() => setShowSubModal(true)}
+                  className={`px-5 py-2 rounded-lg font-bold transition ${
                   task.status === 'in_progress' 
                   ? 'bg-orange-100 text-orange-600 cursor-not-allowed' 
                   : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -106,10 +113,16 @@ const WorkerDashboard: React.FC = () => {
         <div className="relative z-10">
           <h3 className="text-lg font-bold mb-2">Tingkatkan Skill-mu! 🚀</h3>
           <p className="text-indigo-200 text-sm mb-4 max-w-md">Ikuti pelatihan singkat gratis untuk mendapatkan akses ke tugas dengan upah lebih tinggi.</p>
-          <button className="bg-white text-indigo-900 px-4 py-2 rounded-lg font-bold text-sm">Mulai Belajar</button>
+          <button
+            onClick={() => setShowSubModal(true)}
+            className="bg-white text-indigo-900 px-4 py-2 rounded-lg font-bold text-sm"
+          >
+            Mulai Belajar
+          </button>
         </div>
         <FiStar className="absolute -right-4 -bottom-4 text-indigo-800 text-9xl opacity-50" />
       </div>
+      <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
     </div>
   );
 };

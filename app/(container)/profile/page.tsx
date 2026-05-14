@@ -11,6 +11,23 @@ import {
 } from 'react-icons/fi';
 import { UserProfile } from '../types';
 import Image from 'next/image';
+import SubscriptionDialog from '../subscription/page';
+
+// Sub-komponen untuk baris pengaturan
+const SettingsItem = ({ label, value, status }: { label: string, value: string, status: string }) => (
+  <div className="p-6 flex justify-between items-center hover:bg-slate-50 transition">
+    <div>
+      <p className="text-sm font-semibold text-slate-700">{label}</p>
+      <p className="text-xs text-slate-500 mt-0.5">{value}</p>
+    </div>
+    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+      status === 'success' ? 'bg-green-100 text-green-700' : 
+      status === 'warning' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
+    }`}>
+      {status === 'success' ? 'Aktif' : status === 'warning' ? 'Perlu Tindakan' : 'Atur'}
+    </div>
+  </div>
+);
 
 const Profile: React.FC = () => {
   // Mock Data - Integrasikan dengan Auth Provider nantinya
@@ -28,6 +45,7 @@ const Profile: React.FC = () => {
     joinedDate: 'Maret 2024',
     balance: 7500000000,
   });
+  const [showSubModal, setShowSubModal] = useState(false);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -56,7 +74,10 @@ const Profile: React.FC = () => {
                 </div>
               )}
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition">
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+              onClick={() => setShowSubModal(true)}
+            >
               <FiEdit2 size={18} /> Edit Profil
             </button>
           </div>
@@ -106,7 +127,10 @@ const Profile: React.FC = () => {
               Saldo Dompet
             </h2>
             <p className="text-3xl font-bold">Rp{profile.balance.toLocaleString()}</p>
-            <button className="w-full mt-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold transition backdrop-blur-sm">
+            <button
+              className="w-full mt-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold transition backdrop-blur-sm"
+              onClick={() => setShowSubModal(true)}
+            >
               Tarik Tunai
             </button>
           </div>
@@ -137,24 +161,9 @@ const Profile: React.FC = () => {
           </div>
         </div>
       </div>
+      <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
     </div>
   );
 };
-
-// Sub-komponen untuk baris pengaturan
-const SettingsItem = ({ label, value, status }: { label: string, value: string, status: string }) => (
-  <div className="p-6 flex justify-between items-center hover:bg-slate-50 transition">
-    <div>
-      <p className="text-sm font-semibold text-slate-700">{label}</p>
-      <p className="text-xs text-slate-500 mt-0.5">{value}</p>
-    </div>
-    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
-      status === 'success' ? 'bg-green-100 text-green-700' : 
-      status === 'warning' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
-    }`}>
-      {status === 'success' ? 'Aktif' : status === 'warning' ? 'Perlu Tindakan' : 'Atur'}
-    </div>
-  </div>
-);
 
 export default Profile;

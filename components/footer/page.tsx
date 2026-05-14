@@ -11,6 +11,24 @@ import {
   FiLinkedin
 } from 'react-icons/fi';
 
+// --- Helper Components ---
+const FooterLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  <Link href={href} className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 inline-block">
+    {children}
+  </Link>
+);
+
+const SocialIcon = ({ icon, href, target }: { icon: React.ReactNode; href: string; target?: string }) => (
+  <a 
+    href={href} 
+    target={target} // Masukkan variabel target ke sini
+    className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300"
+    rel="noopener noreferrer"
+  >
+    {icon}
+  </a>
+);
+
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
@@ -100,24 +118,5 @@ const Footer: React.FC = () => {
     </footer>
   );
 };
-
-// --- Helper Components ---
-
-const FooterLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <Link href={href} className="hover:text-blue-600 hover:translate-x-1 transition-all duration-200 inline-block">
-    {children}
-  </Link>
-);
-
-const SocialIcon = ({ icon, href, target }: { icon: React.ReactNode; href: string; target?: string }) => (
-  <a 
-    href={href} 
-    target={target} // Masukkan variabel target ke sini
-    className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white transition-all duration-300"
-    rel="noopener noreferrer"
-  >
-    {icon}
-  </a>
-);
 
 export default Footer;

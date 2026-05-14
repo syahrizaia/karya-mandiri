@@ -12,6 +12,34 @@ import {
   FiShield,
   FiTrash
 } from 'react-icons/fi';
+import SubscriptionDialog from '../subscription/page';
+
+// --- Sub Komponen ---
+
+const ToggleItem = ({ title, description, isEnabled, onToggle }: { title: string, description: string, isEnabled: boolean, onToggle: () => void }) => (
+  <div className="p-6 flex justify-between items-start gap-4">
+    <div className="flex-1">
+      <p className="font-semibold text-slate-800">{title}</p>
+      <p className="text-xs text-slate-500 mt-1 leading-relaxed">{description}</p>
+    </div>
+    <button 
+      onClick={onToggle}
+      className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${isEnabled ? 'bg-blue-600' : 'bg-slate-300'}`}
+    >
+      <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${isEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+    </button>
+  </div>
+);
+
+const LinkItem = ({ icon, title, onClick }: { icon: React.ReactNode, title: string, onClick?: () => void }) => (
+  <button onClick={onClick} className="w-full p-6 flex justify-between items-center hover:bg-slate-50 transition">
+    <div className="flex items-center gap-3 font-semibold text-slate-700">
+      <span className="text-slate-400">{icon}</span>
+      {title}
+    </div>
+    <FiChevronRight className="text-slate-300" />
+  </button>
+);
 
 const Settings: React.FC = () => {
   const [settings, setSettings] = useState({
@@ -22,6 +50,7 @@ const Settings: React.FC = () => {
     language: 'id',
     theme: 'light'
   });
+  const [showSubModal, setShowSubModal] = useState(false);
 
   const toggleSetting = (key: string) => {
     setSettings(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
@@ -77,7 +106,7 @@ const Settings: React.FC = () => {
             isEnabled={settings.showEarnings}
             onToggle={() => toggleSetting('showEarnings')}
           />
-          <LinkItem icon={<FiShield />} title="Ubah Kata Sandi" />
+          <LinkItem onClick={() => setShowSubModal(true)} icon={<FiShield />} title="Ubah Kata Sandi" />
         </div>
       </section>
 
@@ -122,39 +151,16 @@ const Settings: React.FC = () => {
         >
           <FiLogOut /> Keluar dari Akun
         </Link>
-        <button className="flex-1 flex items-center justify-center gap-2 p-4 border border-slate-300 text-slate-500 font-bold rounded-2xl hover:bg-slate-50 transition shadow-sm">
+        <button
+          className="flex-1 flex items-center justify-center gap-2 p-4 border border-slate-300 text-slate-500 font-bold rounded-2xl hover:bg-slate-50 transition shadow-sm"
+          onClick={() => setShowSubModal(true)}
+        >
           <FiTrash /> Hapus Data Cache
         </button>
       </div>
+      <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
     </div>
   );
 };
-
-// --- Sub Komponen ---
-
-const ToggleItem = ({ title, description, isEnabled, onToggle }: { title: string, description: string, isEnabled: boolean, onToggle: () => void }) => (
-  <div className="p-6 flex justify-between items-start gap-4">
-    <div className="flex-1">
-      <p className="font-semibold text-slate-800">{title}</p>
-      <p className="text-xs text-slate-500 mt-1 leading-relaxed">{description}</p>
-    </div>
-    <button 
-      onClick={onToggle}
-      className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${isEnabled ? 'bg-blue-600' : 'bg-slate-300'}`}
-    >
-      <div className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${isEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
-    </button>
-  </div>
-);
-
-const LinkItem = ({ icon, title }: { icon: React.ReactNode, title: string }) => (
-  <button className="w-full p-6 flex justify-between items-center hover:bg-slate-50 transition">
-    <div className="flex items-center gap-3 font-semibold text-slate-700">
-      <span className="text-slate-400">{icon}</span>
-      {title}
-    </div>
-    <FiChevronRight className="text-slate-300" />
-  </button>
-);
 
 export default Settings;

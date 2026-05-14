@@ -11,6 +11,25 @@ import {
 } from 'react-icons/fi';
 import { NotificationItem } from '../types';
 
+// Helper Functions
+const getIcon = (type: string) => {
+  switch (type) {
+    case 'payment': return <FiDollarSign className="text-green-600" />;
+    case 'job': return <FiCheckCircle className="text-blue-600" />;
+    case 'system': return <FiInfo className="text-purple-600" />;
+    default: return <FiBell className="text-slate-600" />;
+  }
+};
+
+const getIconBg = (type: string) => {
+  switch (type) {
+    case 'payment': return 'bg-green-50';
+    case 'job': return 'bg-blue-50';
+    case 'system': return 'bg-purple-50';
+    default: return 'bg-slate-50';
+  }
+};
+
 const Notification: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
@@ -116,25 +135,6 @@ const Notification: React.FC = () => {
       </div>
     </div>
   );
-};
-
-// Helper Functions
-const getIcon = (type: string) => {
-  switch (type) {
-    case 'payment': return <FiDollarSign className="text-green-600" />;
-    case 'job': return <FiCheckCircle className="text-blue-600" />;
-    case 'system': return <FiInfo className="text-purple-600" />;
-    default: return <FiBell className="text-slate-600" />;
-  }
-};
-
-const getIconBg = (type: string) => {
-  switch (type) {
-    case 'payment': return 'bg-green-50';
-    case 'job': return 'bg-blue-50';
-    case 'system': return 'bg-purple-50';
-    default: return 'bg-slate-50';
-  }
 };
 
 export default Notification;

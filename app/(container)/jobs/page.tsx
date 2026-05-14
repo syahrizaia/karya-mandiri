@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/static-components */
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   FiSearch, 
   FiMapPin, 
@@ -8,47 +9,87 @@ import {
   FiUsers, 
   FiClock
 } from 'react-icons/fi';
-import { Job } from '../types';
+import Link from 'next/link';
+import { IJobs } from '@/app/types/jobs';
+import supabase from '@/lib/db';
+import formatRelativeTime from '@/components/format-relative-time/page';
+import SubscriptionDialog from '../subscription/page';
+
+// Helper Component for Icon
+const FiBriefcase = ({ className }: { className?: string }) => (
+  <svg className={className} stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="1em" width="1em"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+);
 
 const Jobs: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [jobs, setJobs] = useState<IJobs[]>([]);
+  const [showSubModal, setShowSubModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   
-  // Mock Data Pekerjaan
-  const allJobs: Job[] = [
-    {
-      id: 'JOB-01',
-      title: 'Pengepakan Paket Sembako Bulk',
-      employer: 'Koperasi Makmur',
-      category: 'Produksi',
-      location: 'Jakarta Timur',
-      reward: 45000000,
-      type: 'Crowdsourcing',
-      slots: { taken: 12, total: 50 },
-      postedAt: '2 jam lalu'
-    },
-    {
-      id: 'JOB-02',
-      title: 'Kurir Pengantaran Sayur Organik',
-      employer: 'TaniHub Local',
-      category: 'Logistik',
-      location: 'Depok',
-      reward: 30000000,
-      type: 'Individu',
-      slots: { taken: 1, total: 5 },
-      postedAt: '5 jam lalu'
-    },
-    {
-      id: 'JOB-03',
-      title: 'Tenaga Harian Sortir Sampah Plastik',
-      employer: 'GreenEarthy',
-      category: 'Jasa',
-      location: 'Bekasi',
-      reward: 60000000,
-      type: 'Crowdsourcing',
-      slots: { taken: 8, total: 20 },
-      postedAt: '1 hari lalu'
-    }
-  ];
+  useEffect(() => {
+    // Simulasi fetch data pekerjaan
+    const fetchJobs = async () => {
+      setLoading(true);
+      // Di sini Anda bisa mengganti dengan API call nyata
+      const {data, error} = await supabase.from('jobs').select('*').order('posted_at', { ascending: false });
+      if(error) {
+        console.error('Error fetching jobs:', error);
+      } else {
+        setJobs(data);
+      }
+      setLoading(false);
+    };
+
+    fetchJobs();
+  }, [supabase]);
+
+  const JobCardLoading = () => {
+    return (
+      <div className="flex flex-col gap-6">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 animate-pulse">
+            <div className="flex flex-col md:flex-row justify-between gap-6">
+              
+              {/* Sisi Kiri: Detail Info */}
+              <div className="space-y-4 flex-1">
+                <div className="flex items-center gap-2">
+                  {/* Badge Skeleton */}
+                  <div className="h-6 w-24 bg-slate-100 rounded-full"></div>
+                  {/* Time Skeleton */}
+                  <div className="h-4 w-32 bg-slate-50 rounded"></div>
+                </div>
+                {/* Title Skeleton */}
+                <div className="h-7 w-3/4 bg-slate-200 rounded-lg"></div>
+                {/* Metadata Skeleton */}
+                <div className="flex gap-4">
+                  <div className="h-4 w-28 bg-slate-100 rounded"></div>
+                  <div className="h-4 w-28 bg-slate-100 rounded"></div>
+                </div>
+              </div>
+
+              {/* Sisi Kanan: Harga & Tombol */}
+              <div className="flex flex-col justify-between items-end gap-4 min-w-[150px]">
+                <div className="text-right space-y-2">
+                  <div className="h-3 w-20 bg-slate-50 rounded ml-auto"></div>
+                  <div className="h-8 w-32 bg-slate-200 rounded-lg"></div>
+                </div>
+                <div className="h-12 w-full md:w-36 bg-slate-100 rounded-2xl"></div>
+              </div>
+            </div>
+
+            {/* Progress Bar Skeleton */}
+            <div className="mt-6 pt-4 border-t border-slate-50 space-y-3">
+              <div className="flex justify-between">
+                <div className="h-3 w-28 bg-slate-50 rounded"></div>
+                <div className="h-3 w-20 bg-slate-50 rounded"></div>
+              </div>
+              <div className="w-full bg-slate-100 h-2 rounded-full"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-8">
@@ -69,7 +110,10 @@ const Jobs: React.FC = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 rounded-2xl font-bold transition flex items-center justify-center gap-2">
+            <button
+              onClick={() => setShowSubModal(true)}
+              className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 rounded-2xl font-bold transition flex items-center justify-center gap-2"
+            >
               <FiFilter /> Filter
             </button>
           </div>
@@ -106,72 +150,73 @@ const Jobs: React.FC = () => {
         {/* Job List Area */}
         <div className="lg:col-span-3 space-y-4">
           <div className="flex justify-between items-center px-2">
-            <p className="text-slate-500 font-medium">{allJobs.length} Lowongan Tersedia</p>
+            <p className="text-slate-500 font-medium">{jobs.length} Lowongan Tersedia</p>
             <select className="bg-transparent font-semibold text-blue-600 outline-none">
               <option>Terbaru</option>
               <option>Upah Tertinggi</option>
             </select>
           </div>
 
-          {allJobs.map((job) => (
-            <div key={job.id} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
-              <div className="flex flex-col md:flex-row justify-between gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
-                    }`}>
-                      {job.type}
-                    </span>
-                    <span className="text-slate-400 text-xs flex items-center gap-1">
-                      <FiClock /> {job.postedAt}
-                    </span>
-                  </div>
-                  <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
-                  <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
-                    <div className="flex items-center gap-1"><FiBriefcase className="text-blue-500"/> {job.employer}</div>
-                    <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
-                  </div>
-                </div>
+          {loading ? (
+            <JobCardLoading />
+          ) : (
+            <>
+              {jobs.map((job) => (
+                <div key={job.id} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
+                  <Link href={`/jobs/${job.id}`} className="flex flex-col md:flex-row justify-between gap-6">
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
+                        }`}>
+                          {job.type}
+                        </span>
+                        <span className="text-slate-400 text-xs flex items-center gap-1">
+                          <FiClock /> {formatRelativeTime(job.posted_at)}
+                        </span>
+                      </div>
+                      <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
+                      <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
+                        <div className="flex items-center gap-1"><FiBriefcase className="text-blue-500"/> {job.employer}</div>
+                        <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
+                      </div>
+                    </div>
 
-                <div className="flex flex-col justify-between items-end gap-4 min-w-[150px]">
-                  <div className="text-right">
-                    <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
-                    <p className="text-2xl font-bold text-green-600">Rp{job.reward.toLocaleString()}</p>
-                  </div>
-                  <button className="w-full md:w-auto px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md">
-                    Lamar Sekarang
-                  </button>
-                </div>
-              </div>
+                    <div className="flex flex-col justify-between items-end gap-4 min-w-[150px]">
+                      <div className="text-right">
+                        <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
+                        <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
+                      </div>
+                      <button className="w-full md:w-auto px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md">
+                        Lamar Sekarang
+                      </button>
+                    </div>
+                  </Link>
 
-              {/* Crowdsourcing Progress Bar */}
-              {job.type === 'Crowdsourcing' && (
-                <div className="mt-6 pt-4 border-t border-slate-50">
-                  <div className="flex justify-between text-xs font-bold mb-2">
-                    <span className="text-slate-500 uppercase">Kuota Crowdsourcing</span>
-                    <span className="text-blue-600">{job.slots.taken} / {job.slots.total} Pekerja</span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-blue-500 h-full transition-all duration-500" 
-                      style={{ width: `${(job.slots.taken / job.slots.total) * 100}%` }}
-                    />
-                  </div>
+                  {/* Crowdsourcing Progress Bar */}
+                  {job.type === 'Crowdsourcing' && (
+                    <div className="mt-6 pt-4 border-t border-slate-50">
+                      <div className="flex justify-between text-xs font-bold mb-2">
+                        <span className="text-slate-500 uppercase">Kuota Crowdsourcing</span>
+                        <span className="text-blue-600">{job.taken} / {job.total} Pekerja</span>
+                      </div>
+                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-blue-500 h-full transition-all duration-500" 
+                          style={{ width: `${(job.taken / job.total) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              ))}
+            </>
+          )}
         </div>
-
       </div>
+      <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
     </div>
   );
 };
-
-// Helper Component for Icon
-const FiBriefcase = ({ className }: { className?: string }) => (
-  <svg className={className} stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="1em" width="1em"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-);
 
 export default Jobs;
