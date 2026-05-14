@@ -293,7 +293,7 @@ const EmployerDashboard: React.FC = () => {
           
           {/* PEMBUNGKUS SCROLL DISINI */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[600px]"> 
+            <table className="w-full text-left border-collapse min-w-150"> 
               {/* min-w-[600px] memastikan tabel tidak terlalu sempit di HP */}
               <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
                 <tr>

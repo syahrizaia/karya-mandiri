@@ -1,6 +1,5 @@
 "use client";
 
-import React, { useState } from 'react';
 import { 
   Dialog, 
   DialogContent, 
@@ -21,7 +20,7 @@ const SubscriptionDialog = ({ open, onOpenChange }: { open: boolean, onOpenChang
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[450px] bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
+      <DialogContent className="sm:max-w-112.5 bg-white rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
         {/* Header dengan Aksen Warna */}
         <div className="bg-blue-600 p-8 text-white text-center relative">
           <div className="absolute top-4 right-4 opacity-20">

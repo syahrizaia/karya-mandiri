@@ -46,7 +46,7 @@ const WorkerDashboard: React.FC = () => {
 
       {/* Ringkasan Pendapatan & Capaian */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-green-500 to-green-600 p-6 rounded-2xl text-white shadow-lg">
+        <div className="bg-linear-to-br from-green-500 to-green-600 p-6 rounded-2xl text-white shadow-lg">
           <div className="flex justify-between items-center opacity-80 mb-2">
             <p className="text-sm uppercase tracking-wider">Total Pendapatan</p>
             <FiDollarSign />

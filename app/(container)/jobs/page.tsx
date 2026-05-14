@@ -68,7 +68,7 @@ const Jobs: React.FC = () => {
               </div>
 
               {/* Sisi Kanan: Harga & Tombol */}
-              <div className="flex flex-col justify-between items-end gap-4 min-w-[150px]">
+              <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
                 <div className="text-right space-y-2">
                   <div className="h-3 w-20 bg-slate-50 rounded ml-auto"></div>
                   <div className="h-8 w-32 bg-slate-200 rounded-lg"></div>
@@ -182,7 +182,7 @@ const Jobs: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col justify-between items-end gap-4 min-w-[150px]">
+                    <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
                       <div className="text-right">
                         <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
                         <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
