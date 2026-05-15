@@ -310,8 +310,8 @@ const EmployerDashboard: React.FC = () => {
                       {job.title}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(job.status)}`}>
-                        {job.status.toUpperCase()}
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(job.status ?? 'pending')}`}>
+                        { (job.status?.toUpperCase()) ?? "PENDING" }
                       </span>
                     </td>
                     <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
