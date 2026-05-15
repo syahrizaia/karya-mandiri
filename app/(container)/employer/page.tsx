@@ -3,13 +3,14 @@
 'use client';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { FormEvent, useEffect, useState } from 'react';
-import { FiUsers, FiBriefcase, FiTrendingUp, FiPlus } from 'react-icons/fi';
+import React, { FormEvent, SubmitEvent, useEffect, useState } from 'react';
+import { FiUsers, FiBriefcase, FiTrendingUp, FiPlus, FiLoader } from 'react-icons/fi';
 import { EmployerData } from '../types';
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import supabase from '@/lib/db';
 import { toast } from 'sonner';
 import { IJobs } from '@/app/types/jobs';
+import { useRouter } from 'next/navigation';
 
 // Sub-komponen StatCard
 const StatCard = ({ icon, title, value, color }: { icon: any, title: string, value: any, color: string }) => (
@@ -35,7 +36,8 @@ const getStatusStyle = (status: string) => {
 };
 
 const EmployerDashboard: React.FC = () => {
-  const [createDialog, setCreateDialog] = useState(false);
+  const router = useRouter();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [jobs, setJobs] = useState<IJobs[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -59,56 +61,109 @@ const EmployerDashboard: React.FC = () => {
     fetchJobs();
   }, [supabase]);
 
-  const handlerCreateProject = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const rawData = Object.fromEntries(formData);
+  // const handlerCreateProject = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const formData = new FormData(e.currentTarget);
+  //   const rawData = Object.fromEntries(formData);
 
-    console.log('Membuat proyek baru:', formData);
+  //   console.log('Membuat proyek baru:', formData);
+
+  //   const projectData = {
+  //     id: crypto.randomUUID(),
+  //     ...rawData,
+  //     reward: Number(rawData.reward), // Pastikan menjadi angka
+  //     // Pastikan requirements adalah array, misal dipisahkan koma
+  //     // requirements: typeof rawData.requirements === 'string' 
+  //     //   ? rawData.requirements.split(',').map(item => item.trim()) 
+  //     //   : [],
+  //     requirements: rawData.requirements || "",
+  //     // Tangani tanggal kosong agar tidak menjadi ""
+  //     deadline: rawData.deadline || null, 
+  //     posted_at: new Date().toISOString(),
+  //   };
+
+  //   // const { data, error } = await supabase.from('jobs').insert([projectData]).select();
+  
+  //   // if (error) {
+  //   //   console.error('Error detail:', error.message);
+  //   // } else if (data) {
+  //   //   setJobs((prev) => [...prev, ...data]);
+  //   //   toast("Proyek berhasil dibuat!");
+  //   //   setCreateDialog(false);
+  //   // }
+
+  //   try {
+  //     const {data, error} = await supabase.from('jobs').insert([projectData]).select();
+  //     if (error) {
+  //       console.error('Error creating project:', error);
+  //     }
+  //     else {
+  //       if (data) {
+  //         setJobs((prev) => [...prev, ...data]);
+  //       }
+  //       toast("Proyek berhasil dibuat!");
+  //       setCreateDialog(false);
+  //     }
+  //   } catch (error) {
+  //     toast("Gagal membuat proyek!");
+  //     console.error('Error creating project:', error);
+  //   } finally {
+  //     setCreateDialog(false);
+  //   }
+  // };
+
+  const CreateProject = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const rawData = Object.fromEntries(formData.entries());
 
     const projectData = {
       id: crypto.randomUUID(),
-      ...rawData,
-      reward: Number(rawData.reward), // Pastikan menjadi angka
-      // Pastikan requirements adalah array, misal dipisahkan koma
-      // requirements: typeof rawData.requirements === 'string' 
-      //   ? rawData.requirements.split(',').map(item => item.trim()) 
-      //   : [],
-      requirements: rawData.requirements || "",
-      // Tangani tanggal kosong agar tidak menjadi ""
-      deadline: rawData.deadline || null, 
-      posted_at: new Date().toISOString(),
+      title: rawData.title,
+      employer: "Anonymous", // Hidden data
+      description: rawData.description,
+      requirements: rawData.requirements, // Disimpan sebagai string murni
+      deadline: rawData.deadline || null,
+      category: rawData.category,
+      type: rawData.type,
+      location: rawData.location,
+      reward: Number(rawData.reward),
+      taken: 0, // Hidden data awal
+      total: Number(rawData.total),
+      posted_at: rawData.posted_at ? new Date(rawData.posted_at as string).toISOString() : new Date().toISOString(), // Hidden data
+      status: "active", // Hidden data default
     };
 
-    // const { data, error } = await supabase.from('jobs').insert([projectData]).select();
-  
-    // if (error) {
-    //   console.error('Error detail:', error.message);
-    // } else if (data) {
-    //   setJobs((prev) => [...prev, ...data]);
-    //   toast("Proyek berhasil dibuat!");
-    //   setCreateDialog(false);
-    // }
-
     try {
-      const {data, error} = await supabase.from('jobs').insert([projectData]).select();
+      const { data, error } = await supabase.from("jobs").insert([projectData]).select();
+
+      // if (error) throw error;
+
+      // setJobs((prev) => [...prev, ...data]);
+      // alert("Proyek berhasil dipublikasikan!");
+      // setIsCreateDialogOpen(false);
+      // router.refresh(); // Refresh data di dashboard
+
       if (error) {
-        console.error('Error creating project:', error);
+        throw error;
       }
       else {
         if (data) {
           setJobs((prev) => [...prev, ...data]);
         }
         toast("Proyek berhasil dibuat!");
-        setCreateDialog(false);
+        setIsCreateDialogOpen(false);
+        router.refresh();
       }
     } catch (error) {
-      toast("Gagal membuat proyek!");
-      console.error('Error creating project:', error);
+      console.error("Error inserting project:", error);
+      alert("Gagal membuat proyek. Periksa koneksi atau database.");
     } finally {
-      setCreateDialog(false);
+      setLoading(false);
     }
-  };
+  }
 
   // Mock Data (Integrasikan dengan API backend nantinya)
   const stats: EmployerData = {
@@ -167,109 +222,132 @@ const EmployerDashboard: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-800">Dashboard Employer</h1>
           <p className="text-gray-600">Selamat datang kembali, {stats.name}</p>
         </div>
-        <Dialog open={createDialog} onOpenChange={setCreateDialog}>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition shadow-md">
+            <button className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">
               <FiPlus /> Buat Proyek Baru
             </button>
           </DialogTrigger>
-          <DialogContent className='bg-white rounded-2xl'>
-            <DialogHeader className='text-slate-700'>
-              <DialogTitle>Buat Proyek Baru</DialogTitle>
+          
+          <DialogContent className="sm:max-w-150 max-h-[90vh] overflow-y-auto rounded-3xl p-8 bg-white border-none shadow-2xl">
+            <DialogHeader className="mb-6">
+              <DialogTitle className="text-2xl font-black text-slate-900">Buat Proyek Baru</DialogTitle>
+              <p className="text-slate-500 text-sm italic">Employer: Anonymous</p>
             </DialogHeader>
-            <form action="" onSubmit={handlerCreateProject} className="space-y-4">
-              <div className="mb-4">
-                <label htmlFor="title" className="block text-gray-600 mb-2">Judul Proyek</label>
+
+            <form onSubmit={CreateProject} className="space-y-6">
+              {/* Baris 1: Judul */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-slate-400">Judul Proyek</label>
                 <input
-                  type="text"
-                  id="title"
-                  name="title"                 
-                  className="w-full px-3 py-2 border rounded text-black"
-                  placeholder="Masukkan judul proyek"
+                  type='text'
+                  name="title"
                   required
+                  placeholder="Contoh: Pengumpulan Data Foto UMKM"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
                 />
               </div>
-              <div className="mb-4">
-                <label htmlFor="description" className="block text-gray-600 mb-2">Deskripsi Proyek</label>
+
+              {/* Baris 2: Deskripsi */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-slate-400">Deskripsi Tugas</label>
                 <textarea
-                  id="description"
                   name="description"
-                  className="w-full px-3 py-2 border rounded text-black"
-                  placeholder="Masukkan deskripsi proyek"
                   required
-                />
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition"
+                ></textarea>
               </div>
-              <div className='mb-4'>
-                <label htmlFor="requirements" className="block text-gray-600 mb-2">Persyaratan & Kualifikasi</label>
+
+              {/* Baris 3: Requirements */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase text-slate-400">Persyaratan (Gunakan baris baru untuk poin-poin)</label>
                 <textarea
-                  id="requirements"
                   name="requirements"
-                  className="w-full px-3 py-2 border rounded text-black"
-                  placeholder="Masukkan persyaratan dan kualifikasi"
-                  required
-                />
+                  placeholder="1. Memiliki HP Android&#10;2. Domisili Bekasi"
+                  rows={3}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition"
+                ></textarea>
               </div>
-              <div>
-                <label htmlFor="deadline" className="block text-gray-600 mb-2">Deadline Proyek</label>
-                <input
-                  type="text"
-                  id="deadline"
-                  name="deadline"
-                  className="w-full px-3 py-2 border rounded text-black"
-                  required
-                />
+
+              {/* Baris 4: Lokasi & Kategori (Grid 2 Kolom) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-slate-400">Kategori</label>
+                  <select name="category" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none bg-white">
+                    <option value="Survey">Survey</option>
+                    <option value="Data Entry">Data Entry</option>
+                    <option value="Creative">Creative</option>
+                    <option value="Teknis">Teknis</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-slate-400">Lokasi</label>
+                  <input type="text" name="location" required placeholder="Contoh: Remote / Jakarta" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" />
+                </div>
               </div>
-              <div className='mb-4'>
-                <label htmlFor="category" className="block text-gray-600 mb-2">Kategori Proyek</label>
-                <select id="category" name="category" className="w-full px-3 py-2 border rounded text-black" required>
-                  <option value="">Pilih kategori</option>
-                  <option value="Produksi">Produksi</option>
-                  <option value="Logistik">Logistik</option>
-                  <option value="Jasa">Jasa</option>
-                  <option value="Konstruksi">Konstruksi</option>
-                </select>
+
+              {/* Baris 5: Type & Reward */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-slate-400">Tipe Proyek</label>
+                  <select name="type" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none bg-white">
+                    <option value="Crowdsourcing">Crowdsourcing</option>
+                    <option value="Freelance">Freelance</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-slate-400">Upah (Rp)</label>
+                  <input name="reward" type="number" required placeholder="Contoh: 50000" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" />
+                </div>
               </div>
-              <div className='mb-4'>
-                <label htmlFor="type" className="block text-gray-600 mb-2">Tipe Proyek</label>
-                <select id="type" name="type" className="w-full px-3 py-2 border rounded text-black" required>
-                  <option value="">Pilih tipe proyek</option>
-                  <option value="Produksi">Crowdsourcing</option>
-                  <option value="Logistik">Individu</option>
-                </select>
+
+              {/* Baris 6: Total Kuota & Deadline */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-slate-400">Total Kuota Pekerja</label>
+                  <input name="total" type="number" required placeholder="Jumlah orang" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input 
+                    name="posted_at" 
+                    type="datetime-local"
+                    // defaultValue={new Date().toISOString().slice(0, 16)} // Set default ke waktu sekarang
+                    hidden
+                  />
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase text-slate-400">Batas Akhir (Deadline)</label>
+                    <input 
+                      name="deadline" 
+                      type="datetime-local"
+                      required 
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none bg-white text-slate-700" 
+                    />
+                  </div>
+                </div>
+                {/* <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-slate-400">Deadline</label>
+                  <input name="deadline" type="date" required className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" />
+                </div> */}
               </div>
-              <div className='mb-4'>
-                <label htmlFor="location" className="block text-gray-600 mb-2">Lokasi Proyek</label>
-                <input
-                  type="text"
-                  id="location"
-                  name="location"
-                  className="w-full px-3 py-2 border rounded text-black"
-                  placeholder="Masukkan lokasi proyek"
-                  required
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="reward" className="block text-gray-600 mb-2">Budget</label>
-                <input
-                  type="number"
-                  id="reward"
-                  name="reward"
-                  className="w-full px-3 py-2 border rounded text-black"
-                  placeholder="Masukkan budget proyek"
-                  required
-                />
-              </div>
-              <input type="datetime-local" name="posted_at" id="posted_at" hidden />
-              <DialogFooter>
-                <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition cursor-pointer">
-                  Simpan Proyek
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateDialogOpen(false)}
+                  className="px-6 py-3 rounded-xl font-bold text-slate-400 hover:text-slate-600 transition"
+                >
+                  Batal
                 </button>
-                <DialogClose asChild>
-                  <button type="button" className="bg-red-400 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition cursor-pointer">
-                    Batal
-                  </button>
-                </DialogClose>
-              </DialogFooter>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition flex items-center gap-2 disabled:bg-blue-300"
+                >
+                  {loading ? <FiLoader className="animate-spin" /> : "Buat Proyek"}
+                </button>
+              </div>
             </form>
           </DialogContent>
         </Dialog>

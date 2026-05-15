@@ -62,7 +62,7 @@ const GeneralDashboard: React.FC = () => {
     const fetchEcosystemActivities = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase.from('ecosystem_activities').select('*');
+        const { data, error } = await supabase.from('ecosystem_activities').select('*').order('time', { ascending: false });
 
         if (error) throw error;
         setEcosystemActivities(data);
@@ -214,40 +214,40 @@ const GeneralDashboard: React.FC = () => {
           <EcosystemLoading />
         ) : (
           <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-50 flex justify-between items-center">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
-              <FiActivity className="text-blue-600" /> Aktivitas Ekosistem
-            </h3>
-            <button
-              className="text-xs font-bold text-blue-600 hover:underline"
-              onClick={() => setShowSubModal(true)}
-            >
-              Lihat Semua
-            </button>
-          </div>
-          <div className="divide-y divide-slate-50">
-            {ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => ( 
-              <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition">
-                <div className="flex items-center gap-4">
-                  <div className={`p-3 rounded-xl ${
-                    ecosystemActivity.type === 'project' ? 'bg-blue-50 text-blue-600' : 
-                    ecosystemActivity.type === 'payment' ? 'bg-green-50 text-green-600' : 'bg-purple-50 text-purple-600'
-                  }`}>
-                    {ecosystemActivity.type === 'project' ? <FiLayers /> : ecosystemActivity.type === 'payment' ? <FiTrendingUp /> : <FiUsers />}
+            <div className="p-6 border-b border-slate-50 flex justify-between items-center">
+              <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                <FiActivity className="text-blue-600" /> Aktivitas Ekosistem
+              </h3>
+              <button
+                className="text-xs font-bold text-blue-600 hover:underline"
+                onClick={() => setShowSubModal(true)}
+              >
+                Lihat Semua
+              </button>
+            </div>
+            <div className="divide-y divide-slate-50">
+              {ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => ( 
+                <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition">
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-xl ${
+                      ecosystemActivity.type === 'project' ? 'bg-blue-50 text-blue-600' : 
+                      ecosystemActivity.type === 'payment' ? 'bg-green-50 text-green-600' : 'bg-purple-50 text-purple-600'
+                    }`}>
+                      {ecosystemActivity.type === 'project' ? <FiLayers /> : ecosystemActivity.type === 'payment' ? <FiTrendingUp /> : <FiUsers />}
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-600">
+                        <span className="font-bold text-slate-900">{ecosystemActivity.user}</span> {ecosystemActivity.action} 
+                        <span className="font-semibold text-slate-800"> {ecosystemActivity.target}</span>
+                      </p>
+                      <p className="text-xs text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-slate-600">
-                      <span className="font-bold text-slate-900">{ecosystemActivity.user}</span> {ecosystemActivity.action} 
-                      <span className="font-semibold text-slate-800"> {ecosystemActivity.target}</span>
-                    </p>
-                    <p className="text-xs text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
-                  </div>
+                  <FiArrowUpRight className="text-slate-300" />
                 </div>
-                <FiArrowUpRight className="text-slate-300" />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
         )}
 
         {/* Promo/Info Panel */}

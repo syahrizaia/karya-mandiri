@@ -6,16 +6,16 @@ import {
   FiMapPin, 
   FiCalendar, 
   FiMail, 
-  FiShield, 
-  FiCheck
+  FiShield
 } from 'react-icons/fi';
 import { UserProfile } from '../types';
 import Image from 'next/image';
 import SubscriptionDialog from '../subscription/page';
+import { MdVerified } from 'react-icons/md';
 
 // Sub-komponen untuk baris pengaturan
-const SettingsItem = ({ label, value, status }: { label: string, value: string, status: string }) => (
-  <div className="p-6 flex justify-between items-center hover:bg-slate-50 transition">
+const SettingsItem = ({ label, value, status, onClick }: { label: string, value: string, status: string, onClick?: () => void }) => (
+  <div className="p-6 flex justify-between items-center hover:bg-slate-50 transition cursor-pointer" onClick={onClick}>
     <div>
       <p className="text-sm font-semibold text-slate-700">{label}</p>
       <p className="text-xs text-slate-500 mt-0.5">{value}</p>
@@ -42,7 +42,7 @@ const Profile: React.FC = () => {
     location: 'Jakarta Selatan, Indonesia',
     skills: ['Logistik', 'Pengepakan', 'Manajemen Stok'],
     isVerified: true,
-    joinedDate: 'Maret 2024',
+    joinedDate: 'Maret 2026',
     balance: 7500000000,
   });
   const [showSubModal, setShowSubModal] = useState(false);
@@ -70,7 +70,7 @@ const Profile: React.FC = () => {
               />
               {profile.isVerified && (
                 <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1.5 rounded-full border-2 border-white">
-                  <FiCheck size={16} />
+                  <MdVerified size={16} />
                 </div>
               )}
             </div>
@@ -152,6 +152,7 @@ const Profile: React.FC = () => {
               label="Autentikasi Dua Faktor" 
               value="Non-aktif" 
               status="default"
+              onClick={() => setShowSubModal(true)}
             />
             <SettingsItem 
               label="Metode Pembayaran" 

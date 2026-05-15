@@ -116,10 +116,10 @@ const Notification: React.FC = () => {
               </div>
 
               {/* Action */}
-              <div className="flex flex-col justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex flex-col justify-between items-end">
                 <button 
                   onClick={() => deleteNotification(notif.id)}
-                  className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                  className="p-2 text-red-400 hover:text-red-500 hover:bg-red-100 rounded-lg transition"
                 >
                   <FiTrash2 size={18} />
                 </button>

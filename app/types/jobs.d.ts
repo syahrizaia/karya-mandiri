@@ -3,6 +3,7 @@ interface IJobs {
     id: string;
     title: string;
     employer: string;
+    employer_name: string;
     category: string;
     location: string;
     reward: number;

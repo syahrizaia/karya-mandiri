@@ -67,7 +67,10 @@ const WorkerDashboard: React.FC = () => {
       <section className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-bold text-slate-800">Tugas Tersedia (Crowdsourcing)</h3>
-          <button className="text-blue-600 text-sm font-semibold flex items-center gap-1">
+          <button
+            className="text-blue-600 text-sm font-semibold flex items-center gap-1"
+            onClick={() => setShowSubModal(true)}
+          >
             Lihat Semua <FiArrowRight />
           </button>
         </div>
