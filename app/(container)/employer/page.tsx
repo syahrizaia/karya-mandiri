@@ -191,7 +191,7 @@ const EmployerDashboard: React.FC = () => {
       taken: 0, // Hidden data awal
       total: Number(rawData.total),
       posted_at: rawData.posted_at ? new Date(rawData.posted_at as string).toISOString() : new Date().toISOString(), // Hidden data
-      status: "active" as const, // Hidden data default
+      status: rawData.status, // Hidden data default
     };
 
     try {
@@ -378,22 +378,25 @@ const EmployerDashboard: React.FC = () => {
                   <label className="text-xs font-bold uppercase text-slate-400">Total Kuota Pekerja</label>
                   <input name="total" type="number" required placeholder="Jumlah orang" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase text-slate-400">Batas Akhir (Deadline)</label>
+                  <input 
+                    name="deadline" 
+                    type="datetime-local"
+                    required 
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none bg-white text-slate-700" 
+                  />
                   <input 
                     name="posted_at" 
                     type="datetime-local"
                     // defaultValue={new Date().toISOString().slice(0, 16)} // Set default ke waktu sekarang
                     hidden
                   />
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase text-slate-400">Batas Akhir (Deadline)</label>
-                    <input 
-                      name="deadline" 
-                      type="datetime-local"
-                      required 
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none bg-white text-slate-700" 
-                    />
-                  </div>
+                  <input 
+                    name="is_saved" 
+                    type="text"
+                    hidden
+                  />
                 </div>
                 {/* <div className="space-y-2">
                   <label className="text-xs font-bold uppercase text-slate-400">Deadline</label>
@@ -601,24 +604,34 @@ const EmployerDashboard: React.FC = () => {
                                     defaultValue={selectedJob?.job.total}
                                   />
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <input 
-                                    name="posted_at" 
-                                    type="datetime-local"
-                                    // defaultValue={new Date().toISOString().slice(0, 16)} // Set default ke waktu sekarang
-                                    hidden
-                                  />
-                                  <div className="space-y-2">
-                                    <label className="text-xs font-bold uppercase text-slate-400">Batas Akhir (Deadline)</label>
-                                    <input 
-                                      name="deadline" 
-                                      type="datetime-local"
-                                      required 
-                                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none bg-white text-slate-700" 
-                                      defaultValue={selectedJob?.job.deadline}
-                                    />
-                                  </div>
+                                <div className="space-y-2">
+                                  <label className="text-xs font-bold uppercase text-slate-400">Status Pekerjaan</label>
+                                  <select
+                                    name="status"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none bg-white font-medium"
+                                    defaultValue={selectedJob?.job.status || "active"}
+                                  >
+                                    <option value="active" className="text-blue-600">ACTIVE (Berjalan)</option>
+                                    <option value="pending" className="text-orange-600">PENDING (Ditunda)</option>
+                                    <option value="completed" className="text-green-600">COMPLETED (Selesai)</option>
+                                  </select>
                                 </div>
+                                <div className="space-y-2">
+                                  <label className="text-xs font-bold uppercase text-slate-400">Batas Akhir (Deadline)</label>
+                                  <input 
+                                    name="deadline" 
+                                    type="datetime-local"
+                                    required 
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none bg-white text-slate-700" 
+                                    defaultValue={selectedJob?.job.deadline}
+                                  />
+                                </div>
+                                <input 
+                                  name="posted_at" 
+                                  type="datetime-local"
+                                  // defaultValue={new Date().toISOString().slice(0, 16)} // Set default ke waktu sekarang
+                                  hidden
+                                />
                                 {/* <div className="space-y-2">
                                   <label className="text-xs font-bold uppercase text-slate-400">Deadline</label>
                                   <input name="deadline" type="date" required className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" />
