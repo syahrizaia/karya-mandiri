@@ -203,9 +203,12 @@ const Jobs: React.FC = () => {
                       
                       {/* CONTAINER TOMBOL AKSI */}
                       <div className="flex items-center gap-3 w-full md:w-auto">
-                        <button className="flex-1 md:flex-none px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap">
+                        <Link
+                          href={`/jobs/${job.id}`}
+                          className="flex-1 md:flex-none px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap"
+                        >
                           Lamar Sekarang
-                        </button>
+                        </Link>
                         {/* Tombol Simpan Pekerjaan */}
                         <SaveJobButton is_saved={false} id={job.id} status={'active'} title={job.title} employer={job.employer} employer_name={job.employer_name} category={job.category} location={job.location} reward={job.reward} type={job.type} description={job.description} requirements={job.requirements} taken={job.taken} total={job.total} posted_at={job.posted_at} deadline={job.deadline} />
                       </div>
