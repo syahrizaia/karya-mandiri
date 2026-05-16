@@ -4,13 +4,14 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { FormEvent, SubmitEvent, useEffect, useState } from 'react';
-import { FiUsers, FiBriefcase, FiTrendingUp, FiPlus, FiLoader } from 'react-icons/fi';
+import { FiUsers, FiBriefcase, FiTrendingUp, FiPlus, FiLoader, FiTrash2, FiEdit, FiEdit2, FiEdit3 } from 'react-icons/fi';
 import { EmployerData } from '../types';
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import supabase from '@/lib/db';
 import { toast } from 'sonner';
 import { IJobs } from '@/app/types/jobs';
 import { useRouter } from 'next/navigation';
+import { set } from 'date-fns';
 
 // Sub-komponen StatCard
 const StatCard = ({ icon, title, value, color }: { icon: any, title: string, value: any, color: string }) => (
@@ -40,6 +41,10 @@ const EmployerDashboard: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [jobs, setJobs] = useState<IJobs[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedJob, setSelectedJob] = useState<{
+    job: IJobs;
+    action: "edit" | "delete";
+  } | null>(null);
 
   useEffect(() => {
     // Simulasi fetch data pekerjaan
@@ -165,6 +170,71 @@ const EmployerDashboard: React.FC = () => {
     }
   }
 
+  const EditProject = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+    const rawData = Object.fromEntries(formData.entries());
+
+    const projectData = {
+      id: crypto.randomUUID(),
+      title: rawData.title,
+      employer: "Anonymous", // Hidden data
+      description: rawData.description,
+      requirements: rawData.requirements, // Disimpan sebagai string murni
+      deadline: rawData.deadline || null,
+      category: rawData.category,
+      type: rawData.type,
+      location: rawData.location,
+      reward: Number(rawData.reward),
+      taken: 0, // Hidden data awal
+      total: Number(rawData.total),
+      posted_at: rawData.posted_at ? new Date(rawData.posted_at as string).toISOString() : new Date().toISOString(), // Hidden data
+      status: "active" as const, // Hidden data default
+    };
+
+    try {
+      const { error } = await supabase.from("jobs").update(projectData).eq("id", selectedJob?.job.id);
+
+      if (error) {
+        throw error;
+      }
+      else {
+        setJobs((prev) => prev.map((job) => job.id === selectedJob?.job.id ? { ...job, ...projectData } as IJobs : job));
+        toast("Proyek berhasil diedit!");
+        setSelectedJob(null);
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Error updating project:", error);
+      alert("Gagal mengedit proyek. Periksa koneksi atau database.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const DeleteJob = async (id: string) => {
+    try {
+      const { data, error } = await supabase.from("jobs").delete().eq("id", selectedJob?.job.id);
+
+      if (error) {
+        throw error;
+      }
+      else {
+        setJobs((prev) => prev.filter((job) => job.id !== selectedJob?.job.id));
+        toast("Proyek berhasil dihapus!");
+        setSelectedJob(null);
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Error inserting project:", error);
+      alert("Gagal membuat proyek. Periksa koneksi atau database.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   // Mock Data (Integrasikan dengan API backend nantinya)
   const stats: EmployerData = {
     name: "Syahriza",
@@ -217,7 +287,7 @@ const EmployerDashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       {/* Header */}
-      <header className="flex justify-between items-center mb-8">
+      <header className="flex justify-between items-center gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Dashboard Employer</h1>
           <p className="text-gray-600">Selamat datang kembali, {stats.name}</p>
@@ -379,6 +449,7 @@ const EmployerDashboard: React.FC = () => {
                   <th className="px-6 py-4 font-medium">Status</th>
                   <th className="px-6 py-4 font-medium">Kontributor</th>
                   <th className="px-6 py-4 font-medium">Anggaran</th>
+                  <th className="px-6 py-4 font-medium">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -397,6 +468,228 @@ const EmployerDashboard: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap">
                       Rp{job.reward.toLocaleString()}
+                    </td>
+                    <td colSpan={2} className='px-4 py-2 whitespace-nowrap'>
+                      <div className="flex items-center gap-2 justify-center">
+                        <Dialog
+                          open={selectedJob !== null && selectedJob.action === "edit"}
+                          onOpenChange={(open) => {
+                            if (!open) {
+                              setSelectedJob(null);
+                            }
+                          }}
+                        >
+                          <DialogTrigger asChild>
+                            <button
+                              className="flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-200"
+                              onClick={() => setSelectedJob({ job, action: "edit" })}
+                            >
+                              <FiEdit2 />
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-150 max-h-[90vh] overflow-y-auto rounded-3xl p-8 bg-white border-none shadow-2xl">
+                            <DialogHeader className="mb-6">
+                              <DialogTitle className="text-2xl font-black text-slate-900">Edit Proyek</DialogTitle>
+                              <p className="text-slate-500 text-sm italic">Employer: Anonymous</p>
+                              <DialogDescription className="mt-4 text-slate-600">
+                                Apakah Anda yakin ingin mengedit proyek <strong>{selectedJob?.job.title}</strong>? Tindakan ini tidak dapat dibatalkan.
+                              </DialogDescription>
+                            </DialogHeader>
+
+                            <form onSubmit={EditProject} className="space-y-6">
+                              {/* Baris 1: Judul */}
+                              <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase text-slate-400">Judul Proyek</label>
+                                <input
+                                  type='text'
+                                  name="title"
+                                  required
+                                  placeholder="Contoh: Pengumpulan Data Foto UMKM"
+                                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+                                  defaultValue={selectedJob?.job.title}
+                                />
+                              </div>
+
+                              {/* Baris 2: Deskripsi */}
+                              <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase text-slate-400">Deskripsi Tugas</label>
+                                <textarea
+                                  name="description"
+                                  required
+                                  rows={3}
+                                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition"
+                                  defaultValue={selectedJob?.job.description}
+                                ></textarea>
+                              </div>
+
+                              {/* Baris 3: Requirements */}
+                              <div className="space-y-2">
+                                <label className="text-xs font-bold uppercase text-slate-400">Persyaratan (Gunakan baris baru untuk poin-poin)</label>
+                                <textarea
+                                  name="requirements"
+                                  placeholder="1. Memiliki HP Android&#10;2. Domisili Bekasi"
+                                  rows={3}
+                                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition"
+                                  defaultValue={selectedJob?.job.requirements}
+                                ></textarea>
+                              </div>
+
+                              {/* Baris 4: Lokasi & Kategori (Grid 2 Kolom) */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-xs font-bold uppercase text-slate-400">Kategori</label>
+                                  <select
+                                    name="category"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none bg-white"
+                                    defaultValue={selectedJob?.job.category}
+                                  >
+                                    <option value="Survey">Survey</option>
+                                    <option value="Data Entry">Data Entry</option>
+                                    <option value="Creative">Creative</option>
+                                    <option value="Teknis">Teknis</option>
+                                  </select>
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-xs font-bold uppercase text-slate-400">Lokasi</label>
+                                  <input
+                                    type="text"
+                                    name="location"
+                                    required
+                                    placeholder="Contoh: Remote / Jakarta"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none"
+                                    defaultValue={selectedJob?.job.location}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Baris 5: Type & Reward */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-xs font-bold uppercase text-slate-400">Tipe Proyek</label>
+                                  <select
+                                    name="type"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none bg-white"
+                                    defaultValue={selectedJob?.job.type}
+                                  >
+                                    <option value="Crowdsourcing">Crowdsourcing</option>
+                                    <option value="Freelance">Freelance</option>
+                                  </select>
+                                </div>
+                                <div className="space-y-2">
+                                  <label className="text-xs font-bold uppercase text-slate-400">Upah (Rp)</label>
+                                  <input
+                                    name="reward"
+                                    type="number"
+                                    required
+                                    placeholder="Contoh: 50000"
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none"
+                                    defaultValue={selectedJob?.job.reward}
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Baris 6: Total Kuota & Deadline */}
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                  <label className="text-xs font-bold uppercase text-slate-400">Total Kuota Pekerja</label>
+                                  <input 
+                                    name="total" 
+                                    type="number" 
+                                    required 
+                                    placeholder="Jumlah orang" 
+                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none"
+                                    defaultValue={selectedJob?.job.total}
+                                  />
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <input 
+                                    name="posted_at" 
+                                    type="datetime-local"
+                                    // defaultValue={new Date().toISOString().slice(0, 16)} // Set default ke waktu sekarang
+                                    hidden
+                                  />
+                                  <div className="space-y-2">
+                                    <label className="text-xs font-bold uppercase text-slate-400">Batas Akhir (Deadline)</label>
+                                    <input 
+                                      name="deadline" 
+                                      type="datetime-local"
+                                      required 
+                                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none bg-white text-slate-700" 
+                                      defaultValue={selectedJob?.job.deadline}
+                                    />
+                                  </div>
+                                </div>
+                                {/* <div className="space-y-2">
+                                  <label className="text-xs font-bold uppercase text-slate-400">Deadline</label>
+                                  <input name="deadline" type="date" required className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none" />
+                                </div> */}
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedJob(null)}
+                                  className="px-6 py-3 rounded-xl font-bold text-slate-400 hover:text-slate-600 transition"
+                                >
+                                  Batal
+                                </button>
+                                <button
+                                  type="submit"
+                                  disabled={loading}
+                                  className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition flex items-center gap-2 disabled:bg-green-300"
+                                >
+                                  {loading ? <FiLoader className="animate-spin" /> : "Edit Proyek"}
+                                </button>
+                              </div>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
+
+                        <Dialog
+                          open={selectedJob !== null && selectedJob.action === "delete"}
+                          onOpenChange={(open) => {
+                            if (!open) {
+                              setSelectedJob(null);
+                            }
+                          }}
+                        >
+                          <DialogTrigger asChild>
+                            <button
+                              className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200"
+                              onClick={() => setSelectedJob({ job, action: "delete" })}
+                            >
+                              <FiTrash2 />
+                            </button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-150 max-h-[90vh] overflow-y-auto rounded-3xl p-8 bg-white border-none shadow-2xl">
+                            <DialogHeader className="mb-6">
+                              <DialogTitle className="text-2xl font-black text-slate-900">Delete Proyek</DialogTitle>
+                              <p className="text-slate-500 text-sm italic">Employer: Anonymous</p>
+                              <DialogDescription className="mt-4 text-slate-600">
+                                Apakah Anda yakin ingin menghapus proyek <strong>{selectedJob?.job.title}</strong>? Tindakan ini tidak dapat dibatalkan.
+                              </DialogDescription>
+                            </DialogHeader>
+                            {/* Action Buttons */}
+                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => setSelectedJob(null)}
+                                className="px-6 py-3 rounded-xl font-bold text-slate-400 hover:text-slate-600 transition"
+                              >
+                                Batal
+                              </button>
+                              <button
+                                onClick={() => DeleteJob(selectedJob?.job.id || "")}
+                                disabled={loading}
+                                className="px-8 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition flex items-center gap-2 disabled:bg-red-300"
+                              >
+                                {loading ? <FiLoader className="animate-spin" /> : "Hapus Proyek"}
+                              </button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
                     </td>
                   </tr>
                 ))}

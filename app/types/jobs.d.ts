@@ -14,6 +14,7 @@ interface IJobs {
     total: number;
     posted_at: string;
     deadline: string;
+    is_saved?: boolean;
 }
 
 export type { IJobs };

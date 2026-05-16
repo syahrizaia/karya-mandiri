@@ -14,6 +14,7 @@ import { IJobs } from '@/app/types/jobs';
 import supabase from '@/lib/db';
 import formatRelativeTime from '@/components/format-relative-time/page';
 import SubscriptionDialog from '../subscription/page';
+import SaveJobButton from '@/components/save-job-button/page';
 
 // Helper Component for Icon
 const FiBriefcase = ({ className }: { className?: string }) => (
@@ -163,35 +164,53 @@ const Jobs: React.FC = () => {
             <>
               {jobs.map((job) => (
                 <div key={job.id} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
-                  <Link href={`/jobs/${job.id}`} className="flex flex-col md:flex-row justify-between gap-6">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                          job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
-                        }`}>
-                          {job.type}
-                        </span>
-                        <span className="text-slate-400 text-xs flex items-center gap-1">
-                          <FiClock /> {formatRelativeTime(job.posted_at)}
-                        </span>
+                  <div className='md:grid md:grid-cols-3 flex flex-col'>
+                    <Link href={`/jobs/${job.id}`} className="flex flex-col md:flex-row md:col-span-2 justify-between gap-6">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
+                          }`}>
+                            {job.type}
+                          </span>
+                          <span className="text-slate-400 text-xs flex items-center gap-1">
+                            <FiClock /> {formatRelativeTime(job.posted_at)}
+                          </span>
+                        </div>
+                        <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
+                        <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
+                          <div className="flex items-center gap-1"><FiBriefcase className="text-blue-500"/> {job.employer}</div>
+                          <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
+                        </div>
                       </div>
-                      <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
-                      <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
-                        <div className="flex items-center gap-1"><FiBriefcase className="text-blue-500"/> {job.employer}</div>
-                        <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
-                      </div>
-                    </div>
+
+                      {/* <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
+                        <div className="text-right">
+                          <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
+                          <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
+                        </div>
+                        <button className="w-full md:w-auto px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md">
+                          Lamar Sekarang
+                        </button>
+                      </div> */}
+                    </Link>
 
                     <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
-                      <div className="text-right">
+                      <div className="text-right w-full">
                         <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
                         <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
                       </div>
-                      <button className="w-full md:w-auto px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md">
-                        Lamar Sekarang
-                      </button>
+                      
+                      {/* CONTAINER TOMBOL AKSI */}
+                      <div className="flex items-center gap-3 w-full md:w-auto">
+                        <button className="flex-1 md:flex-none px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap">
+                          Lamar Sekarang
+                        </button>
+                        {/* Tombol Simpan Pekerjaan */}
+                        <SaveJobButton is_saved={false} id={job.id} status={'active'} title={job.title} employer={job.employer} employer_name={job.employer_name} category={job.category} location={job.location} reward={job.reward} type={job.type} description={job.description} requirements={job.requirements} taken={job.taken} total={job.total} posted_at={job.posted_at} deadline={job.deadline} />
+                      </div>
                     </div>
-                  </Link>
+                  </div>
 
                   {/* Crowdsourcing Progress Bar */}
                   {job.type === 'Crowdsourcing' && (
