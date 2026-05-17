@@ -55,7 +55,7 @@ export default function DashboardLayout({
       {/* SIDEBAR */}
       <aside className={`
         fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 flex flex-col transition-transform duration-300 ease-in-out
-        lg:translate-x-0 lg:static lg:block lg:pt-0 pt-10
+        lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:block lg:pt-0 pt-10
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
         <div className="p-6">
@@ -72,7 +72,7 @@ export default function DashboardLayout({
               className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
                 pathname === link.href 
                   ? 'bg-blue-600 text-white shadow-md' 
-                  : 'text-gray-700 hover:bg-blue-50'
+                  : 'text-gray-700 hover:bg-blue-100'
               }`}
             >
               {link.icon} {link.label}

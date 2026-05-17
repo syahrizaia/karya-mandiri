@@ -72,13 +72,6 @@ const GeneralDashboard: React.FC = () => {
       } finally {
         setLoading(false); // Pastikan ini selalu jalan
       }
-
-      // const { data, error } = await supabase.from('ecosystem_activities').select('*');
-      // if (error) {
-      //   console.error('Error fetching ecosystem activities:', error);
-      // } else {
-      //   setEcosystemActivities(data);
-      // }
     };
 
     fetchEcosystemActivities();
@@ -124,12 +117,6 @@ const GeneralDashboard: React.FC = () => {
       </div>
     );
   };
-
-  // const activities: EcosystemActivities[] = [
-  //   { id: '1', user: 'Syahriza', action: 'menyelesaikan tugas', target: 'Sortir Logistik UMKM', time: '5 menit lalu', type: 'project' },
-  //   { id: '2', user: 'Koperasi Jaya', action: 'mencairkan dana', target: 'Rp5.000.000.000', time: '20 menit lalu', type: 'payment' },
-  //   { id: '3', user: 'Syahriza', action: 'mendaftar sebagai', target: 'Worker Baru', time: '1 jam lalu', type: 'user' },
-  // ];
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">

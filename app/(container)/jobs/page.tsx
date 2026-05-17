@@ -28,10 +28,8 @@ const Jobs: React.FC = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // Simulasi fetch data pekerjaan
     const fetchJobs = async () => {
       setLoading(true);
-      // Di sini Anda bisa mengganti dengan API call nyata
       const {data, error} = await supabase.from('jobs').select('*').order('posted_at', { ascending: false });
       if(error) {
         console.error('Error fetching jobs:', error);

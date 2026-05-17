@@ -12,52 +12,55 @@ import SubscriptionDialog from "../../../../components/subscription/page";
 import SaveJobButton from "@/components/ui/save-job-button/page";
 
 const DetailJob: React.FC = () => {
-    const params = useParams();
-    const router = useRouter();
-    const [job, setJob] = useState<IJobs | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [showSubModal, setShowSubModal] = useState(false);
+  const params = useParams();
+  const router = useRouter();
+  const [job, setJob] = useState<IJobs | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showSubModal, setShowSubModal] = useState(false);
 
-    useEffect(() => {
-        if(params?.id) {
-            const fetchJob = async () => {
-                try {
-                    const {data, error} = await supabase.from('jobs').select('*').eq('id', params.id).single();
-                    if (error) throw error;
-                    setJob(data);
-                } catch (error) {
-                    console.error('Error fetching job:', error);
-                } finally {
-                    setLoading(false);
-                }
-            };
-
-            fetchJob();
+  useEffect(() => {
+    if(params?.id) {
+      const fetchJob = async () => {
+        try {
+          const {data, error} = await supabase.from('jobs').select('*').eq('id', params.id).single();
+          if (error) throw error;
+          setJob(data);
+        } catch (error) {
+          console.error('Error fetching job:', error);
+        } finally {
+          setLoading(false);
         }
-    }, [params?.id]);
+      };
 
-    if (loading) return (
-        <div className="flex h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
-        </div>
-    );
+      fetchJob();
+    }
+  }, [params?.id]);
 
-    if (!job) return <div className="text-center py-20">Pekerjaan tidak ditemukan.</div>;
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+    </div>
+  );
 
-    const progressPercentage = (job.taken / job.total) * 100;
+  if (!job) return <div className="text-center py-20">Pekerjaan tidak ditemukan.</div>;
 
-    return (
+  const progressPercentage = (job.taken / job.total) * 100;
+
+  return (
     <div className="min-h-screen bg-slate-50 pb-20">
       {/* Header Navigasi */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="max-w-5xl mx-auto px-6 py-2 flex justify-between items-center">
           <button 
             onClick={() => router.back()}
             className="flex items-center gap-2 text-slate-600 hover:text-blue-600 font-medium transition"
           >
             <FiChevronLeft /> Kembali
           </button>
-          <button className="p-2 hover:bg-slate-100 rounded-full transition">
+          <button
+            className="p-4 text-lg hover:bg-slate-200 rounded-full transition"
+            onClick={() => setShowSubModal(true)}
+          >
             <FiShare2 className="text-slate-600" />
           </button>
         </div>
@@ -117,13 +120,13 @@ const DetailJob: React.FC = () => {
               <div className="mb-6">
                 <p className="text-sm text-slate-400 font-bold uppercase mb-1">Upah Tugas</p>
                 <div className="flex items-baseline gap-1">
-                    {job && typeof job.reward === 'number' ? (
-                        <span className="text-3xl font-black text-green-600">
-                            Rp{job.reward.toLocaleString('id-ID')}
-                        </span>
-                        ) : (
-                        <span className="text-3xl font-black text-slate-400">Rp0</span>
-                    )}
+                  {job && typeof job.reward === 'number' ? (
+                    <span className="text-3xl font-black text-green-600">
+                      Rp{job.reward.toLocaleString('id-ID')}
+                    </span>
+                    ) : (
+                    <span className="text-3xl font-black text-slate-400">Rp0</span>
+                  )}
                 </div>
               </div>
 
@@ -145,12 +148,12 @@ const DetailJob: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex flex-row gap-4">
+              <div className="flex flex-row lg:flex-col gap-4">
                 <button
-                  className="w-full py-4 bg-blue-600 text-white text-sm md:text-lg font-bold rounded-2xl hover:bg-blue-700 transition shadow-blue-200 shadow-lg flex items-center justify-center gap-2"
+                  className="w-full p-4 bg-blue-600 text-white text-sm md:text-lg font-bold rounded-2xl hover:bg-blue-700 transition shadow-blue-200 shadow-lg flex items-center justify-center gap-2"
                   onClick={() => setShowSubModal(true)}
                 >
-                  <FiShield className="text-white" />
+                  <FiShield className="text-white lg:text-4xl" />
                   Ambil Pekerjaan Sekarang
                 </button>
                 <SaveJobButton is_saved={job.is_saved} id={job.id} status={'active'} title={job.title} employer={job.employer} employer_name={job.employer_name} category={job.category} location={job.location} reward={job.reward} type={job.type} description={job.description} requirements={job.requirements} taken={job.taken} total={job.total} posted_at={job.posted_at} deadline={job.deadline} />
@@ -159,12 +162,11 @@ const DetailJob: React.FC = () => {
               <div className="mt-6 pt-6 border-t border-slate-100 flex items-center gap-3 text-slate-400">
                 <FiShield className="text-blue-500 shrink-0" />
                 <p className="text-[10px] leading-tight">
-                  Pembayaran Anda diamankan oleh sistem **Escrow KaryaMandiri**. Dana akan cair otomatis setelah tugas diverifikasi.
+                  Pembayaran Anda diamankan oleh sistem <strong>Escrow KaryaMandiri</strong>. Dana akan cair otomatis setelah tugas diverifikasi.
                 </p>
               </div>
             </div>
           </aside>
-
         </div>
       </main>
       <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />

@@ -49,20 +49,26 @@ export default function Home() {
 
           {/* Heading: Ukuran teks adaptif (text-4xl di HP, text-6xl di Desktop) */}
           <motion.h1 
-            className="text-4xl md:text-6xl font-black text-center text-slate-900 leading-tight whitespace-pre-line"
+            className="text-4xl md:text-6xl font-black text-center text-slate-900 leading-tight whitespace-pre-wrap"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
-            {letters.map((letter, index) => (
-              <motion.span
-                key={index}
-                variants={childVariants}
-                className="inline-block"
-              >
-                {letter === "\n" ? <br /> : letter === " " ? "\u00A0" : letter}
-              </motion.span>
-            ))}
+            {letters.map((letter, index) => {
+              if (letter === "\n") return <br key={index} />;
+
+              if (letter === " ") return <span key={index}> </span>;
+
+              return (
+                <motion.span
+                  key={index}
+                  variants={childVariants}
+                  className="inline-block"
+                >
+                  {letter}
+                </motion.span>
+              );
+            })}
           </motion.h1>
         </div>
 

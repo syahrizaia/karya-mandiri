@@ -36,7 +36,7 @@ const History: React.FC = () => {
           <p className="text-slate-500">Pantau semua transaksi dan pengerjaan tugas Anda.</p>
         </div>
         <button
-          className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition"
+          className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-xl font-semibold text-slate-600 hover:bg-slate-50 transition"
           onClick={() => setShowSubModal(true)}
         >
           <FiDownload /> Unduh Laporan
