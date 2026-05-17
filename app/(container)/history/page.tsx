@@ -9,7 +9,7 @@ import {
   FiClock 
 } from 'react-icons/fi';
 import { TransactionHistory } from '../types';
-import SubscriptionDialog from '../subscription/page';
+import SubscriptionDialog from '../../../components/subscription/page';
 
 const History: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'income' | 'withdrawal'>('all');

@@ -12,7 +12,7 @@ import {
   FiShield,
   FiTrash
 } from 'react-icons/fi';
-import SubscriptionDialog from '../subscription/page';
+import SubscriptionDialog from '../../../components/subscription/page';
 
 // --- Sub Komponen ---
 

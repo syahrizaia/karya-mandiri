@@ -12,9 +12,9 @@ import {
 import Link from 'next/link';
 import { IJobs } from '@/app/types/jobs';
 import supabase from '@/lib/db';
-import formatRelativeTime from '@/components/format-relative-time/page';
-import SubscriptionDialog from '../subscription/page';
-import SaveJobButton from '@/components/save-job-button/page';
+import formatRelativeTime from '@/components/ui/format-relative-time/page';
+import SubscriptionDialog from '../../../components/subscription/page';
+import SaveJobButton from '@/components/ui/save-job-button/page';
 
 // Helper Component for Icon
 const FiBriefcase = ({ className }: { className?: string }) => (
@@ -49,42 +49,53 @@ const Jobs: React.FC = () => {
       <div className="flex flex-col gap-6">
         {[1, 2, 3].map((i) => (
           <div key={i} className="bg-white p-6 rounded-3xl border border-slate-100 animate-pulse">
-            <div className="flex flex-col md:flex-row justify-between gap-6">
+            <div className="md:grid md:grid-cols-3 flex flex-col gap-6">
               
-              {/* Sisi Kiri: Detail Info */}
-              <div className="space-y-4 flex-1">
+              {/* Bagian Kiri: Info Utama (col-span-2) */}
+              <div className="md:col-span-2 space-y-3">
                 <div className="flex items-center gap-2">
-                  {/* Badge Skeleton */}
-                  <div className="h-6 w-24 bg-slate-100 rounded-full"></div>
-                  {/* Time Skeleton */}
-                  <div className="h-4 w-32 bg-slate-50 rounded"></div>
+                  {/* Skeleton Tag Type */}
+                  <div className="h-5 w-24 bg-slate-200 rounded-full" />
+                  {/* Skeleton Waktu */}
+                  <div className="h-4 w-32 bg-slate-100 rounded" />
                 </div>
-                {/* Title Skeleton */}
-                <div className="h-7 w-3/4 bg-slate-200 rounded-lg"></div>
-                {/* Metadata Skeleton */}
-                <div className="flex gap-4">
-                  <div className="h-4 w-28 bg-slate-100 rounded"></div>
-                  <div className="h-4 w-28 bg-slate-100 rounded"></div>
+                
+                {/* Skeleton Judul Proyek */}
+                <div className="h-7 w-3/4 bg-slate-200 rounded-xl" />
+                
+                {/* Skeleton Meta Info (Employer & Lokasi) */}
+                <div className="flex gap-4 pt-1">
+                  <div className="h-4 w-28 bg-slate-100 rounded" />
+                  <div className="h-4 w-24 bg-slate-100 rounded" />
                 </div>
               </div>
 
-              {/* Sisi Kanan: Harga & Tombol */}
+              {/* Bagian Kanan: Upah & Tombol Aksi */}
               <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
-                <div className="text-right space-y-2">
-                  <div className="h-3 w-20 bg-slate-50 rounded ml-auto"></div>
-                  <div className="h-8 w-32 bg-slate-200 rounded-lg"></div>
+                {/* Skeleton Upah Tugas */}
+                <div className="text-right w-full space-y-1">
+                  <div className="h-3 w-20 bg-slate-100 rounded ml-auto" />
+                  <div className="h-8 w-36 bg-slate-200 rounded-xl ml-auto" />
                 </div>
-                <div className="h-12 w-full md:w-36 bg-slate-100 rounded-2xl"></div>
+                
+                {/* CONTAINER TOMBOL AKSI SKELETON */}
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                  {/* Skeleton Tombol Lamar Sekarang */}
+                  <div className="h-12 w-full md:w-36 bg-slate-200 rounded-2xl" />
+                  {/* Skeleton Tombol Simpan Pekerjaan (Kotak Ikon) */}
+                  <div className="h-12 w-12 bg-slate-200 rounded-2xl shrink-0" />
+                </div>
               </div>
+
             </div>
 
-            {/* Progress Bar Skeleton */}
-            <div className="mt-6 pt-4 border-t border-slate-50 space-y-3">
+            {/* Crowdsourcing Progress Bar Skeleton (Dibuat statis/palsu untuk simulasi) */}
+            <div className="mt-6 pt-4 border-t border-slate-50 space-y-2">
               <div className="flex justify-between">
-                <div className="h-3 w-28 bg-slate-50 rounded"></div>
-                <div className="h-3 w-20 bg-slate-50 rounded"></div>
+                <div className="h-3 w-28 bg-slate-100 rounded" />
+                <div className="h-3 w-16 bg-slate-100 rounded" />
               </div>
-              <div className="w-full bg-slate-100 h-2 rounded-full"></div>
+              <div className="w-full bg-slate-100 h-2 rounded-full" />
             </div>
           </div>
         ))}
@@ -183,16 +194,6 @@ const Jobs: React.FC = () => {
                           <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
                         </div>
                       </div>
-
-                      {/* <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
-                        <div className="text-right">
-                          <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
-                          <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
-                        </div>
-                        <button className="w-full md:w-auto px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md">
-                          Lamar Sekarang
-                        </button>
-                      </div> */}
                     </Link>
 
                     <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
@@ -205,7 +206,7 @@ const Jobs: React.FC = () => {
                       <div className="flex items-center gap-3 w-full md:w-auto">
                         <Link
                           href={`/jobs/${job.id}`}
-                          className="flex-1 md:flex-none px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap"
+                          className="text-center w-full px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap"
                         >
                           Lamar Sekarang
                         </Link>

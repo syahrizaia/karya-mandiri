@@ -10,7 +10,7 @@ import {
 } from 'react-icons/fi';
 import { UserProfile } from '../types';
 import Image from 'next/image';
-import SubscriptionDialog from '../subscription/page';
+import SubscriptionDialog from '../../../components/subscription/page';
 import { MdVerified } from 'react-icons/md';
 
 // Sub-komponen untuk baris pengaturan

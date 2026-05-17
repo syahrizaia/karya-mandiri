@@ -1,0 +1,116 @@
+import { IJobs } from "@/app/types/jobs";
+import supabase from "@/lib/db";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { FiLoader, FiTrash2 } from "react-icons/fi";
+
+interface DeleteProjectDialogProps {
+    job: IJobs;
+    id: string;
+    title: string;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onSuccess: () => void;
+}
+
+const DeleteProjectDialog = ({ job, id, title, open, onOpenChange, onSuccess }: DeleteProjectDialogProps) => {
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [, setJobs] = useState<IJobs[]>([]);
+    const [selectedJob, setSelectedJob] = useState<{
+        job: IJobs;
+        action: "edit" | "delete";
+    } | null>(null);
+    
+    useEffect(() => {
+        const fetchJobs = async () => {
+            setLoading(true);
+            try {
+                const {data, error} = await supabase.from('jobs').select('*').order('posted_at', { ascending: false });
+                if(error) {
+                    console.error('Error fetching jobs:', error);
+                } else {
+                    setJobs(data);
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchJobs();
+    }, [supabase]);
+
+    const DeleteProject = async () => {
+        setLoading(true);
+        try {
+          const { error } = await supabase.from("jobs").delete().eq("id", id);
+
+            if (error) {
+                throw error;
+            }
+            else {
+                setJobs((prev) => prev.filter((job) => job.id !== selectedJob?.job.id));
+                toast.success("Proyek berhasil dihapus!");
+                setSelectedJob(null);
+                onSuccess();
+                router.refresh();
+            }
+            } catch (error) {
+                console.error("Error inserting project:", error);
+                toast.error("Gagal membuat proyek. Periksa koneksi atau database.");
+            } finally {
+                setLoading(false);
+        }
+    }
+
+    return (
+        <Dialog
+            // open={selectedJob !== null && selectedJob.action === "delete"}
+            // onOpenChange={(open) => {
+            //     if (!open) {
+            //     setSelectedJob(null);
+            //     }
+            // }}
+            open={open}
+            onOpenChange={onOpenChange}
+        >
+            <DialogTrigger asChild>
+                <button
+                    className="flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-xl font-bold hover:bg-red-700 transition shadow-lg shadow-red-200"
+                    onClick={() => setSelectedJob({ job, action: "delete" })}
+                >
+                    <FiTrash2 />
+                </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-150 max-h-[90vh] overflow-y-auto rounded-3xl p-8 bg-white border-none shadow-2xl">
+                <DialogHeader className="mb-6">
+                    <DialogTitle className="text-2xl font-black text-slate-900">Delete Proyek</DialogTitle>
+                    <p className="text-slate-500 text-sm italic">Employer: Anonymous</p>
+                    <DialogDescription className="mt-4 text-slate-600">
+                        Apakah Anda yakin ingin menghapus proyek <strong>{title}</strong>? Tindakan ini tidak dapat dibatalkan.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                    type="button"
+                    onClick={() => onOpenChange(false)}
+                    className="px-6 py-3 rounded-xl font-bold text-slate-400 hover:text-slate-600 transition"
+                >
+                    Batal
+                </button>
+                <button
+                    onClick={() => DeleteProject()}
+                    disabled={loading}
+                    className="px-8 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition flex items-center gap-2 disabled:bg-red-300"
+                >
+                    {loading ? <FiLoader className="animate-spin" /> : "Hapus Proyek"}
+                </button>
+                </div>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+export default DeleteProjectDialog

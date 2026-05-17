@@ -11,11 +11,11 @@ import {
   FiSearch 
 } from 'react-icons/fi';
 import { WorkerStats } from '../types';
-import SubscriptionDialog from '../subscription/page';
+import SubscriptionDialog from '../../../components/subscription/page';
 import supabase from '@/lib/db';
 import { IJobs } from '@/app/types/jobs';
-import SaveJobButton from '@/components/save-job-button/page';
-import formatRelativeTime from '@/components/format-relative-time/page';
+import SaveJobButton from '@/components/ui/save-job-button/page';
+import formatRelativeTime from '@/components/ui/format-relative-time/page';
 
 const WorkerDashboard: React.FC = () => {
   const [showSubModal, setShowSubModal] = useState(false);
@@ -86,12 +86,6 @@ const WorkerDashboard: React.FC = () => {
       </div>
     );
   }
-
-  // const availableTasks: Task[] = [
-  //   { id: '1', title: 'Sortir Bahan Baku Tekstil', category: 'Produksi', reward: 50000000, deadline: '2 jam lagi', status: 'available' },
-  //   { id: '2', title: 'Pengantaran Paket Sembako', category: 'Logistik', reward: 25000000, deadline: 'Hari ini', status: 'available' },
-  //   { id: '3', title: 'Pengepakan Barang UMKM', category: 'Jasa', reward: 35000000, deadline: 'Besok', status: 'in_progress' },
-  // ];
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
@@ -190,79 +184,6 @@ const WorkerDashboard: React.FC = () => {
             ))
           )}
         </div>
-
-        {/* <div className="space-y-4">
-          {jobs.filter(job => job.is_saved).map((job) => (
-            <div key={job.id} className="bg-white p-5 rounded-xl border border-slate-200 hover:border-blue-400 transition-all shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div className="flex gap-4 items-center">
-                <div className="bg-blue-100 p-3 rounded-lg text-blue-600 hidden sm:block">
-                  <FiSearch />
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-800">{job.title}</h4>
-                  <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
-                    <span className="bg-slate-100 px-2 py-0.5 rounded">{job.category}</span>
-                    <span className="flex items-center gap-1"><FiClock /> {job.deadline}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col md:flex-row items-start justify-between w-full md:w-auto gap-6">
-                <div className="text-left md:text-right">
-                  <p className="text-xs text-slate-400">Upah</p>
-                  <p className="font-bold text-green-600 italic">Rp{job.reward.toLocaleString()}</p>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-3 w-full md:w-auto">
-                  <button
-                    onClick={() => setShowSubModal(true)}
-                    className={`px-5 py-2 rounded-lg font-bold transition col-span-3 ${
-                    job.status === 'active' 
-                    ? 'bg-orange-100 text-orange-600 cursor-not-allowed' 
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}>
-                    {job.status === 'active' ? 'Sedang Dikerjakan' : 'Ambil Tugas'}
-                  </button>
-                  <SaveJobButton is_saved={true} id={job.id} status={'active'} title={job.title} employer={job.employer} employer_name={job.employer_name} category={job.category} location={job.location} reward={job.reward} type={job.type} description={job.description} requirements={job.requirements} taken={job.taken} total={job.total} posted_at={job.posted_at} deadline={job.deadline} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div> */}
-
-        {/* <div className="space-y-4">
-          {availableTasks.map((task) => (
-            <div key={task.id} className="bg-white p-5 rounded-xl border border-slate-200 hover:border-blue-400 transition-all shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div className="flex gap-4 items-center">
-                <div className="bg-blue-100 p-3 rounded-lg text-blue-600 hidden sm:block">
-                  <FiSearch />
-                </div>
-                <div>
-                  <h4 className="font-bold text-slate-800">{task.title}</h4>
-                  <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
-                    <span className="bg-slate-100 px-2 py-0.5 rounded">{task.category}</span>
-                    <span className="flex items-center gap-1"><FiClock /> {task.deadline}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between w-full md:w-auto gap-6">
-                <div className="text-left md:text-right">
-                  <p className="text-xs text-slate-400">Upah</p>
-                  <p className="font-bold text-green-600 italic">Rp{task.reward.toLocaleString()}</p>
-                </div>
-                <button
-                  onClick={() => setShowSubModal(true)}
-                  className={`px-5 py-2 rounded-lg font-bold transition ${
-                  task.status === 'in_progress' 
-                  ? 'bg-orange-100 text-orange-600 cursor-not-allowed' 
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-                }`}>
-                  {task.status === 'in_progress' ? 'Sedang Dikerjakan' : 'Ambil Tugas'}
-                </button>
-              </div>
-            </div>
-          ))}
-        </div> */}
       </section>
 
       {/* Edukasi Mandiri (Micro-learning) */}

@@ -1,12 +1,3 @@
-// types/employer
-// export interface ProjectStats {
-//   id: string;
-//   title: string;
-//   status: 'active' | 'completed' | 'pending';
-//   contributors: number;
-//   budget: number;
-// }
-
 export interface EmployerData {
   name: string;
   company: string;
@@ -15,7 +6,6 @@ export interface EmployerData {
   totalInvestment: number;
 }
 
-// types/worker
 export interface Task {
   id: string;
   title: string;
@@ -33,7 +23,6 @@ export interface WorkerStats {
   level: string;
 }
 
-// types/profile
 export interface UserProfile {
   id: string;
   name: string;
@@ -49,22 +38,6 @@ export interface UserProfile {
   balance: number;
 }
 
-// export interface Job {
-//   id: string;
-//   title: string;
-//   employer: string;
-//   category: 'Logistik' | 'Produksi' | 'Jasa' | 'Konstruksi';
-//   location: string;
-//   reward: number;
-//   type: 'Crowdsourcing' | 'Individu';
-//   slots: {
-//     taken: number;
-//     total: number;
-//   };
-//   postedAt: string;
-// }
-
-// types/settings
 export interface UserSettings {
   notifications: {
     newJobs: boolean;
@@ -79,7 +52,6 @@ export interface UserSettings {
   theme: 'light' | 'dark';
 }
 
-// types/dashboard
 export interface GeneralStats {
   activeProjects: number;
   totalWorkers: number;
@@ -87,16 +59,6 @@ export interface GeneralStats {
   growthRate: number; // Persentase
 }
 
-// export interface EcosystemActivities {
-//   id: string;
-//   user: string;
-//   action: string;
-//   target: string;
-//   time: string;
-//   type: 'project' | 'payment' | 'user';
-// }
-
-// types/history
 export interface TransactionHistory {
   id: string;
   taskTitle: string;
@@ -107,7 +69,6 @@ export interface TransactionHistory {
   status: 'success' | 'processing' | 'failed';
 }
 
-// types/notifications
 export interface NotificationItem {
   id: string;
   title: string;

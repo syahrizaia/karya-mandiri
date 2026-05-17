@@ -13,15 +13,7 @@ export default function SaveJobButton({ id, is_saved = false }: IJobs) {
   // 1. Cek status apakah pekerjaan ini sudah pernah disimpan saat halaman dimuat
   useEffect(() => {
     const checkSavedStatus = async () => {
-      if (!id) return;
-      
-    //   const { data } = await supabase
-    //     .from("jobs")
-    //     .select("id")
-    //     .eq("id", id)
-    //     .single();
-
-    //   if (data) setIsSaved(true);
+      if (!id) return;      
     };
 
     checkSavedStatus();

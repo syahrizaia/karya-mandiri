@@ -8,7 +8,8 @@ import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiBriefcase, FiChevronLeft, FiClock, FiMapPin, FiShare2, FiShield } from "react-icons/fi";
-import SubscriptionDialog from "../../subscription/page";
+import SubscriptionDialog from "../../../../components/subscription/page";
+import SaveJobButton from "@/components/ui/save-job-button/page";
 
 const DetailJob: React.FC = () => {
     const params = useParams();
@@ -44,46 +45,6 @@ const DetailJob: React.FC = () => {
     if (!job) return <div className="text-center py-20">Pekerjaan tidak ditemukan.</div>;
 
     const progressPercentage = (job.taken / job.total) * 100;
-
-//   return (
-//     <div className="space-y-8 text-black">
-//       <h1 className="text-3xl font-bold">Detail Pekerjaan</h1>
-//         {job && (
-//             <div className="space-y-4">
-//                 <div className="space-y-1">
-//                     <span className="font-bold">Judul:</span>
-//                     <p>{job.title}</p>
-//                 </div>
-//                 <div className="space-y-1">
-//                     <span className="font-bold">Penyelenggara:</span>
-//                     <p>{job.employer}</p>
-//                 </div>
-//                 <div className="space-y-1">
-//                     <span className="font-bold">Kategori:</span>
-//                     <p>{job.category}</p>
-//                 </div>
-//                 <div className="space-y-1">
-//                     <span className="font-bold">Lokasi:</span>
-//                     <p>{job.location}</p>
-//                 </div>
-//                 <div className="space-y-1">
-//                     <span className="font-bold">Deskripsi:</span>
-//                     <p>{job.description}</p>
-//                 </div>
-//                 <div className="space-y-1">
-//                     <span className="font-bold">Gaji:</span>
-//                     <p>{job.reward}</p> 
-//                 </div>
-//                 <div className="space-y-1">
-//                     <span className="font-bold">Tipe:</span>
-//                     <p>{job.type}</p>
-//                 </div>
-//             </div>
-//         ) || (
-//             <p>Loading...</p>
-//         )}
-//     </div>
-//   );
 
     return (
     <div className="min-h-screen bg-slate-50 pb-20">
@@ -146,16 +107,6 @@ const DetailJob: React.FC = () => {
                     <li key={index}>{req}</li>
                   ))}
                 </ul>
-                {/* <ul className="list-disc pl-5 text-slate-600 space-y-2">
-                    {typeof job.requirements === 'string' 
-                        ? (job.requirements as string).split('\n').map((req, index) => (
-                            <li key={index}>{req}</li>
-                        ))
-                        : Array.isArray(job.requirements) && job.requirements.map((req, index) => (
-                            <li key={index}>{req}</li>
-                        ))
-                    }
-                </ul> */}
               </div>
             </motion.div>
           </div>
@@ -194,13 +145,16 @@ const DetailJob: React.FC = () => {
                 </div>
               )}
 
-              <button
-                className="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition shadow-blue-200 shadow-lg flex items-center justify-center gap-2"
-                onClick={() => setShowSubModal(true)}
-              >
-                <FiShield className="text-white" />
-                Ambil Pekerjaan Sekarang
-              </button>
+              <div className="flex flex-row gap-4">
+                <button
+                  className="w-full py-4 bg-blue-600 text-white text-sm md:text-lg font-bold rounded-2xl hover:bg-blue-700 transition shadow-blue-200 shadow-lg flex items-center justify-center gap-2"
+                  onClick={() => setShowSubModal(true)}
+                >
+                  <FiShield className="text-white" />
+                  Ambil Pekerjaan Sekarang
+                </button>
+                <SaveJobButton is_saved={job.is_saved} id={job.id} status={'active'} title={job.title} employer={job.employer} employer_name={job.employer_name} category={job.category} location={job.location} reward={job.reward} type={job.type} description={job.description} requirements={job.requirements} taken={job.taken} total={job.total} posted_at={job.posted_at} deadline={job.deadline} />
+              </div>
 
               <div className="mt-6 pt-6 border-t border-slate-100 flex items-center gap-3 text-slate-400">
                 <FiShield className="text-blue-500 shrink-0" />
