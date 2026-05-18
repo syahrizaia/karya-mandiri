@@ -210,9 +210,9 @@ const Jobs: React.FC = () => {
                         </Link>
                         {/* Tombol Simpan Pekerjaan */}
                         <SaveJobButton
-                          is_saved={true}
+                          is_saved={job.is_saved}
                           id={job.id}
-                          status={'active'}
+                          status={job.status}
                           title={job.title}
                           employer={job.employer}
                           employer_name={job.employer_name}

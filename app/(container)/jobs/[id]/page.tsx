@@ -160,9 +160,9 @@ const DetailJob: React.FC = () => {
                   Ambil Pekerjaan Sekarang
                 </button>
                 <SaveJobButton
-                  is_saved={true}
+                  is_saved={job.is_saved}
                   id={job.id}
-                  status={'active'}
+                  status={job.status}
                   title={job.title}
                   employer={job.employer}
                   employer_name={job.employer_name}
