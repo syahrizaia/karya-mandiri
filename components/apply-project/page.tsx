@@ -24,7 +24,6 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
     setLoading(true);
 
     try {
-      // 1. Cek apakah kuota pekerjaan masih tersedia (khusus Crowdsourcing)
       if (job.type === "Crowdsourcing" && (job.taken ?? 0) >= (job.total ?? 0)) {
         toast.error("Maaf, kuota pekerja untuk tugas ini sudah penuh!");
         onOpenChange(false);
@@ -37,13 +36,9 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
         worker_notes: notes || "Tanpa catatan tambahan",
       };
 
-      // Ambil riwayat aplikasi lama (jika belum ada, buat array kosong)
-      // Catatan: Pastikan interface IJobs kamu sudah mengenali properti 'applications'
       const existingApplications = (job as any).applications || [];
       const updatedApplications = [...existingApplications, newApplication];
 
-      // 2. Simulasi/Simpan data lamaran ke tabel database (misal: 'applications' atau 'job_applications')
-      // Catatan: Sesuaikan nama tabel dan kolom dengan skema database Supabase-mu
       const { data: updatedJob, error: updateError } = await supabase
         .from("jobs")
         .update({
@@ -67,31 +62,6 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
       onOpenChange(false);
       setNotes(""); // Reset form input
 
-      // // 3. Jika tipenya Crowdsourcing, update jumlah 'taken' di tabel 'jobs'
-      // if (job.type === "Crowdsourcing") {
-      //   const { data: updatedJob, error: updateError } = await supabase
-      //     .from("jobs")
-      //     .update({ taken: (job.taken ?? 0) + 1 })
-      //     .eq("id", job.id)
-      //     .select() // Ambil baris data yang baru saja diperbarui
-      //     .single();
-
-      //   if (updateError) throw updateError;
-
-      //   // Berikan info feedback data terbaru ke komponen induk jika fungsi onSuccess tersedia
-      //   if (onSuccess && updatedJob) {
-      //     onSuccess(); 
-      //   }
-      // }
-
-      // toast.success(
-      //   job.type === "Crowdsourcing"
-      //     ? "Tugas berhasil diambil! Silakan cek halaman Riwayat."
-      //     : "Lamaran berhasil dikirim! Menunggu tinjauan pemberi kerja."
-      // );
-
-      // if (onSuccess) onSuccess();
-      // onOpenChange(false);
     } catch (err: any) {
       console.error("🔴 DETAIL ERROR 1 TABEL:", JSON.stringify(err, null, 2));
       console.error("💬 PESAN ERROR:", err?.message || err);

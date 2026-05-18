@@ -3,15 +3,12 @@
 'use client';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { FormEvent, SubmitEvent, useEffect, useState } from 'react';
-import { FiUsers, FiBriefcase, FiTrendingUp, FiPlus, FiLoader, FiTrash2, FiEdit, FiEdit2, FiEdit3 } from 'react-icons/fi';
+import React, { useEffect, useState } from 'react';
+import { FiUsers, FiBriefcase, FiTrendingUp, FiTrash2, FiEdit2 } from 'react-icons/fi';
 import { EmployerData } from '../types';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import supabase from '@/lib/db';
-import { toast } from 'sonner';
 import { IJobs } from '@/app/types/jobs';
 import { useRouter } from 'next/navigation';
-import { set } from 'date-fns';
 import CreateProjectDialog from '../../../components/create-project/page';
 import EditProjectDialog from '@/components/edit-project/page';
 import DeleteProjectDialog from '@/components/delete-project/page';

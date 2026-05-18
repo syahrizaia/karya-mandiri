@@ -10,7 +10,7 @@ export default function SaveJobButton({ id, is_saved = false }: IJobs) {
   const [isSaved, setIsSaved] = useState(is_saved);
   const [loading, setLoading] = useState(false);
 
-  // 1. Cek status apakah pekerjaan ini sudah pernah disimpan saat halaman dimuat
+  // Cek status apakah pekerjaan ini sudah pernah disimpan saat halaman dimuat
   useEffect(() => {
     const checkSavedStatus = async () => {
       if (!id) return;      
@@ -19,7 +19,7 @@ export default function SaveJobButton({ id, is_saved = false }: IJobs) {
     checkSavedStatus();
   }, [id]);
 
-  // 2. Fungsi Toggle Simpan / Hapus Simpan
+  // Fungsi Toggle Simpan / Hapus Simpan
   const handleSaveToggle = async () => {
     setLoading(true);
 

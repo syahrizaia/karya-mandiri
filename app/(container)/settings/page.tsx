@@ -1,6 +1,5 @@
 "use client";
 
-import Link from 'next/link';
 import React, { useState } from 'react';
 import { 
   FiBell, 
@@ -13,9 +12,11 @@ import {
   FiTrash
 } from 'react-icons/fi';
 import SubscriptionDialog from '../../../components/subscription/page';
+import supabase from '@/lib/db';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 // --- Sub Komponen ---
-
 const ToggleItem = ({ title, description, isEnabled, onToggle }: { title: string, description: string, isEnabled: boolean, onToggle: () => void }) => (
   <div className="p-6 flex justify-between items-start gap-4">
     <div className="flex-1">
@@ -51,9 +52,19 @@ const Settings: React.FC = () => {
     theme: 'light'
   });
   const [showSubModal, setShowSubModal] = useState(false);
+  const router = useRouter();
 
   const toggleSetting = (key: string) => {
     setSettings(prev => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      toast.success("Berhasil keluar akun.");
+      router.push("/login");
+      router.refresh();
+    }
   };
 
   return (
@@ -145,12 +156,12 @@ const Settings: React.FC = () => {
 
       {/* Danger Zone */}
       <div className="pt-4 flex flex-col sm:flex-row gap-4">
-        <Link
-            href="/"
-            className="flex-1 flex items-center justify-center gap-2 p-4 bg-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-100 transition shadow-sm"
+        <button
+          onClick={handleLogout}
+          className="flex-1 flex items-center justify-center gap-2 p-4 bg-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-100 transition shadow-sm"
         >
           <FiLogOut /> Keluar dari Akun
-        </Link>
+        </button>
         <button
           className="flex-1 flex items-center justify-center gap-2 p-4 border border-slate-300 text-slate-500 font-bold rounded-2xl hover:bg-slate-50 transition shadow-sm"
           onClick={() => setShowSubModal(true)}

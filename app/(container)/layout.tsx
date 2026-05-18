@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import Footer from "@/components/footer/page";
 import { MdHistory } from "react-icons/md";
 import { useState, useEffect } from "react";
+import supabase from "@/lib/db";
 
 export default function DashboardLayout({
   children,
@@ -15,22 +16,55 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+            
+          if (profile) {
+            setUserRole(profile.role);
+          }
+        }
+      } catch (error) {
+        console.error("Gagal mengambil role:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
 
   // Tutup sidebar otomatis saat berpindah halaman (khusus mobile)
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
 
-  const navLinks = [
-    { href: "/general-dashboard", label: "Dashboard Umum", icon: <FiHome /> },
-    { href: "/employer", label: "Pemberi Kerja", icon: <FiUser /> },
-    { href: "/worker", label: "Pekerja", icon: <FiUser /> },
-    { href: "/jobs", label: "Pekerjaan", icon: <FiBriefcase /> },
-    { href: "/history", label: "Riwayat", icon: <MdHistory /> },
-    { href: "/notification", label: "Notifikasi", icon: <FiBell /> },
-    { href: "/profile", label: "Profil", icon: <FiUser /> },
-    { href: "/settings", label: "Pengaturan", icon: <FiSettings /> },
+  const allNavLinks = [
+    { href: "/general-dashboard", label: "Dashboard Umum", icon: <FiHome />, roles: ["employer", "worker"] },
+    { href: "/employer", label: "Pemberi Kerja", icon: <FiUser />, roles: ["employer"] },
+    { href: "/worker", label: "Pekerja", icon: <FiUser />, roles: ["worker"] },
+    { href: "/jobs", label: "Pekerjaan", icon: <FiBriefcase />, roles: ["employer", "worker"] },
+    { href: "/history", label: "Riwayat", icon: <MdHistory />, roles: ["worker"] },
+    { href: "/notification", label: "Notifikasi", icon: <FiBell />, roles: ["employer", "worker"] },
+    { href: "/profile", label: "Profil", icon: <FiUser />, roles: ["employer", "worker"] },
+    { href: "/settings", label: "Pengaturan", icon: <FiSettings />, roles: ["employer", "worker"] },
   ];
+
+  // Filter menu: Hanya tampilkan menu yang mencakup role si user
+  const filteredLinks = allNavLinks.filter(link => 
+    userRole ? link.roles.includes(userRole) : link.roles.includes("worker") // Default fallback jika belum terunduh
+  );
 
   return (
     <div className="flex min-h-screen bg-gray-100 relative">
@@ -64,20 +98,25 @@ export default function DashboardLayout({
           </Link>
         </div>
         
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                pathname === link.href 
-                  ? 'bg-blue-600 text-white shadow-md' 
-                  : 'text-gray-700 hover:bg-blue-100'
-              }`}
-            >
-              {link.icon} {link.label}
-            </Link>
-          ))}
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto pb-6">
+          {/* Skeleton loading opsional jika data sedang di-fetch */}
+          {loading ? (
+            <div className="p-3 text-sm text-slate-400 animate-pulse">Memuat menu...</div>
+          ) : (
+            filteredLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                  pathname === link.href 
+                    ? 'bg-blue-600 text-white shadow-md' 
+                    : 'text-gray-700 hover:bg-blue-50'
+                }`}
+              >
+                {link.icon} {link.label}
+              </Link>
+            ))
+          )}
         </nav>
       </aside>
 

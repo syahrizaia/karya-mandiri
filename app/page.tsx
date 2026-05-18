@@ -78,12 +78,12 @@ export default function Home() {
 
         {/* Grid Tombol: 1 kolom di HP, 2 kolom di Desktop */}
         <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-4 mt-10 w-full max-w-sm sm:max-w-none">
-          <Link href="/employer" className="px-6 py-4 rounded-2xl text-lg text-center font-bold bg-indigo-600 text-white transition-all hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 shadow-md">
-            Pemberi Kerja
+          <Link href="/login" className="px-6 py-4 rounded-2xl text-lg text-center font-bold bg-indigo-600 text-white transition-all hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 shadow-md">
+            Login
           </Link>
 
-          <Link href="/worker" className="px-6 py-4 rounded-2xl text-lg text-center font-bold bg-indigo-600 text-white transition-all hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 shadow-md">
-            Pekerja
+          <Link href="/register" className="px-6 py-4 rounded-2xl text-lg text-center font-bold bg-indigo-600 text-white transition-all hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 shadow-md">
+            Daftar
           </Link>
         </div>
       </main>
