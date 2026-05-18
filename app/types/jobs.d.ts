@@ -15,6 +15,9 @@ interface IJobs {
     posted_at: string;
     deadline: string;
     is_saved?: boolean;
+    applied_at: string;
+    worker_notes: notes;
+    applications: Array;
 }
 
 export type { IJobs };

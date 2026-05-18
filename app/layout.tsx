@@ -32,11 +32,11 @@ export const metadata: Metadata = {
     "freelance",
     "Indonesia"
   ],
-  // icons: {
-  //   icon: "/icon.png",
-  //   shortcut: "/icon.png",
-  //   apple: "/icon.png",
-  // },
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default function RootLayout({

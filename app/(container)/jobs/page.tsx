@@ -209,7 +209,27 @@ const Jobs: React.FC = () => {
                           Lamar Sekarang
                         </Link>
                         {/* Tombol Simpan Pekerjaan */}
-                        <SaveJobButton is_saved={job.is_saved} id={job.id} status={'active'} title={job.title} employer={job.employer} employer_name={job.employer_name} category={job.category} location={job.location} reward={job.reward} type={job.type} description={job.description} requirements={job.requirements} taken={job.taken} total={job.total} posted_at={job.posted_at} deadline={job.deadline} />
+                        <SaveJobButton
+                          is_saved={true}
+                          id={job.id}
+                          status={'active'}
+                          title={job.title}
+                          employer={job.employer}
+                          employer_name={job.employer_name}
+                          category={job.category}
+                          location={job.location}
+                          reward={job.reward}
+                          type={job.type}
+                          description={job.description}
+                          requirements={job.requirements}
+                          taken={job.taken}
+                          total={job.total}
+                          posted_at={job.posted_at}
+                          deadline={job.deadline}
+                          applied_at={job.applied_at}
+                          worker_notes={job.worker_notes}
+                          applications={job.applications}
+                        />
                       </div>
                     </div>
                   </div>

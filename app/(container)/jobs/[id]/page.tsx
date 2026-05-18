@@ -10,13 +10,16 @@ import { useEffect, useState } from "react";
 import { FiBriefcase, FiChevronLeft, FiClock, FiMapPin, FiShare2, FiShield } from "react-icons/fi";
 import SubscriptionDialog from "../../../../components/subscription/page";
 import SaveJobButton from "@/components/ui/save-job-button/page";
+import ApplyJobDialog from "@/components/apply-project/page";
 
 const DetailJob: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const [job, setJob] = useState<IJobs | null>(null);
+  const [, setJobs] = useState<IJobs[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSubModal, setShowSubModal] = useState(false);
+  const [selectedApplyJob, setSelectedApplyJob] = useState<IJobs | null>(null);
 
   useEffect(() => {
     if(params?.id) {
@@ -151,12 +154,32 @@ const DetailJob: React.FC = () => {
               <div className="flex flex-row lg:flex-col gap-4">
                 <button
                   className="w-full p-4 bg-blue-600 text-white text-sm md:text-lg font-bold rounded-2xl hover:bg-blue-700 transition shadow-blue-200 shadow-lg flex items-center justify-center gap-2"
-                  onClick={() => setShowSubModal(true)}
+                  onClick={() => setSelectedApplyJob(job)}
                 >
                   <FiShield className="text-white lg:text-4xl" />
                   Ambil Pekerjaan Sekarang
                 </button>
-                <SaveJobButton is_saved={job.is_saved} id={job.id} status={'active'} title={job.title} employer={job.employer} employer_name={job.employer_name} category={job.category} location={job.location} reward={job.reward} type={job.type} description={job.description} requirements={job.requirements} taken={job.taken} total={job.total} posted_at={job.posted_at} deadline={job.deadline} />
+                <SaveJobButton
+                  is_saved={true}
+                  id={job.id}
+                  status={'active'}
+                  title={job.title}
+                  employer={job.employer}
+                  employer_name={job.employer_name}
+                  category={job.category}
+                  location={job.location}
+                  reward={job.reward}
+                  type={job.type}
+                  description={job.description}
+                  requirements={job.requirements}
+                  taken={job.taken}
+                  total={job.total}
+                  posted_at={job.posted_at}
+                  deadline={job.deadline}
+                  applied_at={job.applied_at}
+                  worker_notes={job.worker_notes}
+                  applications={job.applications}
+                />
               </div>
 
               <div className="mt-6 pt-6 border-t border-slate-100 flex items-center gap-3 text-slate-400">
@@ -169,6 +192,28 @@ const DetailJob: React.FC = () => {
           </aside>
         </div>
       </main>
+      {selectedApplyJob && (
+        <ApplyJobDialog
+          job={selectedApplyJob}
+          open={selectedApplyJob !== null}
+          onOpenChange={(open) => {
+            if (!open) setSelectedApplyJob(null);
+          }}
+          onSuccess={() => {
+            // Opsi A: Jika Anda menggunakan state lokal untuk array lowongan:
+            setJobs((prevJobs) =>
+              prevJobs.map((item) =>
+                item.id === selectedApplyJob.id
+                  ? { ...item, taken: (item.taken ?? 0) + 1 } // Langsung manipulasi UI lokal (+1)
+                  : item
+              )
+            );
+
+            // Opsi B: Paksa Next.js Router untuk menyinkronkan ulang komponen server
+            router.refresh(); 
+          }}
+        />
+      )}
       <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
     </div>
   );

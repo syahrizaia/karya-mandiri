@@ -16,12 +16,12 @@ import supabase from '@/lib/db';
 import { IJobs } from '@/app/types/jobs';
 import SaveJobButton from '@/components/ui/save-job-button/page';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
+import Link from 'next/link';
 
 const WorkerDashboard: React.FC = () => {
   const [showSubModal, setShowSubModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<IJobs[]>([]);
-  
 
   useEffect(() => {
     // Simulasi fetch data pekerjaan
@@ -168,16 +168,36 @@ const WorkerDashboard: React.FC = () => {
                     <p className="font-bold text-green-600 italic">Rp{job.reward.toLocaleString()}</p>
                   </div>
                   <div className="grid grid-cols-4 items-center gap-3 w-full md:w-auto">
-                    <button
-                      onClick={() => setShowSubModal(true)}
+                    <Link
+                      href={`/jobs/${job.id}`}
                       className={`px-5 py-2 rounded-lg font-bold transition col-span-3 ${
-                      job.status === 'active' 
+                      job.status === 'pending' 
                       ? 'bg-orange-100 text-orange-600 cursor-not-allowed' 
                       : 'bg-blue-600 text-white hover:bg-blue-700'
                     }`}>
-                      {job.status === 'active' ? 'Sedang Dikerjakan' : 'Ambil Tugas'}
-                    </button>
-                    <SaveJobButton is_saved={true} id={job.id} status={'active'} title={job.title} employer={job.employer} employer_name={job.employer_name} category={job.category} location={job.location} reward={job.reward} type={job.type} description={job.description} requirements={job.requirements} taken={job.taken} total={job.total} posted_at={job.posted_at} deadline={job.deadline} />
+                      {job.status === 'pending' ? 'Sedang Ditunda' : 'Lamar Sekarang'}
+                    </Link>
+                    <SaveJobButton
+                      is_saved={true}
+                      id={job.id}
+                      status={'active'}
+                      title={job.title}
+                      employer={job.employer}
+                      employer_name={job.employer_name}
+                      category={job.category}
+                      location={job.location}
+                      reward={job.reward}
+                      type={job.type}
+                      description={job.description}
+                      requirements={job.requirements}
+                      taken={job.taken}
+                      total={job.total}
+                      posted_at={job.posted_at}
+                      deadline={job.deadline}
+                      applied_at={job.applied_at}
+                      worker_notes={job.worker_notes}
+                      applications={job.applications}
+                    />
                   </div>
                 </div>
               </div>
