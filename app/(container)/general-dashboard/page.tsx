@@ -58,7 +58,6 @@ const GeneralDashboard: React.FC = () => {
   const [showSubModal, setShowSubModal] = useState(false);
 
   useEffect(() => {
-    // Simulasi fetch data aktivitas ekosistem
     const fetchEcosystemActivities = async () => {
       try {
         setLoading(true);

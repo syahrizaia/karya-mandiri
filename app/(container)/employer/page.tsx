@@ -9,9 +9,9 @@ import { EmployerData } from '../types';
 import supabase from '@/lib/db';
 import { IJobs } from '@/app/types/jobs';
 import { useRouter } from 'next/navigation';
-import CreateProjectDialog from '../../../components/create-project/page';
-import EditProjectDialog from '@/components/edit-project/page';
-import DeleteProjectDialog from '@/components/delete-project/page';
+import CreateProjectDialog from '../../../components/create-job/page';
+import EditProjectDialog from '@/components/edit-job/page';
+import DeleteProjectDialog from '@/components/delete-job/page';
 
 // Sub-komponen StatCard
 const StatCard = ({ icon, title, value, color }: { icon: any, title: string, value: any, color: string }) => (
@@ -63,7 +63,7 @@ const EmployerDashboard: React.FC = () => {
     fetchJobs();
   }, []);
 
-  // Mock Data (Integrasikan dengan API backend nantinya)
+  // Mock Data
   const stats: EmployerData = {
     name: "Syahriza",
     company: "KaryaMandiri Corp",

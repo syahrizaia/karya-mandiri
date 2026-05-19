@@ -34,7 +34,7 @@ export default function PostServiceDialog({ open, onOpenChange, onSuccess }: Pos
     setLoading(true);
 
     try {
-      // 1. Dapatkan info user aktif dari session
+      // Dapatkan info user aktif dari session
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (authError) throw authError;
 
@@ -44,7 +44,7 @@ export default function PostServiceDialog({ open, onOpenChange, onSuccess }: Pos
         return;
       }
 
-      // 2. Insert data ke tabel 'services'
+      // Insert data ke tabel 'services'
       const { error: insertError } = await supabase
         .from("services")
         .insert([
@@ -61,7 +61,7 @@ export default function PostServiceDialog({ open, onOpenChange, onSuccess }: Pos
 
       toast.success("Penawaran jasa Anda berhasil dipublikasikan!");
       
-      // 3. Reset form & pemicu refresh data eksternal jika ada
+      // Reset form & pemicu refresh data eksternal jika ada
       setTitle("");
       setDescription("");
       setPrice("");
@@ -70,7 +70,7 @@ export default function PostServiceDialog({ open, onOpenChange, onSuccess }: Pos
       if (onSuccess) onSuccess();
       onOpenChange(false); // Tutup dialog modal
     } catch (err: any) {
-      console.error("🔴 Error posting service:", err);
+      console.error("Error posting service:", err);
       toast.error(err.message || "Gagal memposting jasa. Coba lagi nanti.");
     } finally {
       setLoading(false);

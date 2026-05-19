@@ -5,7 +5,7 @@
 import React, { useState, useEffect } from "react";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
-import { FiPlus, FiTrash2, FiEdit, FiSearch, FiLoader, FiDollarSign, FiLayers } from "react-icons/fi";
+import { FiTrash2, FiEdit, FiSearch, FiLoader, FiLayers } from "react-icons/fi";
 import EditServiceDialog from "../edit-service/page";
 import DeleteServiceDialog from "../delete-service/page";
 
@@ -21,17 +21,9 @@ interface IService {
 export default function Services() {
   const [services, setServices] = useState<IService[]>([]);
   const [loading, setLoading] = useState(true);
-  const [, setSubmitLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // State Form (Untuk Tambah & Edit)
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("Kreatif & Desain");
-
-  // 🛠️ State Pengendali Dialog (Modal)
+  // State Pengendali Dialog (Modal)
   const [selectedService, setSelectedService] = useState<IService | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -62,55 +54,6 @@ export default function Services() {
     fetchServices();
   }, []);
 
-  // Handle Tambah & Update Jasa
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitLoading(true);
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        toast.error("Anda harus login terlebih dahulu.");
-        return;
-      }
-
-      const serviceData = {
-        title,
-        description,
-        price: Number(price),
-        category,
-        user_id: user.id,
-      };
-
-      if (editingId) {
-        // Mode Aksi: UPDATE
-        const { error } = await supabase
-          .from("services")
-          .update(serviceData)
-          .eq("id", editingId);
-
-        if (error) throw error;
-        toast.success("Jasa berhasil diperbarui!");
-      } else {
-        // Mode Aksi: INSERT
-        const { error } = await supabase
-          .from("services")
-          .insert([serviceData]);
-
-        if (error) throw error;
-        toast.success("Jasa baru berhasil diposting!");
-      }
-
-      // Reset Form & Refresh Data
-      resetForm();
-      fetchServices();
-    } catch (err: any) {
-      toast.error(err.message || "Terjadi kesalahan sistem.");
-    } finally {
-      setSubmitLoading(false);
-    }
-  };
-
   // Pemicu Dialog Edit
   const handleEditClick = (service: IService) => {
     setSelectedService(service);
@@ -126,14 +69,6 @@ export default function Services() {
   // Optimistic update setelah sukses menghapus lewat dialog
   const handleDeleteSuccess = (deletedId: string) => {
     setServices(services.filter((s) => s.id !== deletedId));
-  };
-
-  const resetForm = () => {
-    setEditingId(null);
-    setTitle("");
-    setDescription("");
-    setPrice("");
-    setCategory("Kreatif & Desain");
   };
 
   // Filter pencarian pada UI lokal tabel

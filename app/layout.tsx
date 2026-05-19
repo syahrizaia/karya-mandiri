@@ -27,6 +27,7 @@ export const metadata: Metadata = {
     "Mandiri",
     "Syahriza",
     "pekerjaan",
+    "jasa",
     "proyek",
     "crowdsourcing", 
     "freelance",

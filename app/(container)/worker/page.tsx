@@ -18,8 +18,8 @@ import { IJobs } from '@/app/types/jobs';
 import SaveJobButton from '@/components/ui/save-job-button/page';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import Link from 'next/link';
-import Services from '../../../components/services/page';
-import PostServiceDialog from '@/components/post-service/page';
+import Services from '../../../components/services-management/page';
+import PostServiceDialog from '@/components/create-service/page';
 
 const WorkerDashboard: React.FC = () => {
   const [showSubModal, setShowSubModal] = useState(false);
@@ -45,7 +45,7 @@ const WorkerDashboard: React.FC = () => {
   const handleRefreshData = () => {
     // Fungsi pemicu untuk men-fetch ulang data list dari Supabase agar postingan baru langsung kelihatan
     console.log("Postingan berhasil dikirim, me-refresh feed data...");
-    // Jalankan fungsi fetchServices() milikmu di sini jika ada
+    // Jalankan fungsi fetchServices() di sini jika ada
   };
 
   // Mock Data

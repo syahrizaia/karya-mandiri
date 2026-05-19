@@ -7,10 +7,11 @@ import { id } from "date-fns/locale/id";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FiBriefcase, FiChevronLeft, FiClock, FiMapPin, FiShare2, FiShield } from "react-icons/fi";
+import { FiBriefcase, FiChevronLeft, FiClock, FiMapPin, FiShield } from "react-icons/fi";
 import SubscriptionDialog from "../../../../components/subscription/page";
 import SaveJobButton from "@/components/ui/save-job-button/page";
-import ApplyJobDialog from "@/components/apply-project/page";
+import ApplyJobDialog from "@/components/apply-job/page";
+import ShareJobButton from "@/components/ui/share-job-button/page";
 
 const DetailJob: React.FC = () => {
   const params = useParams();
@@ -49,28 +50,30 @@ const DetailJob: React.FC = () => {
 
   const progressPercentage = (job.taken / job.total) * 100;
 
+  // Contoh simulasi data single job dari detail page
+  const jobDetail = {
+    id: "JOB-1029",
+    title: "Frontend Developer (React/NextJS) - Intern",
+    company: "PT Telekomunikasi Indonesia"
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 pb-20">
+    <div className="min-h-screen pb-10">
       {/* Header Navigasi */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-30">
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-30 py-2">
         <div className="max-w-5xl mx-auto px-6 py-2 flex justify-between items-center">
           <button 
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-slate-600 hover:text-blue-600 font-medium transition"
+            className="flex items-center gap-2 pl-6 md:pl-8 lg:pl-0 text-slate-600 hover:text-blue-600 font-medium transition"
           >
             <FiChevronLeft /> Kembali
           </button>
-          <button
-            className="p-4 text-lg hover:bg-slate-200 rounded-full transition"
-            onClick={() => setShowSubModal(true)}
-          >
-            <FiShare2 className="text-slate-600" />
-          </button>
+          <ShareJobButton jobId={jobDetail.id} jobTitle={jobDetail.title} />
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto px-6 mt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="max-w-5xl mx-auto mt-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Kolom Kiri: Detail Utama */}
           <div className="lg:col-span-2 space-y-6">
@@ -182,7 +185,7 @@ const DetailJob: React.FC = () => {
                 />
               </div>
 
-              <div className="mt-6 pt-6 border-t border-slate-100 flex items-center gap-3 text-slate-400">
+              <div className="mt-6 pt-6 border-t border-slate-200 flex items-center gap-3 text-slate-400">
                 <FiShield className="text-blue-500 shrink-0" />
                 <p className="text-[10px] leading-tight">
                   Pembayaran Anda diamankan oleh sistem <strong>Escrow KaryaMandiri</strong>. Dana akan cair otomatis setelah tugas diverifikasi.

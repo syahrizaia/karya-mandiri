@@ -80,7 +80,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchCurrentProfile = async () => {
       try {
-        // 1. Ambil info akun dari session Supabase Auth
+        // Ambil info akun dari session Supabase Auth
         const { data: { user }, error: authError } = await supabase.auth.getUser();
         if (authError) throw authError;
 
@@ -89,7 +89,7 @@ const Profile: React.FC = () => {
           return;
         }
 
-        // 2. Ambil data spesifik role & pelengkap dari tabel public.profiles
+        // Ambil data spesifik role & pelengkap dari tabel public.profiles
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -114,7 +114,7 @@ const Profile: React.FC = () => {
         });
 
       } catch (err: any) {
-        console.error("🔴 Error mengambil data profil:", err.message);
+        console.error("Error mengambil data profil:", err.message);
       } finally {
         setLoading(false);
       }

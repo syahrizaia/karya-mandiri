@@ -8,7 +8,6 @@ import {
   FiSearch, 
   FiLoader, 
   FiLayers, 
-  FiDollarSign, 
   FiUser, 
   FiSend, 
   FiCalendar 
@@ -88,10 +87,10 @@ export default function Services() {
   });
 
   const handleHireClick = (service: IServiceFeed) => {
-    // Aksi ketika tombol hubungi diklik (bisa diarahkan ke WhatsApp atau sistem chat internal nantinya)
+    // Aksi ketika tombol hubungi diklik
     const message = encodeURIComponent(`Halo, saya tertarik dengan jasa Anda di KaryaMandiri: "${service.title}". Bisa berdiskusi lebih lanjut?`);
     toast.info(`Membuka komunikasi dengan ${service.profiles?.full_name || "Penyedia Jasa"}`);
-    // Contoh direct ke tautan eksternal tiruan (Bisa kamu ganti sesuai kebutuhan flow bisnismu)
+    // Contoh direct ke tautan eksternal tiruan
     window.open(`https://wa.me/6282114487163?text=${message}`, "_blank");
   };
 

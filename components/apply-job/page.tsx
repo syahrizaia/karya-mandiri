@@ -63,8 +63,8 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
       setNotes(""); // Reset form input
 
     } catch (err: any) {
-      console.error("🔴 DETAIL ERROR 1 TABEL:", JSON.stringify(err, null, 2));
-      console.error("💬 PESAN ERROR:", err?.message || err);
+      console.error("DETAIL ERROR 1 TABEL:", JSON.stringify(err, null, 2));
+      console.error("PESAN ERROR:", err?.message || err);
       toast.error(err?.message || "Gagal memproses permohonan.");
     } finally {
       setLoading(false);
