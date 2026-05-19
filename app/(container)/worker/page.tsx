@@ -8,7 +8,8 @@ import {
   FiClock, 
   FiStar, 
   FiArrowRight, 
-  FiSearch 
+  FiSearch, 
+  FiPlus
 } from 'react-icons/fi';
 import { WorkerStats } from '../types';
 import SubscriptionDialog from '../../../components/subscription/page';
@@ -17,11 +18,14 @@ import { IJobs } from '@/app/types/jobs';
 import SaveJobButton from '@/components/ui/save-job-button/page';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import Link from 'next/link';
+import Services from '../../../components/services/page';
+import PostServiceDialog from '@/components/post-service/page';
 
 const WorkerDashboard: React.FC = () => {
   const [showSubModal, setShowSubModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<IJobs[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -37,6 +41,12 @@ const WorkerDashboard: React.FC = () => {
 
     fetchJobs();
   }, [supabase]);
+
+  const handleRefreshData = () => {
+    // Fungsi pemicu untuk men-fetch ulang data list dari Supabase agar postingan baru langsung kelihatan
+    console.log("Postingan berhasil dikirim, me-refresh feed data...");
+    // Jalankan fungsi fetchServices() milikmu di sini jika ada
+  };
 
   // Mock Data
   const profile: WorkerStats = {
@@ -86,17 +96,25 @@ const WorkerDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-8">
+    <div className="min-h-screen md:pt-12 lg:pt-4 lg:p-4">
       {/* Profil Singkat & Level */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">Halo, {profile.name}! 👋</h1>
-          <p className="text-slate-500 font-medium italic">Level: {profile.level}</p>
+      <header className="flex flex-col md:flex-row justify-between items-end md:items-end mb-8 gap-4">
+        <div className='flex flex-row justify-between gap-4'>
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800">Halo, {profile.name}!</h1>
+            <p className="text-slate-500 font-medium italic">Level: {profile.level}</p>
+          </div>
+          <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 h-fit px-4 py-2 rounded-full shadow-sm">
+            <FiStar className="fill-current" />
+            <span className="font-bold">{profile.rating} Rating Kerja</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full shadow-sm">
-          <FiStar className="fill-current" />
-          <span className="font-bold">{profile.rating} Rating Kerja</span>
-        </div>
+        <button
+          onClick={() => setDialogOpen(true)}
+          className="px-6 py-3.5 bg-white hover:bg-slate-100 text-blue-600 font-bold rounded-2xl shadow-md transition flex items-center gap-2 shrink-0"
+        >
+          <FiPlus className="stroke-3" /> Tawarkan Jasaku
+        </button>
       </header>
 
       {/* Ringkasan Pendapatan & Capaian */}
@@ -118,9 +136,11 @@ const WorkerDashboard: React.FC = () => {
         </div>
       </div>
 
+      <Services />
+
       {/* Cari Tugas Baru */}
       <section className="mb-8">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 gap-4">
           <h3 className="text-lg font-bold text-slate-800">Tugas Disimpan (Crowdsourcing)</h3>
           <button
             className="text-blue-600 text-sm font-semibold flex items-center gap-1"
@@ -168,7 +188,7 @@ const WorkerDashboard: React.FC = () => {
                   <div className="grid grid-cols-4 items-center gap-3 w-full md:w-auto">
                     <Link
                       href={`/jobs/${job.id}`}
-                      className={`px-5 py-2 rounded-lg font-bold transition col-span-3 ${
+                      className={`px-5 py-2 rounded-lg text-center font-bold transition col-span-3 ${
                       job.status === 'pending' 
                       ? 'bg-orange-100 text-orange-600 cursor-not-allowed' 
                       : 'bg-blue-600 text-white hover:bg-blue-700'
@@ -218,6 +238,12 @@ const WorkerDashboard: React.FC = () => {
         </div>
         <FiStar className="absolute -right-4 -bottom-4 text-indigo-800 text-9xl opacity-50" />
       </div>
+      
+      <PostServiceDialog 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen} 
+        onSuccess={handleRefreshData} 
+      />
       <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
     </div>
   );

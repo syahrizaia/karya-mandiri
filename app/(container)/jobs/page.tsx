@@ -102,20 +102,20 @@ const Jobs: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 md:pt-12 lg:pt-4 lg:p-4">
       {/* Search & Hero Section */}
-      <section className="bg-blue-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+      <section className="bg-blue-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 max-w-2xl">
           <h1 className="text-3xl font-bold mb-2">Temukan Peluang Kerja</h1>
           <p className="text-blue-100 mb-6">Pilih tugas yang sesuai dengan keahlian dan lokasi Anda.</p>
           
-          <div className="flex flex-col md:flex-row gap-3">
+          <div className="flex flex-row gap-3">
             <div className="flex-1 relative text-slate-800">
               <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input 
                 type="text" 
                 placeholder="Cari posisi atau perusahaan..."
-                className="w-full pl-12 pr-4 py-4 rounded-2xl focus:ring-4 focus:ring-blue-300 text-white border outline-none transition"
+                className="w-full pl-10 pr-4 py-4 rounded-2xl focus:ring-4 focus:ring-blue-300 text-white border outline-none transition"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

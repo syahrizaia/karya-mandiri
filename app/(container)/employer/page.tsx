@@ -113,7 +113,7 @@ const EmployerDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen p-0 md:pt-12 lg:p-4">
       {/* Header */}
       <header className="flex justify-between items-center gap-4 mb-8">
         <div>

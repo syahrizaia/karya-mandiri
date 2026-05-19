@@ -67,7 +67,7 @@ const Notification: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 md:pt-12 lg:pt-4 lg:py-4">
       {/* Header Notifikasi */}
       <header className="flex justify-between items-center mb-8">
         <div>
@@ -76,7 +76,7 @@ const Notification: React.FC = () => {
         </div>
         <button 
           onClick={markAllAsRead}
-          className="text-sm font-bold text-blue-600 hover:text-blue-700 transition"
+          className="text-sm font-bold px-4 py-2 rounded-2xl text-blue-600 hover:text-blue-700 hover:bg-blue-200 transition"
         >
           Tandai Semua Dibaca
         </button>

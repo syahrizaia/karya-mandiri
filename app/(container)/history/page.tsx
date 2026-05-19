@@ -28,7 +28,7 @@ const History: React.FC = () => {
     : historyData.filter(item => item.type === activeTab);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6 md:pt-12 lg:pt-4 lg:py-4">
       {/* Header & Filter */}
       <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>

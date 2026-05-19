@@ -132,7 +132,7 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 md:pt-12 lg:pt-0">
       {/* Profil Header Card */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="relative h-48 w-full">

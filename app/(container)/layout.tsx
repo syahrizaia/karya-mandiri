@@ -55,7 +55,8 @@ export default function DashboardLayout({
     { href: "/employer", label: "Pemberi Kerja", icon: <FiUser />, roles: ["employer"] },
     { href: "/worker", label: "Pekerja", icon: <FiUser />, roles: ["worker"] },
     { href: "/jobs", label: "Pekerjaan", icon: <FiBriefcase />, roles: ["employer", "worker"] },
-    { href: "/history", label: "Riwayat", icon: <MdHistory />, roles: ["worker"] },
+    { href: "/services", label: "Jasa", icon: <FiBriefcase />, roles: ["employer", "worker"] },
+    { href: "/history", label: "Riwayat", icon: <MdHistory />, roles: ["employer", "worker"] },
     { href: "/notification", label: "Notifikasi", icon: <FiBell />, roles: ["employer", "worker"] },
     { href: "/profile", label: "Profil", icon: <FiUser />, roles: ["employer", "worker"] },
     { href: "/settings", label: "Pengaturan", icon: <FiSettings />, roles: ["employer", "worker"] },
@@ -93,9 +94,9 @@ export default function DashboardLayout({
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
         <div className="p-6">
-          <Link href="/" className="text-2xl font-bold text-blue-600">
+          <h1 className="text-2xl font-bold text-blue-600">
             KaryaMandiri
-          </Link>
+          </h1>
         </div>
         
         <nav className="flex-1 px-4 space-y-2 overflow-y-auto pb-6">
@@ -122,7 +123,7 @@ export default function DashboardLayout({
 
       {/* AREA MAIN */}
       <main className="flex-1 flex flex-col min-w-0">
-        <div className="p-4 md:p-8 pt-16 lg:pt-8 flex-1">
+        <div className="p-4 md:p-4 pt-16 lg:pt-4 flex-1">
           {children} 
         </div>
         <Footer />

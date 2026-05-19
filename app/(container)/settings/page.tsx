@@ -68,7 +68,7 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-12">
+    <div className="max-w-4xl mx-auto space-y-6 md:pt-12 lg:pt-4 lg:py-4">
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">Pengaturan</h1>
         <p className="text-slate-500 text-sm mt-1">Kelola akun dan preferensi aplikasi KaryaMandiri Anda.</p>

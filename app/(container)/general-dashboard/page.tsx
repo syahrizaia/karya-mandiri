@@ -119,7 +119,7 @@ const GeneralDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-8 animate-in fade-in duration-500 md:pt-12 lg:pt-4 lg:p-4">
       {/* Welcome Section */}
       <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -133,7 +133,7 @@ const GeneralDashboard: React.FC = () => {
       </section>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <SummaryCard 
           title="Total Inklusi" 
           value={`Rp${(stats.economicImpact / 1000000000000).toFixed(0)}T`} 
@@ -207,6 +207,15 @@ const GeneralDashboard: React.FC = () => {
 
         {/* Promo/Info Panel */}
         <div className="space-y-6">
+          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
+            <h3 className="font-bold text-slate-800 mb-4 text-sm">Target Capaian 2024</h3>
+            <div className="space-y-4">
+              <ProgressItem label="Distribusi Upah" progress={75} color="bg-blue-500" />
+              <ProgressItem label="Verifikasi Pekerja" progress={60} color="bg-emerald-500" />
+              <ProgressItem label="Mitra Employer" progress={80} color="bg-purple-500" />
+            </div>
+          </div>
+
           <div className="bg-slate-900 rounded-3xl p-6 text-white relative overflow-hidden group">
             <div className="relative z-10">
               <h3 className="font-bold text-lg mb-2">Model Crowdsourcing</h3>
@@ -221,15 +230,6 @@ const GeneralDashboard: React.FC = () => {
               </button>
             </div>
             <FiLayers className="absolute -right-4 -bottom-4 text-white/10 text-8xl group-hover:scale-110 transition-transform" />
-          </div>
-
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-            <h3 className="font-bold text-slate-800 mb-4 text-sm">Target Capaian 2024</h3>
-            <div className="space-y-4">
-              <ProgressItem label="Distribusi Upah" progress={75} color="bg-blue-500" />
-              <ProgressItem label="Verifikasi Pekerja" progress={60} color="bg-emerald-500" />
-              <ProgressItem label="Mitra Employer" progress={80} color="bg-purple-500" />
-            </div>
           </div>
         </div>
       </div>
