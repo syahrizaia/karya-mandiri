@@ -28,7 +28,7 @@ export default function LoginPage() {
       if (authError) throw authError;
       if (!authData.user) throw new Error("User tidak ditemukan");
 
-      const { data: profile, error: profileError } = await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", authData.user.id)

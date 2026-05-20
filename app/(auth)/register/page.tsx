@@ -22,7 +22,7 @@ export default function RegisterPage() {
 
     try {
       // Mendaftarkan user baru ke Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {

@@ -2,12 +2,13 @@
 "use client";
 
 import Link from "next/link";
-import { FiBriefcase, FiUser, FiHome, FiSettings, FiBell, FiMenu, FiX } from "react-icons/fi";
-import { usePathname } from "next/navigation";
+import { FiBriefcase, FiUser, FiHome, FiSettings, FiBell, FiMenu, FiX, FiLogOut } from "react-icons/fi";
+import { usePathname, useRouter } from "next/navigation";
 import Footer from "@/components/footer/page";
 import { MdHistory } from "react-icons/md";
 import { useState, useEffect } from "react";
 import supabase from "@/lib/db";
+import { toast } from "sonner";
 
 export default function DashboardLayout({
   children,
@@ -18,6 +19,7 @@ export default function DashboardLayout({
   const [isOpen, setIsOpen] = useState(false);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserRole = async () => {
@@ -67,6 +69,15 @@ export default function DashboardLayout({
     userRole ? link.roles.includes(userRole) : link.roles.includes("worker") // Default fallback jika belum terunduh
   );
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      toast.success("Berhasil keluar akun.");
+      router.push("/login");
+      router.refresh();
+    }
+  };
+
   return (
     <div className="flex min-h-screen bg-gray-100 relative">
       {/* Tombol Hamburger (Hanya muncul di HP) */}
@@ -104,19 +115,28 @@ export default function DashboardLayout({
           {loading ? (
             <div className="p-3 text-sm text-slate-400 animate-pulse">Memuat menu...</div>
           ) : (
-            filteredLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                  pathname === link.href 
-                    ? 'bg-blue-600 text-white shadow-md' 
-                    : 'text-gray-700 hover:bg-blue-50'
-                }`}
+            <>
+              {filteredLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                    pathname === link.href 
+                      ? 'bg-blue-600 text-white shadow-md' 
+                      : 'text-gray-700 hover:bg-blue-50'
+                  }`}
+                >
+                  {link.icon} {link.label}
+                </Link>
+              ))}
+
+              <button
+                onClick={handleLogout}
+                className="flex-1 flex items-center justify-center gap-3 p-3 w-full text-red-600 rounded-lg hover:bg-red-100 transition-colors"
               >
-                {link.icon} {link.label}
-              </Link>
-            ))
+                <FiLogOut /> Keluar dari Akun
+              </button>
+            </>
           )}
         </nav>
       </aside>

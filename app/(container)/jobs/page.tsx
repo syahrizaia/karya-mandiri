@@ -7,7 +7,8 @@ import {
   FiMapPin, 
   FiFilter, 
   FiUsers, 
-  FiClock
+  FiClock,
+  FiUser
 } from 'react-icons/fi';
 import Link from 'next/link';
 import { IJobs } from '@/app/types/jobs';
@@ -15,11 +16,6 @@ import supabase from '@/lib/db';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import SubscriptionDialog from '../../../components/subscription/page';
 import SaveJobButton from '@/components/ui/save-job-button/page';
-
-// Helper Component for Icon
-const FiBriefcase = ({ className }: { className?: string }) => (
-  <svg className={className} stroke="currentColor" fill="none" strokeWidth="2" viewBox="0 0 24 24" height="1em" width="1em"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-);
 
 const Jobs: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -188,7 +184,7 @@ const Jobs: React.FC = () => {
                         </div>
                         <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
                         <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
-                          <div className="flex items-center gap-1"><FiBriefcase className="text-blue-500"/> {job.employer}</div>
+                          <div className="flex items-center gap-1"><FiUser className="text-blue-500"/> {job.employer}</div>
                           <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
                         </div>
                       </div>

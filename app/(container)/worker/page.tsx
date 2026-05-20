@@ -18,7 +18,7 @@ import { IJobs } from '@/app/types/jobs';
 import SaveJobButton from '@/components/ui/save-job-button/page';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import Link from 'next/link';
-import Services from '../../../components/services-management/page';
+import Services from '../../../components/manage-services/page';
 import PostServiceDialog from '@/components/create-service/page';
 
 const WorkerDashboard: React.FC = () => {

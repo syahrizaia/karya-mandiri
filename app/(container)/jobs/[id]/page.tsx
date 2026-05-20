@@ -7,7 +7,7 @@ import { id } from "date-fns/locale/id";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FiBriefcase, FiChevronLeft, FiClock, FiMapPin, FiShield } from "react-icons/fi";
+import { FiChevronLeft, FiClock, FiMapPin, FiShield, FiUser } from "react-icons/fi";
 import SubscriptionDialog from "../../../../components/subscription/page";
 import SaveJobButton from "@/components/ui/save-job-button/page";
 import ApplyJobDialog from "@/components/apply-job/page";
@@ -50,11 +50,10 @@ const DetailJob: React.FC = () => {
 
   const progressPercentage = (job.taken / job.total) * 100;
 
-  // Contoh simulasi data single job dari detail page
   const jobDetail = {
-    id: "JOB-1029",
-    title: "Frontend Developer (React/NextJS) - Intern",
-    company: "PT Telekomunikasi Indonesia"
+    id: job.id,
+    title: job.title,
+    company: job.employer,
   };
 
   return (
@@ -96,7 +95,7 @@ const DetailJob: React.FC = () => {
               <h1 className="text-3xl font-bold text-slate-900 mb-4">{job.title}</h1>
               
               <div className="flex flex-wrap gap-6 text-slate-500 mb-8">
-                <div className="flex items-center gap-2"><FiBriefcase className="text-blue-600"/> {job.employer}</div>
+                <div className="flex items-center gap-2"><FiUser className="text-blue-600"/> {job.employer}</div>
                 <div className="flex items-center gap-2"><FiMapPin className="text-red-400"/> {job.location}</div>
                 <div className="flex items-center gap-2">
                   <FiClock /> {formatDistanceToNow(new Date(job.posted_at), { addSuffix: true, locale: id })}
