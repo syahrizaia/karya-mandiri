@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/static-components */
 "use client";
 
@@ -11,7 +12,6 @@ import {
   FiSearch, 
   FiPlus
 } from 'react-icons/fi';
-import { WorkerStats } from '../types';
 import SubscriptionDialog from '../../../components/subscription/page';
 import supabase from '@/lib/db';
 import { IJobs } from '@/app/types/jobs';
@@ -20,12 +20,29 @@ import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import Link from 'next/link';
 import Services from '../../../components/manage-services/page';
 import PostServiceDialog from '@/components/create-service/page';
+import { useRouter } from 'next/navigation';
+
+interface IProfile {
+  name: string;
+  level: string;
+  rating: number;
+  totalEarnings: number;
+  completedTasks: number;
+}
 
 const WorkerDashboard: React.FC = () => {
+  const router = useRouter();
   const [showSubModal, setShowSubModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [jobs, setJobs] = useState<IJobs[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [profile, setProfile] = useState<IProfile>({
+    name: "Pengguna",
+    level: "Beginner",
+    rating: 0.0,
+    totalEarnings: 0,
+    completedTasks: 0,
+  });
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -42,19 +59,67 @@ const WorkerDashboard: React.FC = () => {
     fetchJobs();
   }, [supabase]);
 
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true);
+
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+          router.push("/login");
+          return;
+        }
+
+        // Tarik data profil spesifik dari tabel public.profiles
+        // SESUAIKAN: Pastikan nama kolom 'full_name', 'level', dan 'rating' cocok dengan DB-mu
+        const { data: profileData, error: profileError } = await supabase
+          .from("profiles")
+          .select("full_name, level, rating, total_earnings, completed_tasks")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("Gagal mengambil data profil:", profileError.message);
+          return;
+        }
+
+        if (profileData) {
+          setProfile({
+            name: profileData.full_name || "Tanpa Nama",
+            level: profileData.level || "Pekerja",
+            rating: profileData.rating ? Number(profileData.rating) : 5.0,
+            totalEarnings: profileData.total_earnings ? Number(profileData.total_earnings) : 0,
+            completedTasks: 0,
+          });
+        }
+      } catch (err) {
+        console.error("Terjadi kesalahan sistem:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [router]);
+
+  // Tampilan Skeleton loading tipis saat verifikasi data di awal agar tidak jomplang
+  if (loading) {
+    return (
+      <div className="flex flex-row justify-between gap-4 animate-pulse bg-white p-4 rounded-2xl border border-slate-100">
+        <div className="space-y-2">
+          <div className="h-6 w-48 bg-slate-200 rounded-md"></div>
+          <div className="h-4 w-24 bg-slate-100 rounded-md"></div>
+        </div>
+        <div className="h-10 w-32 bg-slate-200 rounded-full"></div>
+      </div>
+    );
+  }
+
   const handleRefreshData = () => {
     // Fungsi pemicu untuk men-fetch ulang data list dari Supabase agar postingan baru langsung kelihatan
     console.log("Postingan berhasil dikirim, me-refresh feed data...");
     // Jalankan fungsi fetchServices() di sini jika ada
-  };
-
-  // Mock Data
-  const profile: WorkerStats = {
-    name: "Syahriza",
-    totalEarnings: 4250000000,
-    completedTasks: 240,
-    rating: 4.9,
-    level: "Pejuang Terampil",
   };
 
   function SavedJobSkeleton() {
@@ -99,14 +164,14 @@ const WorkerDashboard: React.FC = () => {
     <div className="min-h-screen md:pt-12 lg:pt-4 lg:p-4">
       {/* Profil Singkat & Level */}
       <header className="flex flex-col md:flex-row justify-between items-end md:items-end mb-8 gap-4">
-        <div className='flex flex-row justify-between gap-4'>
+        <div className="flex flex-row justify-between gap-4 w-full">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Halo, {profile.name}!</h1>
             <p className="text-slate-500 font-medium italic">Level: {profile.level}</p>
           </div>
           <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 h-fit px-4 py-2 rounded-full shadow-sm">
             <FiStar className="fill-current" />
-            <span className="font-bold">{profile.rating} Rating Kerja</span>
+            <span className="font-bold">{profile.rating.toFixed(1)} Rating Kerja</span>
           </div>
         </div>
         <button
@@ -124,7 +189,7 @@ const WorkerDashboard: React.FC = () => {
             <p className="text-sm uppercase tracking-wider">Total Pendapatan</p>
             <FiDollarSign />
           </div>
-          <h2 className="text-3xl font-bold">Rp{profile.totalEarnings.toLocaleString()}</h2>
+          <h2 className="text-3xl font-bold">Rp{(profile?.totalEarnings ?? 0).toLocaleString("id-ID")}</h2>
         </div>
         
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">

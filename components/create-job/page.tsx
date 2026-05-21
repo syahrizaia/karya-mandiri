@@ -37,7 +37,7 @@ const CreateProjectDialog = () => {
     };
 
     fetchJobs();
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     const getActiveUser = async () => {

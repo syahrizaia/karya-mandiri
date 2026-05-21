@@ -62,7 +62,7 @@ const Settings: React.FC = () => {
     const { error } = await supabase.auth.signOut();
     if (!error) {
       toast.success("Berhasil keluar akun.");
-      router.push("/login");
+      router.push("/");
       router.refresh();
     }
   };

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/static-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
@@ -118,7 +119,7 @@ const GeneralDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 md:pt-12 lg:pt-4 lg:p-4">
+    <div className="space-y-4 animate-in fade-in duration-500 md:pt-12 lg:pt-4 lg:p-4">
       {/* Welcome Section */}
       <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -132,7 +133,7 @@ const GeneralDashboard: React.FC = () => {
       </section>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard 
           title="Total Inklusi" 
           value={`Rp${(stats.economicImpact / 1000000000000).toFixed(0)}T`} 
@@ -168,7 +169,7 @@ const GeneralDashboard: React.FC = () => {
           <EcosystemLoading />
         ) : (
           <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-slate-50 flex justify-between items-center">
+            <div className="p-6 border-b border-slate-200 flex justify-between items-center">
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
                 <FiActivity className="text-blue-600" /> Aktivitas Ekosistem
               </h3>
@@ -179,7 +180,7 @@ const GeneralDashboard: React.FC = () => {
                 Lihat Semua
               </button>
             </div>
-            <div className="divide-y divide-slate-50">
+            <div className="divide-y divide-slate-100">
               {ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => ( 
                 <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition">
                   <div className="flex items-center gap-4">
@@ -205,7 +206,7 @@ const GeneralDashboard: React.FC = () => {
         )}
 
         {/* Promo/Info Panel */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
             <h3 className="font-bold text-slate-800 mb-4 text-sm">Target Capaian 2024</h3>
             <div className="space-y-4">

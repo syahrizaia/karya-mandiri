@@ -1,7 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { 
   FiEdit2, 
   FiMapPin, 
@@ -11,7 +13,7 @@ import {
   FiCamera
 } from 'react-icons/fi';
 import Image from 'next/image';
-import SubscriptionDialog from '../../../components/subscription/page';
+import SubscriptionDialog from '../../../../components/subscription/page';
 import { MdVerified } from 'react-icons/md';
 import supabase from '@/lib/db';
 import { toast } from 'sonner';
@@ -36,8 +38,14 @@ const SettingsItem = ({ label, value, status, onClick }: { label: string, value:
   </div>
 );
 
-const Profile: React.FC = () => {
+interface ProfileProps {
+  params: Promise<{ id: string }>;
+}
+
+const Profile: React.FC<ProfileProps> = ({ params }) => {
+  const { id: profileId } = use(params);
   const [, setLoading] = useState(true);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [showSubModal, setShowSubModal] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showManageSkills, setShowManageSkills] = useState(false);
@@ -71,64 +79,84 @@ const Profile: React.FC = () => {
     joinedDate: "Memuat tanggal...",
   });
 
-  useEffect(() => {
-    const fetchCurrentProfile = async () => {
-      try {
-        // Ambil info akun dari session Supabase Auth
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        if (authError) throw authError;
+  const fetchCurrentProfile = async () => {
+    try {
+      setLoading(true);
 
-        if (!user) {
-          toast.error("Sesi habis, silakan login kembali.");
-          return;
-        }
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
 
-        // Ambil data spesifik role & pelengkap dari tabel public.profiles
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        // Abaikan error "Row not found" (PGRST116) karena user baru mungkin belum punya row di tabel profiles
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error("Database Error:", profileError);
-        }
-
-        // Siapkan variabel nama untuk generator avatar
-        const fallbackName = user.user_metadata?.full_name || "Pengguna KaryaMandiri";
-        const generatedAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=0D8ABC&color=fff&size=256`;
-
-        // Jika profile belum terbentuk di DB, gunakan data fallback metadata auth
-        setUserData({
-          full_name: profile?.full_name || user.user_metadata?.full_name || fallbackName,
-          email: user.email || "",
-          role: profile?.role || user.user_metadata?.role || "worker",
-          bio: (profile as any)?.bio || "Belum ada bio profil. Ceritakan sedikit tentang diri Anda.",
-          location: (profile as any)?.location || "Belum mengatur lokasi.",
-          skills: (profile as any)?.skills || [],
-          isVerified: (profile as any)?.is_verified || false,
-          balance: (profile as any)?.balance || 0,
-          avatarUrl: (profile as any)?.avatar_url || generatedAvatar,
-          bannerUrl: (profile as any)?.banner_url || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200",
-          joinedDate: user.created_at 
-            ? new Date(user.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
-            : "Baru Saja",
-        });
-
-      } catch (err: any) {
-        console.error("Error mengambil data profil:", err.message);
-      } finally {
-        setLoading(false);
+      // Jika ID di URL sama dengan ID user yang sedang login, berarti ini profilnya sendiri
+      if (currentUser && currentUser.id === profileId) {
+        setIsOwnProfile(true);
+      } else {
+        setIsOwnProfile(false);
       }
-    };
 
-    fetchCurrentProfile();
-  }, []);
+      // Ambil info akun dari session Supabase Auth
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
 
-  function fetchCurrentProfile() {
-    throw new Error('Function not implemented.');
-  }
+      if (!user) {
+        toast.error("Sesi habis, silakan login kembali.");
+        return;
+      }
+
+      // Ambil data spesifik role & pelengkap dari tabel public.profiles
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      // Abaikan error "Row not found" (PGRST116) karena user baru mungkin belum punya row di tabel profiles
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error("Database Error:", profileError);
+      }
+
+      if (profileError) {
+        console.error("Database Error:", profileError);
+        toast.error("Gagal memuat profil.");
+        return;
+      }
+
+      if (!profile) {
+        toast.error("Profil tidak ditemukan.");
+        return;
+      }
+
+      // Siapkan variabel nama untuk generator avatar
+      const fallbackName = user.user_metadata?.full_name || "Pengguna KaryaMandiri";
+      const generatedAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=0D8ABC&color=fff&size=256`;
+
+      // Jika profile belum terbentuk di DB, gunakan data fallback metadata auth
+      setUserData({
+        full_name: profile?.full_name || user.user_metadata?.full_name || fallbackName,
+        email: user.email || "Email disembunyikan",
+        role: profile?.role || user.user_metadata?.role || "worker",
+        bio: (profile as any)?.bio || "Belum ada bio profil. Ceritakan sedikit tentang diri Anda.",
+        location: (profile as any)?.location || "Belum mengatur lokasi.",
+        skills: (profile as any)?.skills || [],
+        isVerified: (profile as any)?.is_verified || false,
+        balance: (profile as any)?.balance || 0,
+        avatarUrl: (profile as any)?.avatar_url || generatedAvatar,
+        bannerUrl: (profile as any)?.banner_url || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200",
+        joinedDate: user.created_at 
+          ? new Date(user.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
+          : "Baru Saja",
+      });
+
+    } catch (err: any) {
+      console.error("Error mengambil data profil:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (profileId) {
+      fetchCurrentProfile();
+    }
+  }, [profileId]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 md:pt-12 lg:pt-0">
@@ -142,14 +170,16 @@ const Profile: React.FC = () => {
               className="object-cover"
               priority
             />
-            <button
-              className="flex items-center gap-2 p-2 absolute bottom-2 right-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
-              onClick={() => setShowMediaBanner(true)}
-            >
-              <FiCamera size={18} />
-            </button>
+            {isOwnProfile && (
+              <button
+                className="flex items-center gap-2 p-2 absolute bottom-2 right-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                onClick={() => setShowMediaBanner(true)}
+              >
+                <FiCamera size={18} />
+              </button>
+            )}
         </div>
-        <div className="px-8 pb-8">
+        <div className="px-6 pb-6">
           <div className="relative flex justify-between items-end -mt-12 mb-6">
             <div className="relative w-32 h-32">
               <Image
@@ -158,24 +188,28 @@ const Profile: React.FC = () => {
                 fill
                 className="rounded-2xl border-4 border-white bg-white shadow-md object-cover"
               />
-              <button
-                className="flex items-center gap-2 p-2 absolute -top-2 -right-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
-                onClick={() => setShowMediaProfile(true)}
-              >
-                <FiCamera size={18} />
-              </button>
+              {isOwnProfile && (
+                <button
+                  className="flex items-center gap-2 p-2 absolute -top-2 -right-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                  onClick={() => setShowMediaProfile(true)}
+                >
+                  <FiCamera size={18} />
+                </button>
+              )}
               {userData.isVerified && (
                 <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1.5 rounded-full border-2 border-white z-10">
                   <MdVerified size={16} />
                 </div>
               )}
             </div>
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
-              onClick={() => setShowEditProfile(true)}
-            >
-              <FiEdit2 size={18} /> Edit Profil
-            </button>
+            {isOwnProfile && (
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                onClick={() => setShowEditProfile(true)}
+              >
+                <FiEdit2 size={18} /> Edit Profil
+              </button>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -211,12 +245,14 @@ const Profile: React.FC = () => {
                 <FiShield className="text-blue-600" /> Keahlian
               </h2>
               {/* Tombol Tambah / Edit Keahlian */}
-              <button
-                onClick={() => setShowManageSkills(true)}
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1"
-              >
-                <FiEdit2 size={12} /> Kelola
-              </button>
+              {isOwnProfile && (
+                <button
+                  onClick={() => setShowManageSkills(true)}
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1"
+                >
+                  <FiEdit2 size={12} /> Kelola
+                </button>
+              )}
             </div>
 
             {/* Daftar Tag Keahlian */}
@@ -233,18 +269,20 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-blue-600 p-6 rounded-2xl shadow-lg text-white">
-            <h2 className="text-sm font-semibold opacity-80 mb-1 flex items-center gap-2">
-              Saldo Dompet
-            </h2>
-            <p className="text-3xl font-bold">Rp{userData.balance.toLocaleString("id-ID")}</p>
-            <button
-              className="w-full mt-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold transition backdrop-blur-sm"
-              onClick={() => setShowSubModal(true)}
-            >
-              Tarik Tunai
-            </button>
-          </div>
+          {isOwnProfile && (
+            <div className="bg-blue-600 p-6 rounded-2xl shadow-lg text-white">
+              <h2 className="text-sm font-semibold opacity-80 mb-1 flex items-center gap-2">
+                Saldo Dompet
+              </h2>
+              <p className="text-3xl font-bold">Rp{userData.balance.toLocaleString("id-ID")}</p>
+              <button
+                className="w-full mt-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold transition backdrop-blur-sm"
+                onClick={() => setShowSubModal(true)}
+              >
+                Tarik Tunai
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Sisi Kanan: Pengaturan & Keamanan */}

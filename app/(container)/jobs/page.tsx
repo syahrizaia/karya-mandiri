@@ -22,21 +22,75 @@ const Jobs: React.FC = () => {
   const [jobs, setJobs] = useState<IJobs[]>([]);
   const [showSubModal, setShowSubModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [minReward, setMinReward] = useState<number>(0);
+  const [maxPriceLimit, setMaxPriceLimit] = useState<number>(5000000); // Batas atas slider bawaan (Rp5 Juta)
+  const [sortBy, setSortBy] = useState<string>('Terbaru');
   
   useEffect(() => {
     const fetchJobs = async () => {
-      setLoading(true);
-      const {data, error} = await supabase.from('jobs').select('*').order('posted_at', { ascending: false });
-      if(error) {
-        console.error('Error fetching jobs:', error);
-      } else {
-        setJobs(data);
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('jobs')
+          .select('*')
+          .order('posted_at', { ascending: false });
+          
+        if (error) {
+          console.error('Error fetching jobs:', error);
+        } else if (data) {
+          setJobs(data);
+          
+          // Set batas atas dinamis untuk slider upah berdasarkan upah tertinggi di database
+          if (data.length > 0) {
+            const highestReward = Math.max(...data.map(j => j.reward ?? 0));
+            setMaxPriceLimit(highestReward > 0 ? highestReward : 5000000);
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchJobs();
-  }, [supabase]);
+  }, []);
+
+  const handleCategoryChange = (category: string) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter((c) => c !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  const filteredJobs = jobs
+    .filter((job) => {
+      // Filter berdasarkan teks pencarian (Judul, Nama Perusahaan, Lokasi)
+      const matchesSearch = 
+        job.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.employer?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.location?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      // Filter berdasarkan kategori checklist (menggunakan kolom job.category)
+      const matchesCategory = 
+        selectedCategories.length === 0 || 
+        selectedCategories.some(cat => job.category?.toLowerCase() === cat.toLowerCase());
+
+      // Filter berdasarkan batas minimum upah tugas
+      const matchesReward = (job.reward ?? 0) >= minReward;
+
+      return matchesSearch && matchesCategory && matchesReward;
+    })
+    .sort((a, b) => {
+      // Logika sorting pilihan dropdown pembantu
+      if (sortBy === 'Upah Tertinggi') {
+        return (b.reward ?? 0) - (a.reward ?? 0);
+      }
+      // Bawaan: Terbaru berdasarkan waktu postingan
+      return new Date(b.posted_at).getTime() - new Date(a.posted_at).getTime();
+    });
 
   const JobCardLoading = () => {
     return (
@@ -139,7 +193,12 @@ const Jobs: React.FC = () => {
             <div className="space-y-2">
               {['Produksi', 'Logistik', 'Jasa', 'Konstruksi'].map((cat) => (
                 <label key={cat} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white cursor-pointer transition">
-                  <input type="checkbox" className="w-5 h-5 rounded text-blue-600" />
+                  <input 
+                    type="checkbox" 
+                    className="w-5 h-5 rounded text-blue-600 accent-blue-600 cursor-pointer"
+                    checked={selectedCategories.includes(cat)}
+                    onChange={() => handleCategoryChange(cat)}
+                  />
                   <span className="text-slate-600 font-medium">{cat}</span>
                 </label>
               ))}
@@ -148,18 +207,34 @@ const Jobs: React.FC = () => {
 
           <div className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
             <h3 className="font-bold text-slate-800 mb-2">Upah Minimum</h3>
-            <p className="text-2xl font-bold text-green-600 mb-4">Rp25.000.000</p>
-            <input type="range" className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" />
+            <p className="text-xl font-bold text-green-600 mb-4">Rp{minReward.toLocaleString('id-ID')}</p>
+            <input 
+              type="range" 
+              min="0"
+              max={maxPriceLimit}
+              step="10000"
+              value={minReward}
+              onChange={(e) => setMinReward(Number(e.target.value))}
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" 
+            />
+            <div className="flex justify-between text-[10px] text-slate-400 font-semibold mt-2">
+              <span>Rp0</span>
+              <span>Max: Rp{maxPriceLimit.toLocaleString('id-ID')}</span>
+            </div>
           </div>
         </aside>
 
         {/* Job List Area */}
         <div className="lg:col-span-3 space-y-4">
           <div className="flex justify-between items-center px-2">
-            <p className="text-slate-500 font-medium">{jobs.length} Lowongan Tersedia</p>
-            <select className="bg-transparent font-semibold text-blue-600 outline-none">
-              <option>Terbaru</option>
-              <option>Upah Tertinggi</option>
+            <p className="text-slate-500 font-medium">{filteredJobs.length} Lowongan Tersedia</p>
+            <select 
+              value={sortBy} 
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-transparent font-semibold text-blue-600 outline-none cursor-pointer text-sm"
+            >
+              <option value="Terbaru">Terbaru</option>
+              <option value="Upah Tertinggi">Upah Tertinggi</option>
             </select>
           </div>
 
@@ -167,86 +242,98 @@ const Jobs: React.FC = () => {
             <JobCardLoading />
           ) : (
             <>
-              {jobs.map((job) => (
-                <div key={job.id} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
-                  <div className='md:grid md:grid-cols-3 flex flex-col'>
-                    <Link href={`/jobs/${job.id}`} className="flex flex-col md:flex-row md:col-span-2 justify-between gap-6">
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                            job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
-                          }`}>
-                            {job.type}
-                          </span>
-                          <span className="text-slate-400 text-xs flex items-center gap-1">
-                            <FiClock /> {formatRelativeTime(job.posted_at)}
-                          </span>
-                        </div>
-                        <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
-                        <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
-                          <div className="flex items-center gap-1"><FiUser className="text-blue-500"/> {job.employer}</div>
-                          <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
-                        </div>
-                      </div>
-                    </Link>
-
-                    <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
-                      <div className="text-right w-full">
-                        <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
-                        <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
-                      </div>
-                      
-                      {/* CONTAINER TOMBOL AKSI */}
-                      <div className="flex items-center gap-3 w-full md:w-auto">
-                        <Link
-                          href={`/jobs/${job.id}`}
-                          className="text-center w-full px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap"
-                        >
-                          Lamar Sekarang
-                        </Link>
-                        {/* Tombol Simpan Pekerjaan */}
-                        <SaveJobButton
-                          is_saved={job.is_saved}
-                          id={job.id}
-                          status={job.status}
-                          title={job.title}
-                          employer={job.employer}
-                          employer_name={job.employer_name}
-                          category={job.category}
-                          location={job.location}
-                          reward={job.reward}
-                          type={job.type}
-                          description={job.description}
-                          requirements={job.requirements}
-                          taken={job.taken}
-                          total={job.total}
-                          posted_at={job.posted_at}
-                          deadline={job.deadline}
-                          applied_at={job.applied_at}
-                          worker_notes={job.worker_notes}
-                          applications={job.applications}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Crowdsourcing Progress Bar */}
-                  {job.type === 'Crowdsourcing' && (
-                    <div className="mt-6 pt-4 border-t border-slate-50">
-                      <div className="flex justify-between text-xs font-bold mb-2">
-                        <span className="text-slate-500 uppercase">Kuota Crowdsourcing</span>
-                        <span className="text-blue-600">{job.taken} / {job.total} Pekerja</span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div 
-                          className="bg-blue-500 h-full transition-all duration-500" 
-                          style={{ width: `${(job.taken / job.total) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
+              {filteredJobs.length === 0 ? (
+                <div className="bg-white rounded-3xl p-12 text-center border border-slate-100">
+                  <p className="text-slate-400 font-medium">Tidak ada lowongan kerja yang cocok dengan filter pencarian Anda.</p>
+                  <button 
+                    onClick={() => { setSearchQuery(''); setSelectedCategories([]); setMinReward(0); }} 
+                    className="mt-4 text-sm font-bold text-blue-600 hover:underline"
+                  >
+                    Reset Semua Filter
+                  </button>
                 </div>
-              ))}
+              ) : (
+                filteredJobs.map((job) => (
+                  <div key={job.id} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
+                    <div className='md:grid md:grid-cols-3 flex flex-col'>
+                      <Link href={`/jobs/${job.id}`} className="flex flex-col md:flex-row md:col-span-2 justify-between gap-6">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                              job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
+                            }`}>
+                              {job.type}
+                            </span>
+                            <span className="text-slate-400 text-xs flex items-center gap-1">
+                              <FiClock /> {formatRelativeTime(job.posted_at)}
+                            </span>
+                          </div>
+                          <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
+                          <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
+                            <div className="flex items-center gap-1"><FiUser className="text-blue-500"/> {job.employer}</div>
+                            <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
+                        <div className="text-right w-full">
+                          <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
+                          <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
+                        </div>
+                        
+                        {/* CONTAINER TOMBOL AKSI */}
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+                          <Link
+                            href={`/jobs/${job.id}`}
+                            className="text-center w-full px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap"
+                          >
+                            Lamar Sekarang
+                          </Link>
+                          {/* Tombol Simpan Pekerjaan */}
+                          <SaveJobButton
+                            is_saved={job.is_saved}
+                            id={job.id}
+                            status={job.status}
+                            title={job.title}
+                            employer={job.employer}
+                            employer_name={job.employer_name}
+                            category={job.category}
+                            location={job.location}
+                            reward={job.reward}
+                            type={job.type}
+                            description={job.description}
+                            requirements={job.requirements}
+                            taken={job.taken}
+                            total={job.total}
+                            posted_at={job.posted_at}
+                            deadline={job.deadline}
+                            applied_at={job.applied_at}
+                            worker_notes={job.worker_notes}
+                            applications={job.applications}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Crowdsourcing Progress Bar */}
+                    {job.type === 'Crowdsourcing' && (
+                      <div className="mt-6 pt-4 border-t border-slate-50">
+                        <div className="flex justify-between text-xs font-bold mb-2">
+                          <span className="text-slate-500 uppercase">Kuota Crowdsourcing</span>
+                          <span className="text-blue-600">{job.taken} / {job.total} Pekerja</span>
+                        </div>
+                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                          <div 
+                            className="bg-blue-500 h-full transition-all duration-500" 
+                            style={{ width: `${(job.taken / job.total) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </>
           )}
         </div>

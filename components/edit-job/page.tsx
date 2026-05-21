@@ -17,6 +17,7 @@ const EditProjectDialog = ({ job, open, onOpenChange, onSuccess }: EditProjectDi
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [, setJobs] = useState<IJobs[]>([]);
+    const [userName, setUserName] = useState<string | null>(null);
     const [, setSelectedJob] = useState<{
         job: IJobs;
         action: "edit" | "delete";
@@ -38,7 +39,28 @@ const EditProjectDialog = ({ job, open, onOpenChange, onSuccess }: EditProjectDi
         };
 
         fetchJobs();
-    }, [supabase]);
+    }, []);
+
+    useEffect(() => {
+    const getActiveUser = async () => {
+      try {
+        setLoading(true);
+        // Cara mutakhir Supabase v2 untuk mengambil info user aktif
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const name = user.user_metadata?.full_name || user.email || "Pengguna";
+          setUserName(name);
+        }
+      } catch (err) {
+        console.error("Gagal memuat info user:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getActiveUser();
+  }, []);
 
     const EditProject = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -47,10 +69,17 @@ const EditProjectDialog = ({ job, open, onOpenChange, onSuccess }: EditProjectDi
         const formData = new FormData(e.currentTarget);
         const rawData = Object.fromEntries(formData.entries());
 
+        const { data: { user }, error } = await supabase.auth.getUser();
+
+        if (error || !user) {
+            toast.error("Sesi Anda telah berakhir. Silakan login kembali.");
+            return;
+        }
+
         const projectData = {
         id: crypto.randomUUID(),
         title: rawData.title,
-        employer: "Anonymous", // Hidden data
+        employer: user.user_metadata?.full_name || "Pengguna KaryaMandiri", // Hidden data
         description: rawData.description,
         requirements: rawData.requirements, // Disimpan sebagai string murni
         deadline: rawData.deadline || null,
@@ -107,7 +136,7 @@ const EditProjectDialog = ({ job, open, onOpenChange, onSuccess }: EditProjectDi
             <DialogContent className="sm:max-w-150 max-h-[90vh] overflow-y-auto rounded-3xl p-8 bg-white border-none shadow-2xl">
                 <DialogHeader className="mb-6">
                     <DialogTitle className="text-2xl font-black text-slate-900">Edit Proyek</DialogTitle>
-                    <p className="text-slate-500 text-sm italic">Employer: Anonymous</p>
+                    <p className="text-slate-500 text-sm italic">Employer: {loading ? <FiLoader className="animate-spin inline text-blue-600" /> : userName}</p>
                     <DialogDescription className="mt-4 text-slate-600">
                         Apakah Anda yakin ingin mengedit proyek <strong>{job.title}</strong>?
                     </DialogDescription>

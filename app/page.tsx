@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FiLayers } from "react-icons/fi";
 import { MdWork } from "react-icons/md";
 import { motion, Variants } from "framer-motion";
+import LandingPage from "./(public)/landing-page/page";
 
 export default function Home() {
   const text = "Selamat Datang di\nKaryaMandiri!";
@@ -37,60 +38,64 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-linear-to-r from-blue-600 to-indigo-700 font-sans p-4 relative overflow-hidden">
-      {/* Container Utama: Ukuran lebar dinamis sesuai layar */}
-      <main className="z-10 flex w-full max-w-3xl flex-col items-center justify-between text-center py-12 px-6 md:py-24 md:px-16 bg-white rounded-3xl shadow-2xl">
+    <>
+      <LandingPage />
+    </>
+
+    // <div className="flex flex-col min-h-screen items-center justify-center bg-linear-to-r from-blue-600 to-indigo-700 font-sans p-4 relative overflow-hidden">
+    //   {/* Container Utama: Ukuran lebar dinamis sesuai layar */}
+    //   <main className="z-10 flex w-full max-w-3xl flex-col items-center justify-between text-center py-12 px-6 md:py-24 md:px-16 bg-white rounded-3xl shadow-2xl">
         
-        <div className="flex flex-col items-center justify-center gap-4 md:gap-5">
-          {/* Logo Box: Ukuran lebih kecil di HP */}
-          <div className="w-16 h-16 md:w-24 md:h-24 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-4xl md:text-6xl shadow-lg">
-            K
-          </div>
+    //     <div className="flex flex-col items-center justify-center gap-4 md:gap-5">
+    //       {/* Logo Box: Ukuran lebih kecil di HP */}
+    //       <div className="w-16 h-16 md:w-24 md:h-24 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-4xl md:text-6xl shadow-lg">
+    //         K
+    //       </div>
 
-          {/* Heading: Ukuran teks adaptif (text-4xl di HP, text-6xl di Desktop) */}
-          <motion.h1 
-            className="text-4xl md:text-6xl font-black text-center text-slate-900 leading-tight whitespace-pre-wrap"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {letters.map((letter, index) => {
-              if (letter === "\n") return <br key={index} />;
+    //       {/* Heading: Ukuran teks adaptif (text-4xl di HP, text-6xl di Desktop) */}
+    //       <motion.h1 
+    //         className="text-4xl md:text-6xl font-black text-center text-slate-900 leading-tight whitespace-pre-wrap"
+    //         variants={containerVariants}
+    //         initial="hidden"
+    //         animate="visible"
+    //       >
+    //         {letters.map((letter, index) => {
+    //           if (letter === "\n") return <br key={index} />;
 
-              if (letter === " ") return <span key={index}> </span>;
+    //           if (letter === " ") return <span key={index}> </span>;
 
-              return (
-                <motion.span
-                  key={index}
-                  variants={childVariants}
-                  className="inline-block"
-                >
-                  {letter}
-                </motion.span>
-              );
-            })}
-          </motion.h1>
-        </div>
+    //           return (
+    //             <motion.span
+    //               key={index}
+    //               variants={childVariants}
+    //               className="inline-block"
+    //             >
+    //               {letter}
+    //             </motion.span>
+    //           );
+    //         })}
+    //       </motion.h1>
+    //     </div>
 
-        <p className="text-base md:text-xl text-slate-600 text-center mt-6 max-w-md">
-          Temukan Pekerjaan yang Sesuai dengan Kebutuhanmu
-        </p>
+    //     <p className="text-base md:text-xl text-slate-600 text-center mt-6 max-w-md">
+    //       Temukan Pekerjaan yang Sesuai dengan Kebutuhanmu
+    //     </p>
 
-        {/* Grid Tombol: 1 kolom di HP, 2 kolom di Desktop */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-4 mt-10 w-full max-w-sm sm:max-w-none">
-          <Link href="/login" className="px-6 py-4 rounded-2xl text-lg text-center font-bold bg-indigo-600 text-white transition-all hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 shadow-md">
-            Login
-          </Link>
+    //     {/* Grid Tombol: 1 kolom di HP, 2 kolom di Desktop */}
+    //     <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-4 mt-10 w-full max-w-sm sm:max-w-none">
+    //       <Link href="/login" className="px-6 py-4 rounded-2xl text-lg text-center font-bold bg-indigo-600 text-white transition-all hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 shadow-md">
+    //         Login
+    //       </Link>
 
-          <Link href="/register" className="px-6 py-4 rounded-2xl text-lg text-center font-bold bg-indigo-600 text-white transition-all hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 shadow-md">
-            Daftar
-          </Link>
-        </div>
-      </main>
+    //       <Link href="/register" className="px-6 py-4 rounded-2xl text-lg text-center font-bold bg-indigo-600 text-white transition-all hover:bg-white hover:text-indigo-600 border-2 border-transparent hover:border-indigo-600 shadow-md">
+    //         Daftar
+    //       </Link>
+    //     </div>
+    //   </main>
 
-      {/* Dekorasi Icon: Ukuran mengecil di HP dan posisi lebih aman agar tidak menutupi teks */}
-      <FiLayers className="absolute left-40 top-5 md:left-5 md:top-20 text-white/10 w-40 h-40 md:w-80 md:h-80 animate-pulse pointer-events-none" />
-      <MdWork className="absolute right-40 bottom-5 md:right-5 md:bottom-20 text-white/10 w-40 h-40 md:w-80 md:h-80 animate-pulse pointer-events-none" />
-    </div>
+    //   {/* Dekorasi Icon: Ukuran mengecil di HP dan posisi lebih aman agar tidak menutupi teks */}
+    //   <FiLayers className="absolute left-40 top-5 md:left-5 md:top-20 text-white/10 w-40 h-40 md:w-80 md:h-80 animate-pulse pointer-events-none" />
+    //   <MdWork className="absolute right-40 bottom-5 md:right-5 md:bottom-20 text-white/10 w-40 h-40 md:w-80 md:h-80 animate-pulse pointer-events-none" />
+    // </div>
   );
 }

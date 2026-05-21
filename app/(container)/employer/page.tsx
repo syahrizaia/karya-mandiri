@@ -4,7 +4,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
-import { FiUsers, FiBriefcase, FiTrendingUp, FiTrash2, FiEdit2 } from 'react-icons/fi';
+import { FiUsers, FiBriefcase, FiTrendingUp, FiTrash2, FiEdit2, FiAlertCircle } from 'react-icons/fi';
 import { EmployerData } from '../types';
 import supabase from '@/lib/db';
 import { IJobs } from '@/app/types/jobs';
@@ -40,37 +40,78 @@ const EmployerDashboard: React.FC = () => {
   const router = useRouter();
   const [jobs, setJobs] = useState<IJobs[]>([]);
   const [loading, setLoading] = useState(true);
+  const [employerName, setEmployerName] = useState<string>("User");
   const [selectedJob, setSelectedJob] = useState<{
     job: IJobs;
     action: "edit" | "delete";
   } | null>(null);
 
+  // Perhitungan State Statis dari Database Secara Dinamis
+  const [stats, setStats] = useState<EmployerData>({
+    name: "User",
+    company: "KaryaMandiri Corp",
+    totalProjects: 0,
+    activeWorkers: 0,
+    totalInvestment: 0,
+  });
+
   useEffect(() => {
-    const fetchJobs = async () => {
+    const fetchEmployerDashboardData = async () => {
       setLoading(true);
       try {
-        const {data, error} = await supabase.from('jobs').select('*').order('posted_at', { ascending: false });
-        if(error) {
-          console.error('Error fetching jobs:', error);
-        } else {
-          setJobs(data);
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
+          router.push('/login');
+          return;
         }
+
+        // Ambil Nama Lengkap dari profil untuk menyapa user di header
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.full_name) {
+          setEmployerName(profile.full_name);
+        }
+
+        // Ambil data pekerjaan yang dibuat KHUSUS oleh user ini saja
+        // CATATAN: Ganti 'created_by' di bawah sesuai nama kolom user id di tabel 'jobs' milikmu (misal: 'user_id')
+        const { data: jobsData, error: jobsError } = await supabase
+          .from('jobs')
+          .select('*')
+          .eq('user_id', user.id) 
+          .order('posted_at', { ascending: false });
+
+        if (jobsError) {
+          console.error('Error fetching filtered jobs:', jobsError);
+        } else if (jobsData) {
+          setJobs(jobsData);
+
+          // Hitung akumulasi statistik riil berdasarkan data pekerjaan di database
+          const totalJobsCreated = jobsData.length;
+          const totalWorkersGathered = jobsData.reduce((acc, job) => acc + (job.taken || 0), 0);
+          const totalBudgetSpent = jobsData.reduce((acc, job) => acc + ((job.reward || 0) * (job.taken || 0)), 0);
+
+          setStats({
+            name: profile?.full_name || "Employer",
+            company: "KaryaMandiri Corp",
+            totalProjects: totalJobsCreated,
+            activeWorkers: totalWorkersGathered,
+            totalInvestment: totalBudgetSpent > 0 ? totalBudgetSpent : 0,
+          });
+        }
+      } catch (err) {
+        console.error('Terjadi kesalahan data:', err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchJobs();
-  }, []);
-
-  // Mock Data
-  const stats: EmployerData = {
-    name: "Syahriza",
-    company: "KaryaMandiri Corp",
-    totalProjects: 120,
-    activeWorkers: 450,
-    totalInvestment: 25000000, // Rp 25.000.000
-  };
+    fetchEmployerDashboardData();
+  }, [router]);
 
   const TableLoading = () => {
     return (
@@ -139,64 +180,72 @@ const EmployerDashboard: React.FC = () => {
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-lg font-semibold text-gray-800">Status Proyek Crowdsourcing</h2>
           </div>
-          
-          {/* PEMBUNGKUS SCROLL DISINI */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-150"> 
-              {/* min-w-[600px] memastikan tabel tidak terlalu sempit di HP */}
-              <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Judul Proyek</th>
-                  <th className="px-6 py-4 font-medium">Status</th>
-                  <th className="px-6 py-4 font-medium">Kontributor</th>
-                  <th className="px-6 py-4 font-medium">Anggaran</th>
-                  <th className="px-6 py-4 font-medium">Aksi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {jobs.map((job) => (
-                  <tr key={job.id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 font-medium text-gray-800 whitespace-nowrap">
-                      {job.title}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(job.status ?? 'pending')}`}>
-                        { (job.status?.toUpperCase()) ?? "PENDING" }
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
-                      {job.taken} dari {job.total} Orang
-                    </td>
-                    <td className="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap">
-                      Rp{job.reward.toLocaleString()}
-                    </td>
-                    <td colSpan={2} className='px-4 py-2 whitespace-nowrap'>
-                      <div className="flex items-center gap-2 justify-center">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedJob({ job, action: "edit" })}
-                          className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition"
-                        >
-                          <FiEdit2 size={18} />
-                        </button>
 
-                        {/* TOMBOL HAPUS */}
-                        <button
-                          type="button"
-                          onClick={() => setSelectedJob({ job, action: "delete" })}
-                          className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
-                        >
-                          <FiTrash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
+          <div className="overflow-x-auto">
+            {jobs.length === 0 ? (
+              /* Tampilan State Jika Employer Belum Membuat Lowongan Apapun */
+              <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
+                <div className="p-4 bg-slate-50 text-slate-400 rounded-full">
+                  <FiAlertCircle size={32} />
+                </div>
+                <h3 className="text-md font-bold text-slate-700">Belum Ada Proyek</h3>
+                <p className="text-sm text-slate-400 max-w-xs">Anda belum mempublikasikan lowongan proyek crowdsourcing apa pun saat ini.</p>
+              </div>
+            ) : (
+              <table className="w-full text-left border-collapse min-w-175"> 
+                <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                  <tr>
+                    <th className="px-6 py-4 font-medium">Judul Proyek</th>
+                    <th className="px-6 py-4 font-medium">Status</th>
+                    <th className="px-6 py-4 font-medium">Kontributor</th>
+                    <th className="px-6 py-4 font-medium">Anggaran per Orang</th>
+                    <th className="px-6 py-4 font-medium text-center">Aksi</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {jobs.map((job) => (
+                    <tr key={job.id} className="hover:bg-gray-50 transition">
+                      <td className="px-6 py-4 font-medium text-gray-800 whitespace-nowrap">
+                        {job.title}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(job.status ?? 'pending')}`}>
+                          { (job.status?.toUpperCase()) ?? "PENDING" }
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                        {job.taken} dari {job.total} Orang
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap">
+                        Rp{job.reward.toLocaleString()}
+                      </td>
+                      <td className='px-4 py-2 whitespace-nowrap'>
+                        <div className="flex items-center gap-2 justify-center">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedJob({ job, action: "edit" })}
+                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition"
+                          >
+                            <FiEdit2 size={18} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedJob({ job, action: "delete" })}
+                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
+                          >
+                            <FiTrash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       )}
+
       {selectedJob?.action === "edit" && (
         <EditProjectDialog
           job={selectedJob.job}

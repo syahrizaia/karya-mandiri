@@ -3,16 +3,17 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import supabase from "@/lib/db";
 import { toast } from "sonner";
 import { FiLoader } from "react-icons/fi";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase-browser";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
