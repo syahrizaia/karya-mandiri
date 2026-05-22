@@ -139,14 +139,14 @@ export default function Services() {
                         <button
                           onClick={() => handleEditClick(service)}
                           title="Edit Jasa"
-                          className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                          className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-100 rounded-lg transition"
                         >
                           <FiEdit size={16} />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(service)}
                           title="Hapus Jasa"
-                          className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-lg transition"
                         >
                           <FiTrash2 size={16} />
                         </button>

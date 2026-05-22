@@ -79,7 +79,6 @@ const EmployerDashboard: React.FC = () => {
         }
 
         // Ambil data pekerjaan yang dibuat KHUSUS oleh user ini saja
-        // CATATAN: Ganti 'created_by' di bawah sesuai nama kolom user id di tabel 'jobs' milikmu (misal: 'user_id')
         const { data: jobsData, error: jobsError } = await supabase
           .from('jobs')
           .select('*')
@@ -155,7 +154,7 @@ const EmployerDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen p-0 md:pt-12 lg:p-4">
+    <div className="min-h-fit p-0 md:pt-12 lg:p-4">
       {/* Header */}
       <header className="flex justify-between items-center gap-4 mb-8">
         <div>

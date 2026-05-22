@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/static-components */
 "use client";
 
@@ -35,7 +35,7 @@ const WorkerDashboard: React.FC = () => {
   const router = useRouter();
   const [showSubModal, setShowSubModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [jobs, setJobs] = useState<IJobs[]>([]);
+  const [savedJobs, setSavedJobs] = useState<IJobs[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [profile, setProfile] = useState<IProfile>({
     id: null,
@@ -46,48 +46,23 @@ const WorkerDashboard: React.FC = () => {
     completedTasks: 0,
   });
 
-  // Fetch daftar pekerjaan dari Supabase
-  useEffect(() => {
-    const fetchJobs = async () => {
-      setLoading(true);
-
-      const {data, error} = await supabase.from('jobs').select('*').order('posted_at', { ascending: false });
-
-      if(error) {
-        console.error('Error fetching jobs:', error);
-      } else {
-        setJobs(data);
-      }
-      setLoading(false);
-    };
-
-    fetchJobs();
-  }, [supabase]);
-
   // Fetch data profil sekaligus mengunci ID user yang sedang login
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const initDashboardData = async () => {
       try {
         setLoading(true);
 
         const { data: { user }, error: authError } = await supabase.auth.getUser();
-
         if (authError || !user) {
           router.push("/login");
           return;
         }
 
-        // Ambil data dari tabel profiles berdasarkan id user auth
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData } = await supabase
           .from("profiles")
           .select("full_name, level, rating, total_earnings, completed_tasks")
           .eq("id", user.id)
           .maybeSingle();
-
-        if (profileError) {
-          console.error("Gagal mengambil data profil:", profileError.message);
-          return;
-        }
 
         if (profileData) {
           setProfile({
@@ -96,40 +71,40 @@ const WorkerDashboard: React.FC = () => {
             level: profileData.level || "Pekerja",
             rating: profileData.rating ? Number(profileData.rating) : 5.0,
             totalEarnings: profileData.total_earnings ? Number(profileData.total_earnings) : 0,
-            completedTasks: 0,
+            completedTasks: profileData.completed_tasks ? Number(profileData.completed_tasks) : 0,
           });
         }
+
+        const { data: bookmarkData, error: bookmarkError } = await supabase
+          .from('saved_jobs')
+          .select(`
+            job_id,
+            jobs:jobs (
+              *
+            )
+          `)
+          .eq('user_id', user.id);
+
+        if (bookmarkError) {
+          console.error('Error fetching bookmarked jobs:', bookmarkError);
+        } else if (bookmarkData) {
+          const extractedJobs = bookmarkData
+            .map((item: any) => item.jobs)
+            .filter((job) => job !== null)
+            .map((job: any) => ({ ...job, is_saved: true }));
+            
+          setSavedJobs(extractedJobs);
+        }
+
       } catch (err) {
-        console.error("Terjadi kesalahan sistem:", err);
+        console.error("Terjadi kesalahan sistem dashboard:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfileData();
+    initDashboardData();
   }, [router]);
-
-  // Tampilan Skeleton loading tipis saat verifikasi data di awal agar tidak jomplang
-  if (loading) {
-    return (
-      <div className="flex flex-row justify-between gap-4 animate-pulse bg-white p-4 rounded-2xl border border-slate-100">
-        <div className="space-y-2">
-          <div className="h-6 w-48 bg-slate-200 rounded-md"></div>
-          <div className="h-4 w-24 bg-slate-100 rounded-md"></div>
-        </div>
-        <div className="h-10 w-32 bg-slate-200 rounded-full"></div>
-      </div>
-    );
-  }
-
-  const savedJobs = jobs.filter(job => {
-    // Pastikan user sudah login
-    if (!profile.id) return false;
-    
-    // Sesuaikan kondisi di bawah ini dengan struktur kolom penyimpanan bookmark pada DB Anda:
-    // Contoh jika menggunakan kolom 'is_saved' dan dicek kepemilikannya:
-    return job.is_saved && (job.worker_id === profile.id || job.user_id === profile.id);
-  });
 
   const handleRefreshData = () => {
     console.log("Postingan berhasil dikirim, me-refresh feed data...");
@@ -189,7 +164,7 @@ const WorkerDashboard: React.FC = () => {
         </div>
         <button
           onClick={() => setDialogOpen(true)}
-          className="px-6 py-3.5 bg-white hover:bg-slate-100 text-blue-600 font-bold rounded-2xl shadow-md transition flex items-center gap-2 shrink-0"
+          className="px-6 py-3.5 bg-white hover:bg-blue-100 text-blue-600 font-bold rounded-2xl shadow-md transition flex items-center gap-2 shrink-0"
         >
           <FiPlus className="stroke-3" /> Tawarkan Jasaku
         </button>
@@ -306,7 +281,7 @@ const WorkerDashboard: React.FC = () => {
       <div className="bg-indigo-900 rounded-2xl p-6 text-white overflow-hidden relative">
         <div className="relative z-10">
           <h3 className="text-lg font-bold mb-2">Tingkatkan Skill-mu! 🚀</h3>
-          <p className="text-indigo-200 text-sm mb-4 max-w-md">Ikuti pelatihan singkat gratis untuk mendapatkan akses ke tugas dengan upah lebih tinggi.</p>
+          <p className="text-indigo-200 text-sm mb-4">Ikuti pelatihan singkat gratis untuk mendapatkan akses ke tugas dengan upah lebih tinggi.</p>
           <button
             onClick={() => setShowSubModal(true)}
             className="bg-white text-indigo-900 px-4 py-2 rounded-lg font-bold text-sm"

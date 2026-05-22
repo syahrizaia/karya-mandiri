@@ -87,7 +87,7 @@ export default function LandingPage() {
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:hidden absolute top-full left-0 w-full bg-slate-950 border-b border-slate-900 px-6 py-6 space-y-4 flex flex-col shadow-2xl"
+            className="md:hidden absolute top-full left-0 w-full bg-slate-950 border-b border-slate-900 px-6 py-6 space-y-4 flex flex-col shadow-2xl rounded-2xl"
           >
             <Link href="/general-dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-white font-medium">Ringkasan Platform</Link>
             <Link href="/jobs" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-white font-medium">Cari Lowongan</Link>
@@ -269,23 +269,62 @@ export default function LandingPage() {
           
           {/* Ilustrasi Kotak Abstrak Futuristik Bermutasi/Animasi */}
           <div className="relative w-full h-80 flex items-center justify-center">
+            {/* Lingkaran Putar Luar */}
             <motion.div 
               animate={{ rotate: 360 }}
               transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
               className="absolute w-64 h-64 border-2 border-dashed border-blue-500/20 rounded-full"
             />
+            
+            {/* Kotak Putar Tengah */}
             <motion.div 
               animate={{ rotate: -360 }}
               transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
               className="absolute w-48 h-48 border border-purple-500/30 rounded-3xl"
             />
-            <motion.div 
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="w-36 h-36 bg-linear-to-br from-blue-600 to-indigo-700 rounded-3xl shadow-[0_0_50px_rgba(37,99,235,0.4)] flex items-center justify-center p-6 text-center text-xs font-bold text-white tracking-wider uppercase"
-            >
-              Karya Mandiri Node
-            </motion.div>
+
+            {/* CONTAINER UTAMA KARYA MANDIRI NODE (Untuk Efek Lapisan Glow) */}
+            <div className="relative flex items-center justify-center">
+              
+              {/* LAPISAN 1: Aura Pendaran Belakang Super Lebar (Super Blur) */}
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.15, 1],
+                  opacity: [0.6, 0.9, 0.6] 
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute w-36 h-36 bg-blue-500 rounded-3xl blur-2xl mix-blend-screen"
+              />
+
+              {/* LAPISAN 2: Aura Pendaran Belakang Lebih Pekat (Intense Blur) */}
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.08, 1],
+                  opacity: [0.7, 1, 0.7] 
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute w-32 h-32 bg-indigo-500 rounded-3xl blur-md mix-blend-screen"
+              />
+
+              {/* KOTAK UTAMA + LAPISAN 3: Animasi Box Shadow Paling Terang */}
+              <motion.div 
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  boxShadow: [
+                    "0 0 40px 10px rgba(37,99,235,0.5), 0 0 80px 20px rgba(99,102,241,0.3)",
+                    "0 0 70px 25px rgba(37,99,235,0.8), 0 0 110px 35px rgba(99,102,241,0.5)",
+                    "0 0 40px 10px rgba(37,99,235,0.5), 0 0 80px 20px rgba(99,102,241,0.3)"
+                  ]
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="relative w-36 h-36 bg-linear-to-br from-blue-500 via-blue-600 to-indigo-700 rounded-3xl border border-blue-400/40 flex items-center justify-center p-6 text-center text-xs font-black text-white tracking-wider uppercase z-10"
+              >
+                {/* LAPISAN 4: Pendaran Teks Inti agar Tetap Kontras & Menyala */}
+                <span className="filter drop-shadow-[0_0_12px_rgba(255,255,255,1)]_drop-shadow-[0_0_20px_rgba(59,130,246,0.8)]">
+                  Karya Mandiri Node
+                </span>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>

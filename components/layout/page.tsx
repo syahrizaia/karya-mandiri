@@ -35,7 +35,7 @@ export default function ClientDashboardWrapper({
           setUserId(null);
           setUserRole(null);
           
-          // 🌟 PERBAIKAN: Jika rute saat ini tidak termasuk rute publik, baru tendang ke login
+          // Jika rute saat ini tidak termasuk rute publik, baru tendang ke login
           const isCurrentRoutePublic = publicRoutes.some(route => 
             pathname === route || pathname.startsWith(`${route}/`)
           );
@@ -161,41 +161,36 @@ export default function ClientDashboardWrapper({
         </div>
         
         <nav className="flex-1 px-4 space-y-2 overflow-y-auto pb-6">
-          {loading ? (
-            <div className="p-3 text-sm text-slate-400 animate-pulse">Memuat menu...</div>
-          ) : (
-            <>
-              {filteredLinks.map((link) => {
-                const targetHref = link.href === "/profile" 
-                  ? (userId ? `/profile/${userId}` : '/login') 
-                  : link.href;
-                
-                const isActive = pathname.startsWith(link.href);
-                
-                return (
-                  <Link
-                    key={link.href}
-                    href={targetHref}
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                      isActive 
-                        ? 'bg-blue-600 text-white shadow-md' 
-                        : 'text-gray-700 hover:bg-blue-50'
-                    }`}
-                  >
-                    {link.icon} {link.label}
-                  </Link>
-                )
-              })}
+          {filteredLinks.map((link) => {
+            const targetHref = link.href === "/profile" 
+              ? (userId ? `/profile/${userId}` : '/login') 
+              : link.href;
+            
+            const isActive = pathname.startsWith(link.href);
+            
+            return (
+              <Link
+                key={link.href}
+                href={targetHref}
+                className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                  isActive 
+                    ? 'bg-blue-600 text-white shadow-md' 
+                    : 'text-gray-700 hover:bg-blue-50'
+                }`}
+              >
+                {link.icon} {link.label}
+              </Link>
+            )
+          })}
 
-              {userId && (
-                <button
-                  onClick={handleLogout}
-                  className="flex flex-center justify-center items-center gap-3 p-3 w-full text-red-600 rounded-lg hover:bg-red-100 transition-colors text-center"
-                >
-                  <FiLogOut className="mt-1" /> Keluar dari Akun
-                </button>
-              )}
-            </>
+          {/* Tombol keluar hanya muncul jika id user sudah terverifikasi ada */}
+          {!loading && userId && (
+            <button
+              onClick={handleLogout}
+              className="flex flex-center justify-center items-center gap-3 p-3 w-full text-red-600 rounded-lg hover:bg-red-100 transition-colors text-center mt-2"
+            >
+              <FiLogOut className="mt-1" /> Keluar dari Akun
+            </button>
           )}
         </nav>
       </aside>

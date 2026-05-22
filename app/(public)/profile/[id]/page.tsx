@@ -11,7 +11,8 @@ import {
   FiMail, 
   FiShield,
   FiCamera,
-  FiPhone
+  FiPhone,
+  FiMoreVertical
 } from 'react-icons/fi';
 import Image from 'next/image';
 import SubscriptionDialog from '../../../../components/subscription/page';
@@ -22,6 +23,8 @@ import EditProfileDialog from '@/components/edit-profile/page';
 import ManageSkillsDialog from '@/components/manage-skills/page';
 import EditProfilePhotoDialog from '@/components/edit-profile-photo/page';
 import EditProfileBannerDialog from '@/components/edit-profile-banner/page';
+import ShareProfileButton from '@/components/ui/share-profile-button/page';
+import ProfileSkeleton from '@/components/ui/skeleton-profile/page';
 
 // Sub-komponen untuk baris pengaturan
 const SettingsItem = ({ label, value, status, onClick }: { label: string, value: string, status: string, onClick?: () => void }) => (
@@ -45,13 +48,14 @@ interface ProfileProps {
 
 const Profile: React.FC<ProfileProps> = ({ params }) => {
   const { id: profileId } = use(params);
-  const [, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
   const [showSubModal, setShowSubModal] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showManageSkills, setShowManageSkills] = useState(false);
   const [showMediaProfile, setShowMediaProfile] = useState(false);
   const [showMediaBanner, setShowMediaBanner] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // State mandiri untuk menampung data user login asli
   const [userData, setUserData] = useState<{
@@ -69,7 +73,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
     joinedDate: string;
   }>({
     full_name: "Memuat nama...",
-    email: "",
+    email: "nama@email.com",
     phone: "Memuat nomor...",
     role: "worker",
     bio: "Memuat bio...",
@@ -86,7 +90,6 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
     try {
       setLoading(true);
 
-      // Ambil data spesifik role & pelengkap dari tabel public.profiles
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -120,12 +123,12 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
       const generatedAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=0D8ABC&color=fff&size=256`;
 
       const displayPhone = ownsProfile 
-        ? (currentUser?.phone || "Nomor tidak tersedia") 
-        : "Nomor disembunyikan";
+        ? (profile?.phone || currentUser?.user_metadata?.phone || "Nomor telepon tidak tersedia") 
+        : "Nomor telepon disembunyikan";
 
-      const displayEmail = ownsProfile 
-        ? (currentUser?.email || "Email tidak tersedia") 
-        : "Email disembunyikan";
+      const displayEmail = profile?.email || currentUser?.email || "Email tidak tersedia";
+
+      const rawJoinedDate = profile?.created_at;
 
       // Jika profile belum terbentuk di DB, gunakan data fallback metadata auth
       setUserData({
@@ -140,8 +143,8 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
         balance: (profile as any)?.balance || 0,
         avatarUrl: (profile as any)?.avatar_url || generatedAvatar,
         bannerUrl: (profile as any)?.banner_url || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200",
-        joinedDate: (profile as any)?.created_at 
-          ? new Date((profile as any)?.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
+        joinedDate: rawJoinedDate 
+          ? new Date(rawJoinedDate).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
           : "Baru Saja",
       });
 
@@ -157,6 +160,10 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
       fetchCurrentProfile();
     }
   }, [profileId]);
+
+  if (loading) {
+     return <ProfileSkeleton isOwnProfile={isOwnProfile} />;
+   }
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 md:pt-12 lg:pt-0">
@@ -203,14 +210,72 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
                 </div>
               )}
             </div>
-            {isOwnProfile && (
-              <button
-                className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
-                onClick={() => setShowEditProfile(true)}
-              >
-                <FiEdit2 size={18} /> Edit Profil
-              </button>
-            )}
+
+            {/* Flex container untuk tombol aksi (Desktop & Mobile) */}
+            <div className="relative flex items-center gap-2">
+              <div className="hidden md:grid md:grid-cols-2 items-center gap-2">
+                <ShareProfileButton 
+                  profileId={profileId} 
+                  fullName={userData.full_name} 
+                />
+                {isOwnProfile && (
+                  <button
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                    onClick={() => setShowEditProfile(true)}
+                  >
+                    <FiEdit2 size={18} /> Edit Profil
+                  </button>
+                )}
+              </div>
+
+              <div className="md:hidden relative">
+                <button
+                  onClick={() => setShowMobileMenu(!showMobileMenu)}
+                  className="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full transition focus:outline-hidden"
+                  aria-label="Menu Opsi"
+                >
+                  <FiMoreVertical size={20} />
+                </button>
+
+                {/* Dropdown Menu Popup */}
+                {showMobileMenu && (
+                  <>
+                    {/* Backdrop transparan untuk menutup menu saat area luar diklik */}
+                    <div 
+                      className="fixed inset-0 z-20" 
+                      onClick={() => setShowMobileMenu(false)} 
+                    />
+                    
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-30 animate-in fade-in slide-in-from-top-2 duration-150">
+                      
+                      {/* Opsi Bagian 1: Share Profile (Selalu Muncul untuk Semua Pengunjung) */}
+                      <div className="px-2 pb-1 border-b border-slate-100">
+                        <ShareProfileButton 
+                          profileId={profileId} 
+                          fullName={userData.full_name} 
+                        />
+                      </div>
+
+                      {/* Opsi Bagian 2: Edit Profil (Hanya Muncul Jika Pemilik Akun) */}
+                      {isOwnProfile && (
+                        <div className="px-2 pt-1">
+                          <button
+                            className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition"
+                            onClick={() => {
+                              setShowEditProfile(true);
+                              setShowMobileMenu(false); // Tutup menu setelah diklik
+                            }}
+                          >
+                            <FiEdit2 size={16} className="text-slate-500" /> 
+                            <span>Edit Profil</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-1">
@@ -240,9 +305,9 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className={'grid grid-cols-1 gap-6 ' + (isOwnProfile ? 'md:grid-cols-3' : 'md:grid-cols-1')}>
         {/* Sisi Kiri: Skills & Trust */}
-        <div className="md:col-span-1 space-y-6">
+        <div className={isOwnProfile ? 'md:col-span-1 space-y-6' : 'space-y-6'}>
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
@@ -291,32 +356,40 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
 
         {/* Sisi Kanan: Pengaturan & Keamanan */}
         <div className="md:col-span-2">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100">
-            <div className="p-6">
-              <h2 className="text-lg font-bold text-slate-900">Keamanan & Privasi</h2>
-              <p className="text-sm text-slate-500">Kelola informasi akun dan kata sandi Anda.</p>
+          {isOwnProfile ? (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100">
+              <div className="p-6">
+                <h2 className="text-lg font-bold text-slate-900">Keamanan & Privasi</h2>
+                <p className="text-sm text-slate-500">Kelola informasi akun dan kata sandi Anda.</p>
+              </div>
+              <SettingsItem 
+                label="Verifikasi Identitas (KTP)" 
+                value={userData.isVerified ? "Terverifikasi" : "Belum Verifikasi"} 
+                status={userData.isVerified ? "success" : "warning"}
+                onClick={() => setShowSubModal(true)}
+              />
+              <SettingsItem 
+                label="Autentikasi Dua Faktor" 
+                value="Non-aktif" 
+                status="default"
+                onClick={() => setShowSubModal(true)}
+              />
+              <SettingsItem 
+                label="Metode Pembayaran" 
+                value="Bank Central Asia (BCA)" 
+                status="success"
+                onClick={() => setShowSubModal(true)}
+              />
             </div>
-            <SettingsItem 
-              label="Verifikasi Identitas (KTP)" 
-              value={userData.isVerified ? "Terverifikasi" : "Belum Verifikasi"} 
-              status={userData.isVerified ? "success" : "warning"}
-              onClick={() => setShowSubModal(true)}
-            />
-            <SettingsItem 
-              label="Autentikasi Dua Faktor" 
-              value="Non-aktif" 
-              status="default"
-              onClick={() => setShowSubModal(true)}
-            />
-            <SettingsItem 
-              label="Metode Pembayaran" 
-              value="Bank Central Asia (BCA)" 
-              status="success"
-              onClick={() => setShowSubModal(true)}
-            />
-          </div>
+          ) : (
+            /* Opsional: Tampilan alternatif jika pengunjung adalah orang lain/guest */
+            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center text-slate-500 italic">
+              Terima kasih telah mengunjungi profil saya. Jika ada keperluan bisnis atau kerja sama, silakan hubungi saya melalui kontak di atas.
+            </div>
+          )}
         </div>
       </div>
+      
       <EditProfilePhotoDialog 
         open={showMediaProfile} 
         onOpenChange={setShowMediaProfile} 
