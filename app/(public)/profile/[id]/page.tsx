@@ -10,7 +10,8 @@ import {
   FiCalendar, 
   FiMail, 
   FiShield,
-  FiCamera
+  FiCamera,
+  FiPhone
 } from 'react-icons/fi';
 import Image from 'next/image';
 import SubscriptionDialog from '../../../../components/subscription/page';
@@ -56,6 +57,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
   const [userData, setUserData] = useState<{
     full_name: string;
     email: string;
+    phone: string;
     role: string;
     bio: string;
     location: string;
@@ -68,6 +70,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
   }>({
     full_name: "Memuat nama...",
     email: "",
+    phone: "Memuat nomor...",
     role: "worker",
     bio: "Memuat bio...",
     location: "Memuat lokasi...",
@@ -83,30 +86,12 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
     try {
       setLoading(true);
 
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
-
-      // Jika ID di URL sama dengan ID user yang sedang login, berarti ini profilnya sendiri
-      if (currentUser && currentUser.id === profileId) {
-        setIsOwnProfile(true);
-      } else {
-        setIsOwnProfile(false);
-      }
-
-      // Ambil info akun dari session Supabase Auth
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-      if (authError) throw authError;
-
-      if (!user) {
-        toast.error("Sesi habis, silakan login kembali.");
-        return;
-      }
-
       // Ambil data spesifik role & pelengkap dari tabel public.profiles
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
-        .single();
+        .eq('id', profileId)
+        .maybeSingle();
 
       // Abaikan error "Row not found" (PGRST116) karena user baru mungkin belum punya row di tabel profiles
       if (profileError && profileError.code !== 'PGRST116') {
@@ -124,15 +109,30 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
         return;
       }
 
+      const { data: authData } = await supabase.auth.getUser();
+      const currentUser = authData?.user;
+
+      const ownsProfile = !!(currentUser && currentUser.id === profileId);
+      setIsOwnProfile(ownsProfile);
+
       // Siapkan variabel nama untuk generator avatar
-      const fallbackName = user.user_metadata?.full_name || "Pengguna KaryaMandiri";
+      const fallbackName = currentUser?.user_metadata?.full_name || "Pengguna KaryaMandiri";
       const generatedAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=0D8ABC&color=fff&size=256`;
+
+      const displayPhone = ownsProfile 
+        ? (currentUser?.phone || "Nomor tidak tersedia") 
+        : "Nomor disembunyikan";
+
+      const displayEmail = ownsProfile 
+        ? (currentUser?.email || "Email tidak tersedia") 
+        : "Email disembunyikan";
 
       // Jika profile belum terbentuk di DB, gunakan data fallback metadata auth
       setUserData({
-        full_name: profile?.full_name || user.user_metadata?.full_name || fallbackName,
-        email: user.email || "Email disembunyikan",
-        role: profile?.role || user.user_metadata?.role || "worker",
+        full_name: profile?.full_name || currentUser?.user_metadata?.full_name || fallbackName,
+        email: displayEmail,
+        phone: displayPhone,
+        role: profile?.role || currentUser?.user_metadata?.role || "worker",
         bio: (profile as any)?.bio || "Belum ada bio profil. Ceritakan sedikit tentang diri Anda.",
         location: (profile as any)?.location || "Belum mengatur lokasi.",
         skills: (profile as any)?.skills || [],
@@ -140,8 +140,8 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
         balance: (profile as any)?.balance || 0,
         avatarUrl: (profile as any)?.avatar_url || generatedAvatar,
         bannerUrl: (profile as any)?.banner_url || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200",
-        joinedDate: user.created_at 
-          ? new Date(user.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
+        joinedDate: (profile as any)?.created_at 
+          ? new Date((profile as any)?.created_at).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
           : "Baru Saja",
       });
 
@@ -187,6 +187,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
                 alt={userData.full_name} 
                 fill
                 className="rounded-2xl border-4 border-white bg-white shadow-md object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
               {isOwnProfile && (
                 <button
@@ -228,6 +229,9 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
             </div>
             <div className="flex items-center gap-2">
               <FiMail className="text-blue-500" /> {userData.email}
+            </div>
+            <div className="flex items-center gap-2">
+              <FiPhone className="text-blue-500" /> {userData.phone}
             </div>
             <div className="flex items-center gap-2">
               <FiCalendar className="text-blue-500" /> Bergabung {userData.joinedDate}

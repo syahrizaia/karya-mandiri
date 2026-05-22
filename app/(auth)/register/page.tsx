@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [role, setRole] = useState("worker");
 
@@ -29,6 +30,7 @@ export default function RegisterPage() {
           // Menyimpan data tambahan (Metadata) seperti nama lengkap ke tabel auth
           data: {
             full_name: fullName,
+            phone: phone,
             role: role,
           },
         },
@@ -73,6 +75,20 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full mt-1 px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
               placeholder="nama@email.com"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-bold text-slate-400 uppercase">Nomor Telepon</label>
+            <input
+              type="tel"
+              required
+              pattern="[0-9]*"
+              inputMode="numeric"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))} // Hanya mengizinkan input angka
+              className="w-full mt-1 px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+              placeholder="081234567890"
             />
           </div>
 

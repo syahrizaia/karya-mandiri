@@ -23,6 +23,7 @@ import PostServiceDialog from '@/components/create-service/page';
 import { useRouter } from 'next/navigation';
 
 interface IProfile {
+  id: string | null;
   name: string;
   level: string;
   rating: number;
@@ -37,6 +38,7 @@ const WorkerDashboard: React.FC = () => {
   const [jobs, setJobs] = useState<IJobs[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [profile, setProfile] = useState<IProfile>({
+    id: null,
     name: "Pengguna",
     level: "Beginner",
     rating: 0.0,
@@ -44,10 +46,13 @@ const WorkerDashboard: React.FC = () => {
     completedTasks: 0,
   });
 
+  // Fetch daftar pekerjaan dari Supabase
   useEffect(() => {
     const fetchJobs = async () => {
       setLoading(true);
+
       const {data, error} = await supabase.from('jobs').select('*').order('posted_at', { ascending: false });
+
       if(error) {
         console.error('Error fetching jobs:', error);
       } else {
@@ -59,6 +64,7 @@ const WorkerDashboard: React.FC = () => {
     fetchJobs();
   }, [supabase]);
 
+  // Fetch data profil sekaligus mengunci ID user yang sedang login
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -71,8 +77,7 @@ const WorkerDashboard: React.FC = () => {
           return;
         }
 
-        // Tarik data profil spesifik dari tabel public.profiles
-        // SESUAIKAN: Pastikan nama kolom 'full_name', 'level', dan 'rating' cocok dengan DB-mu
+        // Ambil data dari tabel profiles berdasarkan id user auth
         const { data: profileData, error: profileError } = await supabase
           .from("profiles")
           .select("full_name, level, rating, total_earnings, completed_tasks")
@@ -86,6 +91,7 @@ const WorkerDashboard: React.FC = () => {
 
         if (profileData) {
           setProfile({
+            id: user.id,
             name: profileData.full_name || "Tanpa Nama",
             level: profileData.level || "Pekerja",
             rating: profileData.rating ? Number(profileData.rating) : 5.0,
@@ -116,10 +122,17 @@ const WorkerDashboard: React.FC = () => {
     );
   }
 
+  const savedJobs = jobs.filter(job => {
+    // Pastikan user sudah login
+    if (!profile.id) return false;
+    
+    // Sesuaikan kondisi di bawah ini dengan struktur kolom penyimpanan bookmark pada DB Anda:
+    // Contoh jika menggunakan kolom 'is_saved' dan dicek kepemilikannya:
+    return job.is_saved && (job.worker_id === profile.id || job.user_id === profile.id);
+  });
+
   const handleRefreshData = () => {
-    // Fungsi pemicu untuk men-fetch ulang data list dari Supabase agar postingan baru langsung kelihatan
     console.log("Postingan berhasil dikirim, me-refresh feed data...");
-    // Jalankan fungsi fetchServices() di sini jika ada
   };
 
   function SavedJobSkeleton() {
@@ -223,14 +236,14 @@ const WorkerDashboard: React.FC = () => {
               <SavedJobSkeleton />
               <SavedJobSkeleton />
             </>
-          ) : jobs.filter(job => job.is_saved).length === 0 ? (
+          ) : savedJobs.length === 0 ? (
             /* Antisipasi jika tidak ada pekerjaan yang disimpan */
             <div className="text-center py-10 text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">
               Belum ada proyek yang disimpan.
             </div>
           ) : (
             /* Render data asli jika sudah selesai loading */
-            jobs.filter(job => job.is_saved).map((job) => (
+            savedJobs.map((job) => (
               <div key={job.id} className="bg-white p-5 rounded-xl border border-slate-200 hover:border-blue-400 transition-all shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex gap-4 items-center">
                   <div className="bg-blue-100 p-3 rounded-lg text-blue-600 hidden sm:block">

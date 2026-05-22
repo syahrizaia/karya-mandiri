@@ -54,7 +54,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return response;
+  return NextResponse.next();
 }
 
 // KONFIGURASI MATCHER (SANGAT KRUSIAL)
@@ -68,6 +68,10 @@ export const config = {
      * - favicon.ico (ikon browser)
      * - file dengan ekstensi (svg, png, jpg, jpeg, gif, webp)
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/employer/:path*',
+    '/worker/:path*',
+    '/history/:path*',
+    '/notification/:path*',
+    '/settings/:path*',
   ],
 };

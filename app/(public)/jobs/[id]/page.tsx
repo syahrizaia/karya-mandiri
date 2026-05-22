@@ -21,22 +21,60 @@ const DetailJob: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showSubModal, setShowSubModal] = useState(false);
   const [selectedApplyJob, setSelectedApplyJob] = useState<IJobs | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [isSavedByUser, setIsSavedByUser] = useState<boolean>(false);
 
   useEffect(() => {
     if(params?.id) {
-      const fetchJob = async () => {
+      const fetchJobAndUser = async () => {
         try {
-          const {data, error} = await supabase.from('jobs').select('*').eq('id', params.id).single();
+          setLoading(true);
+
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (user) {
+            setUserId(user.id);
+            
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', user.id)
+              .maybeSingle();
+              
+            if (profile) {
+              setUserRole(profile.role?.toLowerCase());
+            }
+
+            const { data: savedData } = await supabase
+              .from('saved_jobs')
+              .select('*')
+              .eq('user_id', user.id)
+              .eq('job_id', params.id)
+              .maybeSingle();
+
+            if (savedData) {
+              setIsSavedByUser(true);
+            }
+          }
+
+          const { data, error } = await supabase.from('jobs').select('*').eq('id', params.id).single();
           if (error) throw error;
           setJob(data);
+
+          // Fallback sekunder jika skema simpan Anda langsung menggunakan kolom 'worker_id' di tabel 'jobs'
+          if (user && data && data.is_saved && data.worker_id === user.id) {
+            setIsSavedByUser(true);
+          }
+
         } catch (error) {
-          console.error('Error fetching job:', error);
+          console.error('Error fetching data:', error);
         } finally {
           setLoading(false);
         }
       };
 
-      fetchJob();
+      fetchJobAndUser();
     }
   }, [params?.id]);
 
@@ -153,35 +191,49 @@ const DetailJob: React.FC = () => {
                 </div>
               )}
 
+              {/* CONTAINER TOMBOL AKSI */}
               <div className="flex flex-row lg:flex-col gap-4">
-                <button
-                  className="w-full p-4 bg-blue-600 text-white text-sm md:text-lg font-bold rounded-2xl hover:bg-blue-700 transition shadow-blue-200 shadow-lg flex items-center justify-center gap-2"
-                  onClick={() => setSelectedApplyJob(job)}
-                >
-                  <FiShield className="text-white lg:text-4xl" />
-                  Ambil Pekerjaan Sekarang
-                </button>
-                <SaveJobButton
-                  is_saved={job.is_saved}
-                  id={job.id}
-                  status={job.status}
-                  title={job.title}
-                  employer={job.employer}
-                  employer_name={job.employer_name}
-                  category={job.category}
-                  location={job.location}
-                  reward={job.reward}
-                  type={job.type}
-                  description={job.description}
-                  requirements={job.requirements}
-                  taken={job.taken}
-                  total={job.total}
-                  posted_at={job.posted_at}
-                  deadline={job.deadline}
-                  applied_at={job.applied_at}
-                  worker_notes={job.worker_notes}
-                  applications={job.applications}
-                />
+                {/* PROSES VALIDASI ROLE: Hanya Worker yang Bisa Melamar & Menyimpan */}
+                {userRole === 'worker' ? (
+                  <>
+                    <button
+                      className="w-full p-4 bg-blue-600 text-white text-sm md:text-lg font-bold rounded-2xl hover:bg-blue-700 transition shadow-blue-200 shadow-lg flex items-center justify-center gap-2"
+                      onClick={() => setSelectedApplyJob(job)}
+                    >
+                      <FiShield className="text-white lg:text-4xl" />
+                      Ambil Pekerjaan Sekarang
+                    </button>
+                    <SaveJobButton
+                      is_saved={isSavedByUser} // Sinkronisasi dinamis sesuai user login
+                      id={job.id}
+                      status={job.status}
+                      title={job.title}
+                      employer={job.employer}
+                      employer_name={job.employer_name}
+                      category={job.category}
+                      location={job.location}
+                      reward={job.reward}
+                      type={job.type}
+                      description={job.description}
+                      requirements={job.requirements}
+                      taken={job.taken}
+                      total={job.total}
+                      posted_at={job.posted_at}
+                      deadline={job.deadline}
+                      applied_at={job.applied_at}
+                      worker_notes={job.worker_notes}
+                      applications={job.applications}
+                    />
+                  </>
+                ) : (
+                  /* Tampilan Fallback jika dibuka oleh Employer atau User tanpa Sesi Login */
+                  <div className="w-full p-4 bg-slate-50 border border-slate-200 text-slate-500 text-center font-semibold text-xs rounded-2xl">
+                    {userId 
+                      ? "Aksi lamar & simpan lowongan hanya tersedia untuk akun Pekerja (Worker)." 
+                      : "Silakan login terlebih dahulu untuk melamar pekerjaan."
+                    }
+                  </div>
+                )}
               </div>
 
               <div className="mt-6 pt-6 border-t border-slate-200 flex items-center gap-3 text-slate-400">
@@ -194,6 +246,7 @@ const DetailJob: React.FC = () => {
           </aside>
         </div>
       </main>
+      
       {selectedApplyJob && (
         <ApplyJobDialog
           job={selectedApplyJob}

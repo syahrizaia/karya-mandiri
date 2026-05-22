@@ -11,7 +11,7 @@ import {
   DialogDescription, 
   DialogFooter 
 } from "@/components/ui/dialog";
-import { FiLoader, FiUser, FiMapPin, FiEdit3, FiAlignLeft } from "react-icons/fi";
+import { FiLoader, FiUser, FiMapPin, FiEdit3, FiAlignLeft, FiPhone } from "react-icons/fi";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
 
@@ -27,6 +27,7 @@ export default function EditProfileDialog({ open, onOpenChange, userData, onSucc
   
   // State Form
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
   const [location, setLocation] = useState("");
 
@@ -34,6 +35,7 @@ export default function EditProfileDialog({ open, onOpenChange, userData, onSucc
   useEffect(() => {
     if (open && userData) {
       setFullName(userData.full_name || "");
+      setPhone(userData.phone === "Belum mengatur nomor telepon" || userData.phone === "Memuat nomor..." ? "" : userData.phone || "");
       setBio(userData.bio || "");
       setLocation(userData.location || "");
     }
@@ -47,14 +49,21 @@ export default function EditProfileDialog({ open, onOpenChange, userData, onSucc
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Sesi tidak ditemukan.");
 
+      const updatePayload: any = {
+        full_name: fullName,
+        phone: phone,
+        bio: bio,
+        location: location,
+        updated_at: new Date().toISOString(), // Hanya mengubah waktu modifikasi terakhir
+      };
+
+      if (userData?.created_at) {
+        updatePayload.created_at = userData.created_at;
+      }
+
       const { error } = await supabase
         .from("profiles")
-        .update({
-          full_name: fullName,
-          bio: bio,
-          location: location,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updatePayload)
         .eq("id", user.id);
 
       if (error) throw error;
@@ -95,6 +104,22 @@ export default function EditProfileDialog({ open, onOpenChange, userData, onSucc
               onChange={(e) => setFullName(e.target.value)}
               className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
               placeholder="Masukkan nama lengkap Anda"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase text-slate-400 tracking-wider flex items-center gap-1.5">
+              <FiPhone /> Nomor Telepon
+            </label>
+            <input
+              type="tel"
+              required
+              pattern="[0-9]*"
+              inputMode="numeric"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))} // Hanya mengizinkan ketikan angka saja
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+              placeholder="Contoh: 081234567890"
             />
           </div>
 

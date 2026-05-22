@@ -26,24 +26,57 @@ const Jobs: React.FC = () => {
   const [minReward, setMinReward] = useState<number>(0);
   const [maxPriceLimit, setMaxPriceLimit] = useState<number>(5000000); // Batas atas slider bawaan (Rp5 Juta)
   const [sortBy, setSortBy] = useState<string>('Terbaru');
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [savedJobIds, setSavedJobIds] = useState<string[]>([]); // Menyimpan list job_id yang dibookmark user ini
   
   useEffect(() => {
-    const fetchJobs = async () => {
+    const checkUserAndFetchJobs = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
+
+        // Dapatkan user session saat ini
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          setUserId(user.id);
+          
+          // Ambil role dari tabel profiles (Asumsi kolom bernama 'role' bernilai 'worker' / 'employer')
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle();
+            
+          if (profile) {
+            setUserRole(profile.role?.toLowerCase());
+          }
+
+          // Tarik data pekerjaan yang disimpan oleh user ini jika skema Anda menggunakan tabel perantara 'saved_jobs'
+          // Jika skema Anda berbeda (misal kolom 'worker_id' langsung di tabel 'jobs'), Anda bisa menyesuaikannya di bawah.
+          const { data: savedData } = await supabase
+            .from('saved_jobs') 
+            .select('job_id')
+            .eq('user_id', user.id);
+            
+          if (savedData) {
+            setSavedJobIds(savedData.map(item => item.job_id));
+          }
+        }
+
+        // Fetch daftar lowongan pekerjaan
+        const { data: jobsData, error } = await supabase
           .from('jobs')
           .select('*')
           .order('posted_at', { ascending: false });
           
         if (error) {
           console.error('Error fetching jobs:', error);
-        } else if (data) {
-          setJobs(data);
+        } else if (jobsData) {
+          setJobs(jobsData);
           
-          // Set batas atas dinamis untuk slider upah berdasarkan upah tertinggi di database
-          if (data.length > 0) {
-            const highestReward = Math.max(...data.map(j => j.reward ?? 0));
+          if (jobsData.length > 0) {
+            const highestReward = Math.max(...jobsData.map(j => j.reward ?? 0));
             setMaxPriceLimit(highestReward > 0 ? highestReward : 5000000);
           }
         }
@@ -54,7 +87,7 @@ const Jobs: React.FC = () => {
       }
     };
 
-    fetchJobs();
+    checkUserAndFetchJobs();
   }, []);
 
   const handleCategoryChange = (category: string) => {
@@ -253,86 +286,101 @@ const Jobs: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                filteredJobs.map((job) => (
-                  <div key={job.id} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
-                    <div className='md:grid md:grid-cols-3 flex flex-col'>
-                      <Link href={`/jobs/${job.id}`} className="flex flex-col md:flex-row md:col-span-2 justify-between gap-6">
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                              job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
-                            }`}>
-                              {job.type}
-                            </span>
-                            <span className="text-slate-400 text-xs flex items-center gap-1">
-                              <FiClock /> {formatRelativeTime(job.posted_at)}
-                            </span>
-                          </div>
-                          <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
-                          <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
-                            <div className="flex items-center gap-1"><FiUser className="text-blue-500"/> {job.employer}</div>
-                            <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
-                          </div>
-                        </div>
-                      </Link>
+                filteredJobs.map((job) => {
+                  const isJobSavedByUser = savedJobIds.includes(job.id) || (job.is_saved && job.worker_id === userId);
 
-                      <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
-                        <div className="text-right w-full">
-                          <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
-                          <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
-                        </div>
-                        
-                        {/* CONTAINER TOMBOL AKSI */}
-                        <div className="flex items-center gap-3 w-full md:w-auto">
-                          <Link
-                            href={`/jobs/${job.id}`}
-                            className="text-center w-full px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap"
-                          >
-                            Lamar Sekarang
-                          </Link>
-                          {/* Tombol Simpan Pekerjaan */}
-                          <SaveJobButton
-                            is_saved={job.is_saved}
-                            id={job.id}
-                            status={job.status}
-                            title={job.title}
-                            employer={job.employer}
-                            employer_name={job.employer_name}
-                            category={job.category}
-                            location={job.location}
-                            reward={job.reward}
-                            type={job.type}
-                            description={job.description}
-                            requirements={job.requirements}
-                            taken={job.taken}
-                            total={job.total}
-                            posted_at={job.posted_at}
-                            deadline={job.deadline}
-                            applied_at={job.applied_at}
-                            worker_notes={job.worker_notes}
-                            applications={job.applications}
-                          />
+                  return (
+                    <div key={job.id} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
+                      <div className='md:grid md:grid-cols-3 flex flex-col'>
+                        <Link href={`/jobs/${job.id}`} className="flex flex-col md:flex-row md:col-span-2 justify-between gap-6">
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-2">
+                              <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
+                              }`}>
+                                {job.type}
+                              </span>
+                              <span className="text-slate-400 text-xs flex items-center gap-1">
+                                <FiClock /> {formatRelativeTime(job.posted_at)}
+                              </span>
+                            </div>
+                            <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
+                            <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
+                              <div className="flex items-center gap-1"><FiUser className="text-blue-500"/> {job.employer}</div>
+                              <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
+                          <div className="text-right w-full">
+                            <p className="text-xs text-slate-400 font-semibold uppercase">Upah Tugas</p>
+                            <p className="text-2xl font-bold text-green-600">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
+                          </div>
+                          
+                          {/* CONTAINER TOMBOL AKSI */}
+                          <div className="flex items-center gap-3 w-full md:w-auto">
+                            {userRole === 'worker' ? (
+                              <>
+                                <Link
+                                  href={`/jobs/${job.id}`}
+                                  className="text-center w-full px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap"
+                                >
+                                  Lamar Sekarang
+                                </Link>
+                                <SaveJobButton
+                                  is_saved={isJobSavedByUser} // Menggunakan pengecekan dinamis user login
+                                  id={job.id}
+                                  status={job.status}
+                                  title={job.title}
+                                  employer={job.employer}
+                                  employer_name={job.employer_name}
+                                  category={job.category}
+                                  location={job.location}
+                                  reward={job.reward}
+                                  type={job.type}
+                                  description={job.description}
+                                  requirements={job.requirements}
+                                  taken={job.taken}
+                                  total={job.total}
+                                  posted_at={job.posted_at}
+                                  deadline={job.deadline}
+                                  applied_at={job.applied_at}
+                                  worker_notes={job.worker_notes}
+                                  applications={job.applications}
+                                />
+                              </>
+                            ) : (
+                              /* Tampilan fallback opsional jika yang login adalah Employer / Tamu */
+                              <Link
+                                href={`/jobs/${job.id}`}
+                                className="text-center w-full px-6 py-3 bg-slate-100 text-slate-600 font-bold text-xs rounded-2xl hover:bg-slate-200 transition whitespace-nowrap"
+                              >
+                                Lihat Detail Proyek
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       </div>
+
+                      {/* Crowdsourcing Progress Bar */}
+                      {job.type === 'Crowdsourcing' && (
+                        <div className="mt-6 pt-4 border-t border-slate-50">
+                          <div className="flex justify-between text-xs font-bold mb-2">
+                            <span className="text-slate-500 uppercase">Kuota Crowdsourcing</span>
+                            <span className="text-blue-600">{job.taken} / {job.total} Pekerja</span>
+                          </div>
+                          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-blue-500 h-full transition-all duration-500" 
+                              style={{ width: `${(job.taken / job.total) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
-
-                    {/* Crowdsourcing Progress Bar */}
-                    {job.type === 'Crowdsourcing' && (
-                      <div className="mt-6 pt-4 border-t border-slate-50">
-                        <div className="flex justify-between text-xs font-bold mb-2">
-                          <span className="text-slate-500 uppercase">Kuota Crowdsourcing</span>
-                          <span className="text-blue-600">{job.taken} / {job.total} Pekerja</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div 
-                            className="bg-blue-500 h-full transition-all duration-500" 
-                            style={{ width: `${(job.taken / job.total) * 100}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))
+                  )
+                })
               )}
             </>
           )}

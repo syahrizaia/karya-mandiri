@@ -26,6 +26,7 @@ const EditProjectDialog = ({ job, open, onOpenChange, onSuccess }: EditProjectDi
     useEffect(() => {
         const fetchJobs = async () => {
             setLoading(true);
+            
             try {
                 const {data, error} = await supabase.from('jobs').select('*').order('posted_at', { ascending: false });
                 if(error) {
@@ -77,7 +78,7 @@ const EditProjectDialog = ({ job, open, onOpenChange, onSuccess }: EditProjectDi
         }
 
         const projectData = {
-        id: crypto.randomUUID(),
+        id: job.id,
         title: rawData.title,
         employer: user.user_metadata?.full_name || "Pengguna KaryaMandiri", // Hidden data
         description: rawData.description,
@@ -87,9 +88,9 @@ const EditProjectDialog = ({ job, open, onOpenChange, onSuccess }: EditProjectDi
         type: rawData.type,
         location: rawData.location,
         reward: Number(rawData.reward),
-        taken: 0, // Hidden data awal
+        taken: job.taken, // Hidden data awal
         total: Number(rawData.total),
-        posted_at: rawData.posted_at ? new Date(rawData.posted_at as string).toISOString() : new Date().toISOString(), // Hidden data
+        posted_at: job.posted_at, // Hidden data
         status: rawData.status, // Hidden data default
         };
 

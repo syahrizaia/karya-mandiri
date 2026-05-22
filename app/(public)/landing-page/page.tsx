@@ -43,7 +43,7 @@ export default function LandingPage() {
       <div className="absolute top-1/3 right-1/4 w-125 h-125 bg-purple-600/10 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-80 h-80 bg-emerald-600/5 rounded-full blur-[100px] pointer-events-none" />
 
-      <nav className="fixed top-4 inset-x-0 z-50 bg-slate-450/70 backdrop-blur-xl border border-slate-400 px-6 py-4 w-fit mx-auto rounded-full shadow-lg">
+      <nav className="fixed top-4 inset-x-0 z-50 bg-slate-450/70 backdrop-blur-xl backdrop-brightness-125 border border-slate-400 px-6 py-4 w-fit mx-auto rounded-full shadow-lg">
         <div className="max-w-6xl mx-auto flex items-center justify-between lg:gap-32 w-fit">
           {/* Logo */}
           <Link href="/" className="text-xl font-black tracking-wider bg-linear-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent flex items-center gap-2 mr-6 lg:mr-0">

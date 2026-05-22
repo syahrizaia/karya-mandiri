@@ -58,6 +58,7 @@ const EmployerDashboard: React.FC = () => {
   useEffect(() => {
     const fetchEmployerDashboardData = async () => {
       setLoading(true);
+      
       try {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
         

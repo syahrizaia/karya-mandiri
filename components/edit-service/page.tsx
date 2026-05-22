@@ -62,6 +62,7 @@ export default function EditServiceDialog({ open, onOpenChange, service, onSucce
           description,
           price: Number(price),
           category,
+          created_at: service.created_at,
         })
         .eq("id", service.id);
 

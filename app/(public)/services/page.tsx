@@ -23,6 +23,7 @@ interface IServiceFeed {
   // Relasi join untuk mengambil data nama pembuat jasa dari tabel profiles
   profiles: {
     full_name: string;
+    phone: string | null;
   } | null;
 }
 
@@ -60,7 +61,8 @@ export default function Services() {
             category,
             created_at,
             profiles (
-              full_name
+              full_name,
+              phone
             )
           `)
           .order("created_at", { ascending: false });
@@ -87,11 +89,25 @@ export default function Services() {
   });
 
   const handleHireClick = (service: IServiceFeed) => {
+    const rawPhone = service.profiles?.phone;
+
+    // Validasi jika penyedia jasa belum mendaftarkan nomor telepon
+    if (!rawPhone) {
+      toast.error(`Gagal menghubungi: ${service.profiles?.full_name || "Penyedia Jasa"} belum mengatur nomor telepon di profil mereka.`);
+      return;
+    }
+
+    // Standardisasi nomor telepon ke format internasional WhatsApp (menghapus karakter non-angka & mengubah '08' menjadi '62')
+    let cleanPhone = rawPhone.replace(/\D/g, "");
+    if (cleanPhone.startsWith("0")) {
+      cleanPhone = "62" + cleanPhone.slice(1);
+    }
+
     // Aksi ketika tombol hubungi diklik
     const message = encodeURIComponent(`Halo, saya tertarik dengan jasa Anda di KaryaMandiri: "${service.title}". Bisa berdiskusi lebih lanjut?`);
-    toast.info(`Membuka komunikasi dengan ${service.profiles?.full_name || "Penyedia Jasa"}`);
-    // Contoh direct ke tautan eksternal tiruan
-    window.open(`https://wa.me/6282114487163?text=${message}`, "_blank");
+    
+    toast.info(`Membuka komunikasi dengan ${service.profiles?.full_name}`);
+    window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
   };
 
   return (

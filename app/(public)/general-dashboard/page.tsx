@@ -12,7 +12,7 @@ import {
   FiArrowUpRight,
   FiZap 
 } from 'react-icons/fi';
-import { GeneralStats } from '../types';
+import { GeneralStats } from '../../(private)/types';
 import supabase from '@/lib/db';
 import type { IEcosystemActivities } from '@/app/types/ecosystem-activity';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
