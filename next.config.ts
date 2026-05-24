@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
         hostname: 'qnevjjzuwpvekiccokfn.supabase.co',
         pathname: '/storage/v1/object/public/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'dims.apnews.com',
+        pathname: '/**',
+      },
     ],
   },
 };

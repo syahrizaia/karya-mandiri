@@ -23,7 +23,7 @@ export default function ClientDashboardWrapper({
   const router = useRouter();
 
   // Daftar rute yang benar-benar publik dan bisa diakses tanpa login/tanpa role khusus
-  const publicRoutes = ["/", "/general-dashboard", "/jobs", "/services", "/profile", "/login", "/register"];
+  const publicRoutes = ["/", "/general-dashboard", "/news", "/jobs", "/services", "/profile", "/login", "/register", "/maintenance"];
 
   useEffect(() => {
     const fetchUserSessionAndRole = async () => {
@@ -77,6 +77,7 @@ export default function ClientDashboardWrapper({
 
   const allNavLinks = [
     { href: "/general-dashboard", label: "Dashboard Umum", icon: <FiHome />, roles: ["employer", "worker", "guest"] },
+    { href: "/maintenance", label: "Berita", icon: <FiHome />, roles: ["employer", "worker", "guest"] },
     { href: "/employer", label: "Ruang Kerja", icon: <FiUser />, roles: ["employer"] },
     { href: "/worker", label: "Ruang Kerja", icon: <FiUser />, roles: ["worker"] },
     { href: "/jobs", label: "Pekerjaan", icon: <FiBriefcase />, roles: ["employer", "worker", "guest"] },

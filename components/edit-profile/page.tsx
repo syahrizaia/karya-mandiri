@@ -49,12 +49,35 @@ export default function EditProfileDialog({ open, onOpenChange, userData, onSucc
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Sesi tidak ditemukan.");
 
+      // FORMAT AUTOMATIC KE E.164 (+62)
+      let formattedPhone = phone.trim();
+      if (formattedPhone.startsWith("0")) {
+        formattedPhone = "62" + formattedPhone.substring(1);
+      }
+      // Jika user lupa menulis kode negara dan langsung angka 8, tambahkan 62
+      if (formattedPhone.startsWith("8")) {
+        formattedPhone = "62" + formattedPhone;
+      }
+
+      if (formattedPhone !== "") {
+        const { error: authError } = await supabase.from("profiles").update({
+          phone: formattedPhone // Sekarang formatnya sudah valid (misal: 628123456789)
+        }).eq("id", user.id);;
+
+        if (authError) {
+          console.warn("Catatan Autentikasi Sistem:", authError.message);
+          // Jika tetap gagal karena alasan lain, lempar error agar user tahu
+          throw new Error(`Gagal verifikasi nomor: ${authError.message}`);
+        }
+      }
+
       const updatePayload: any = {
         full_name: fullName,
         phone: phone,
         bio: bio,
         location: location,
         updated_at: new Date().toISOString(), // Hanya mengubah waktu modifikasi terakhir
+        email: user.email,
       };
 
       if (userData?.created_at) {

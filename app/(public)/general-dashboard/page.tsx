@@ -17,6 +17,7 @@ import supabase from '@/lib/db';
 import type { IEcosystemActivities } from '@/app/types/ecosystem-activity';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import SubscriptionDialog from '../../../components/subscription/page';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // --- Sub Komponen ---
 const SummaryCard = ({ title, value, icon, trend, color, isLoading }: any) => {
@@ -70,6 +71,7 @@ const GeneralDashboard: React.FC = () => {
   const [ecosystemActivities, setEcosystemActivities] = useState<IEcosystemActivities[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSubModal, setShowSubModal] = useState(false);
+  const [showAllActivities, setShowAllActivities] = useState(false);
 
   // State untuk statistik dinamis dari Supabase
   const [dynamicStats, setDynamicStats] = useState({
@@ -101,7 +103,6 @@ const GeneralDashboard: React.FC = () => {
           .from('ecosystem_activities')
           .select('*')
           .order('time', { ascending: false })
-          .limit(5); // Batasi hanya mengambil 5 riwayat terbaru demi performa
 
         if (activitiesError) throw activitiesError;
         setEcosystemActivities(activitiesData || []);
@@ -187,41 +188,41 @@ const GeneralDashboard: React.FC = () => {
           }
         }
 
-        // A. Ambil total user (Gunakan select standar tanpa opsi head jika memicu eror)
+        // Ambil total user (Gunakan select standar tanpa opsi head jika memicu eror)
         const { data: allProfiles, error: errTotalUsers } = await supabase
           .from('profiles')
           .select('id, is_verified, role, full_name, email, phone'); // Cukup ambil kolom yang diperlukan saja (efisiensi performa)
 
         const totalUsersCount = allProfiles ? allProfiles.length : 0;
 
-        // B. Hitung user terverifikasi langsung dari array lokal untuk menghindari filter URL yang sensitif
+        // Hitung user terverifikasi langsung dari array lokal untuk menghindari filter URL yang sensitif
         const verifiedUsersCount = allProfiles 
           ? allProfiles.filter(p => (p as any).is_verified === true).length
           : 0;
 
-        // C. Hitung rasio KYC untuk akurasi persentase Target Capaian (menggunakan definisi baru Anda)
+        // Hitung rasio KYC untuk akurasi persentase Target Capaian (menggunakan definisi baru Anda)
         const verifikasiKYCProgress = totalUsersCount 
           ? Math.round((verifiedUsersCount / totalUsersCount) * 100) 
           : 0;
 
-        // C. Ambil total tugas keseluruhan dari tabel jobs
+        // Ambil total tugas keseluruhan dari tabel jobs
         const { data: allJobs, error: errTotalJobs } = await supabase
           .from('jobs')
           .select('id, employer_id');
 
         const totalTasksCount = allJobs ? allJobs.length : 0;
 
-        // D. Hitung total semua profile dengan role 'employer'
+        // Hitung total semua profile dengan role 'employer'
         const totalEmployers = allProfiles 
           ? allProfiles.filter(p => p.role === 'employer').length 
           : 0;
 
-        // E. Ambil ID employer unik yang sudah pernah memposting proyek dari data jobs yang sudah ditarik
+        // Ambil ID employer unik yang sudah pernah memposting proyek dari data jobs yang sudah ditarik
         const uniqueActiveEmployers = allJobs
           ? new Set(allJobs.map(j => j.employer_id).filter(Boolean)).size
           : 0;
 
-        // F. Rumus Persentase Retensi Kemitraan
+        // Rumus Persentase Retensi Kemitraan
         const kalkulasiRetensi = totalEmployers > 0
           ? Math.round((uniqueActiveEmployers / totalEmployers) * 100)
           : 0;
@@ -262,8 +263,7 @@ const GeneralDashboard: React.FC = () => {
       (payload) => {
         // Begitu ada baris baru masuk, selipkan ke urutan paling atas array state
         setEcosystemActivities((prevActivities) => {
-          const updated = [payload.new as IEcosystemActivities, ...prevActivities];
-          return updated.slice(0, 5); // Batasi tetap maksimal 5 item agar layout tidak rusak kebawah
+          return [payload.new as IEcosystemActivities, ...prevActivities];
         });
       }
     )
@@ -278,11 +278,11 @@ const GeneralDashboard: React.FC = () => {
   // Format Helper Rupiah Triliun/Miliar agar scannable
   const formatImpactValue = (value: number) => {
     if (value >= 1000000000000) {
-      return `Rp ${(value / 1000000000000).toFixed(1)}T`;
+      return `Rp${(value / 1000000000000).toFixed(1)}T`;
     } else if (value >= 100000000) {
-      return `Rp ${(value / 1000000000).toFixed(1)}M`;
+      return `Rp${(value / 1000000000).toFixed(1)}M`;
     }
-    return `Rp ${value.toLocaleString('id-ID')}`;
+    return `Rp${value.toLocaleString('id-ID')}`;
   };
 
   const EcosystemLoading = () => (
@@ -363,6 +363,7 @@ const GeneralDashboard: React.FC = () => {
           <EcosystemLoading />
         ) : (
           /* Aktivitas Utama */
+          <>
           <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-slate-200 flex justify-between items-center">
               <h3 className="font-bold text-slate-800 flex items-center gap-2">
@@ -370,7 +371,7 @@ const GeneralDashboard: React.FC = () => {
               </h3>
               <button
                 className="text-xs font-bold text-blue-600 hover:underline"
-                onClick={() => setShowSubModal(true)}
+                onClick={() => setShowAllActivities(true)}
               >
                 Lihat Semua
               </button>
@@ -379,7 +380,7 @@ const GeneralDashboard: React.FC = () => {
               {ecosystemActivities.length === 0 ? (
                 <div className="p-8 text-center text-sm text-slate-400">Belum ada aktivitas baru hari ini.</div>
               ) : (
-                ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => ( 
+                ecosystemActivities.slice(0, 5).map((ecosystemActivity: IEcosystemActivities) => ( 
                   <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition">
                     <div className="flex items-center gap-4">
                       <div className={`p-3 rounded-xl ${
@@ -402,6 +403,57 @@ const GeneralDashboard: React.FC = () => {
               )}
             </div>
           </div>
+
+          <Dialog open={showAllActivities} onOpenChange={setShowAllActivities}>
+            <DialogContent className="sm:max-w-xl rounded-3xl p-8 border-none shadow-2xl">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-2">
+                  <FiActivity className="text-blue-600" /> Semua Aktivitas Ekosistem
+                </DialogTitle>
+                <DialogDescription className="text-slate-500">
+                  Daftar lengkap seluruh rekam jejak aktivitas realtime yang terjadi di platform KaryaMandiri.
+                </DialogDescription>
+              </DialogHeader>
+
+              {/* Container list yang bisa di-scroll secara independen */}
+              <div className="max-h-[60vh] overflow-y-auto pr-2 mt-4 divide-y divide-slate-100 min-h-[200px]">
+                {ecosystemActivities.length === 0 ? (
+                  <div className="py-12 text-center text-sm text-slate-400">Tidak ada data aktivitas yang tercatat.</div>
+                ) : (
+                  ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => (
+                    <div key={`modal-${ecosystemActivity.id}`} className="py-4 flex items-center justify-between hover:bg-slate-50/50 transition px-2 rounded-xl">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-xl ${
+                          ecosystemActivity.type === 'project' ? 'bg-blue-50 text-blue-600' : 
+                          ecosystemActivity.type === 'payment' ? 'bg-green-50 text-green-600' : 'bg-purple-50 text-purple-600'
+                        }`}>
+                          {ecosystemActivity.type === 'project' ? <FiLayers /> : ecosystemActivity.type === 'payment' ? <FiTrendingUp /> : <FiUsers />}
+                        </div>
+                        <div>
+                          <p className="text-sm text-slate-600">
+                            <span className="font-bold text-slate-900">{ecosystemActivity.user}</span> {ecosystemActivity.action} 
+                            <span className="font-semibold text-slate-800"> {ecosystemActivity.target}</span>
+                          </p>
+                          <p className="text-xs text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <DialogFooter className="pt-4 border-t border-slate-100 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAllActivities(false)}
+                  className="w-full sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-colors text-center"
+                >
+                  Tutup Halaman
+                </button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          </>
         )}
 
         {/* Panel Info Tambahan & Statistik Baru */}
