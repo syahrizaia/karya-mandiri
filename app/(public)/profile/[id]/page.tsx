@@ -204,8 +204,8 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
                   <FiCamera size={18} />
                 </button>
               )}
-              {userData.isVerified && (
-                <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1.5 rounded-full border-2 border-white z-10">
+              {(userData.isVerified || (userData as any).is_verified) && (
+                <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1.5 rounded-full border-2 border-white z-10 shadow-sm animate-in zoom-in-50 duration-200">
                   <MdVerified size={16} />
                 </div>
               )}

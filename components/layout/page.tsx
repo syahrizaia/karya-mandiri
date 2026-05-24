@@ -183,6 +183,15 @@ export default function ClientDashboardWrapper({
             )
           })}
 
+          {!loading && (!userRole || userRole === "guest") && (
+            <Link
+              href="/"
+              className="flex items-center gap-3 p-3 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors mt-4 border border-dashed border-blue-200 font-semibold text-sm"
+            >
+              <FiHome /> Kembali ke Beranda Utama
+            </Link>
+          )}
+
           {/* Tombol keluar hanya muncul jika id user sudah terverifikasi ada */}
           {!loading && userId && (
             <button
