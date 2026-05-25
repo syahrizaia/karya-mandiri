@@ -82,6 +82,7 @@ export default function EditProfileBannerDialog({ open, onOpenChange, currentBan
       setBannerSrc(null); // Keluar dari mode editor cropper
       toast.success("Banner profil berhasil disesuaikan dan disimpan!");
       onSuccess();
+      window.location.reload();
     } catch (err: any) {
       console.error("Banner Upload Error:", err.message);
       toast.error(err.message || "Gagal memperbarui banner.");

@@ -68,6 +68,7 @@ export default function PostServiceDialog({ open, onOpenChange, onSuccess }: Pos
       setCategory("Web Development");
       
       if (onSuccess) onSuccess();
+      window.location.reload();
       onOpenChange(false); // Tutup dialog modal
     } catch (err: any) {
       console.error("Error posting service:", err);

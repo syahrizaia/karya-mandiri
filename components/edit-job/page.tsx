@@ -106,6 +106,7 @@ const EditProjectDialog = ({ job, open, onOpenChange, onSuccess }: EditProjectDi
                 setSelectedJob(null);
                 onSuccess();
                 router.refresh();
+                window.location.reload();
             }
         } catch (error) {
             console.error("Error updating project:", error);

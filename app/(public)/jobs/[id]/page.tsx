@@ -13,9 +13,11 @@ import SaveJobButton from "@/components/ui/save-job-button/page";
 import ApplyJobDialog from "@/components/apply-job/page";
 import ShareJobButton from "@/components/ui/share-job-button/page";
 import Image from "next/image";
+import Link from "next/link";
 
 interface IApplicant {
   id: string;
+  worker_id: string;
   status: string;
   applied_at: string;
   notes?: string;
@@ -40,6 +42,7 @@ const DetailJob: React.FC = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [roleLoading, setRoleLoading] = useState(true);
   const [isSavedByUser, setIsSavedByUser] = useState<boolean>(false);
+  const [isAppliedByUser, setIsAppliedByUser] = useState<boolean>(false);
 
   useEffect(() => {
     if(params?.id) {
@@ -71,6 +74,17 @@ const DetailJob: React.FC = () => {
 
             if (savedData) {
               setIsSavedByUser(true);
+            }
+
+            const { data: application, error } = await supabase
+              .from('applications')
+              .select('id')
+              .eq('job_id', jobId)      // Ambil dari params id pekerjaan saat ini
+              .eq('worker_id', user.id) // Filter berdasarkan ID user aktif
+              .maybeSingle();
+
+            if (application) {
+              setIsAppliedByUser(true); // User terbukti sudah melamar proyek ini
             }
           }
 
@@ -124,6 +138,7 @@ const DetailJob: React.FC = () => {
           .from('applications')
           .select(`
             id,
+            worker_id,
             status,
             applied_at,
             notes,
@@ -294,11 +309,27 @@ const DetailJob: React.FC = () => {
                 {userRole === 'worker' ? (
                   <>
                     <button
-                      className="w-full p-4 bg-blue-600 text-white text-sm md:text-lg font-bold rounded-2xl hover:bg-blue-700 transition shadow-blue-200 shadow-lg flex items-center justify-center gap-2"
+                      disabled={isAppliedByUser || job.status === 'pending' || job.status === 'completed'}
+                      className={`w-full p-4 text-sm md:text-lg font-bold rounded-2xl transition flex items-center justify-center gap-2 ${
+                        isAppliedByUser 
+                          ? 'bg-slate-400 text-white cursor-not-allowed shadow-none'
+                          : job.status === 'pending'
+                            ? 'bg-orange-100 text-orange-600 cursor-not-allowed shadow-none'
+                            : job.status === 'completed'
+                              ? 'bg-slate-600 text-white cursor-not-allowed shadow-none'
+                              : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200 shadow-lg'
+                      }`}
                       onClick={() => setSelectedApplyJob(job)}
                     >
-                      <FiShield className="text-white lg:text-4xl" />
-                      Ambil Pekerjaan Sekarang
+                      <FiShield className="lg:text-4xl" />
+                      {isAppliedByUser 
+                        ? 'Pekerjaan Sudah Dilamar' 
+                        : job.status === 'pending' 
+                          ? 'Pekerjaan Sedang Ditunda' 
+                          : job.status === 'completed'
+                            ? 'Pekerjaan Telah Selesai'
+                            : 'Ambil Pekerjaan Sekarang'
+                      }
                     </button>
                     <SaveJobButton
                       is_saved={isSavedByUser} // Sinkronisasi dinamis sesuai user login
@@ -343,7 +374,7 @@ const DetailJob: React.FC = () => {
           </aside>
         </div>
 
-        {userRole !== 'employer' ? (
+        {userRole !== 'employer' || job.user_id !== userId ? (
           /* Tampilan jika Worker atau user lain mencoba mengakses halaman ini */
           // <div className="p-12 bg-white rounded-2xl border border-red-100 text-center flex flex-col items-center justify-center space-y-3 shadow-sm">
           //   <div className="p-4 bg-red-50 text-red-500 rounded-full">
@@ -406,7 +437,7 @@ const DetailJob: React.FC = () => {
                       {/* Profil Worker */}
                       <div className="flex flex-col items-start gap-2">
                         <div className="flex gap-2">
-                          <div className="bg-blue-100 text-blue-600 p-1 rounded-2xl w-fit h-fit">
+                          <Link href={`/profile/${applicant.worker_id}`} className="bg-blue-100 text-blue-600 p-1 rounded-2xl w-fit h-fit">
                             {/* <FiUser size={20} /> */}
                             <Image
                               src={applicant.profiles?.avatar_url || 'https://api.dicebear.com/7.x/initials/svg?seed=Worker'}
@@ -415,9 +446,9 @@ const DetailJob: React.FC = () => {
                               height={60}
                               className="rounded-xl object-cover w-10 h-10 sm:w-12 sm:h-12"
                             />
-                          </div>
+                          </Link>
                           <div className="space-y-1">
-                            <h4 className="font-semibold text-gray-800 text-base">{applicant.profiles?.full_name || 'Worker Anonim'}</h4>
+                            <Link href={`/profile/${applicant.worker_id}`} className="font-semibold text-gray-800 text-base">{applicant.profiles?.full_name || 'Worker Anonim'}</Link>
                             <div className="flex flex-col items-start gap-y-1 text-sm text-gray-500">
                               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                                 <span className="flex items-center gap-1">

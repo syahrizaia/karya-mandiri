@@ -82,7 +82,7 @@ const NewsPage = () => {
                     title: art.title,
                     description: art.description,
                     url: art.url,
-                    urlToImage: art.image, // 🌟 Gnews menggunakan .image, kita ubah ke .urlToImage
+                    urlToImage: art.image, // news menggunakan .image, kita ubah ke .urlToImage
                     publishedAt: art.publishedAt,
                     source: { name: art.source.name },
                 }));
@@ -100,7 +100,7 @@ const NewsPage = () => {
         const gnewsUrl = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=id&country=id&apikey=${gnewsApiKey}`;
         const res = await fetch(gnewsUrl);
         
-        // 🌟 JIKA VENDOR EROR (403/429/500), JANGAN CRASH. CUKUP LOG DAN LANJUTKAN.
+        // JIKA VENDOR EROR (403/429/500), JANGAN CRASH. CUKUP LOG DAN LANJUTKAN.
         if (!res.ok) {
             console.warn(`GNews mengembalikan status ${res.status}. Kuota mungkin habis.`);
         } else {

@@ -104,6 +104,7 @@ const CreateProjectDialog = () => {
         toast.success("Proyek berhasil dibuat!");
         setIsOpen(false);
         router.refresh();
+        window.location.reload();
       }
     } catch (error) {
       console.error("Error inserting project:", error);

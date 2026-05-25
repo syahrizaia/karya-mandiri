@@ -91,7 +91,7 @@ const GeneralDashboard: React.FC = () => {
   const [targetProgress, setTargetProgress] = useState({
     distribusiUpah: 0,
     verifikasiKYC: 0,
-    retensiEmployer: 0, // Bisa dibiarkan default atau dihitung dari total mitra aktif
+    retensiEmployer: 0,
   });
 
   useEffect(() => {
@@ -107,18 +107,13 @@ const GeneralDashboard: React.FC = () => {
         if (activitiesError) throw activitiesError;
         setEcosystemActivities(activitiesData || []);
 
-        const { count: workerCount, error: workerError } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('role', 'worker');
-
         const { count: projectCount, error: projectError } = await supabase
-          .from('jobs') // sesuaikan nama tabel jika menggunakan nama lain seperti 'projects'
+          .from('jobs')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'active'); 
 
         const { data: transactionData, error: transError } = await supabase
-          .from('transactions') // sesuaikan nama tabel finansial Anda
+          .from('transactions')
           .select('amount')
           .eq('status', 'success');
 
@@ -191,7 +186,7 @@ const GeneralDashboard: React.FC = () => {
         // Ambil total user (Gunakan select standar tanpa opsi head jika memicu eror)
         const { data: allProfiles, error: errTotalUsers } = await supabase
           .from('profiles')
-          .select('id, is_verified, role, full_name, email, phone'); // Cukup ambil kolom yang diperlukan saja (efisiensi performa)
+          .select('id, is_verified, role, full_name, email, phone');
 
         const totalUsersCount = allProfiles ? allProfiles.length : 0;
 
@@ -252,7 +247,7 @@ const GeneralDashboard: React.FC = () => {
     fetchDashboardData();
 
     const activityChannel = supabase
-    .channel('realtime_ecosystem_changes') // Nama bebas untuk channel
+    .channel('realtime_ecosystem_changes')
     .on(
       'postgres_changes',
       {
@@ -481,7 +476,7 @@ const GeneralDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* STATISTIK BARU: Distribusi Pembagian Tugas Ekosistem */}
+          {/* Distribusi Pembagian Tugas Ekosistem */}
           <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
             <h3 className="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
               <FiPieChart className="text-purple-600" /> Alokasi Sektor Jasa Live

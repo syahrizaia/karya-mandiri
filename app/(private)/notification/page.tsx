@@ -44,7 +44,7 @@ const Notification: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 1. Ambil data asli dari Supabase saat halaman dimuat
+  // Ambil data asli dari Supabase saat halaman dimuat
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -71,7 +71,7 @@ const Notification: React.FC = () => {
     fetchNotifications();
   }, []);
 
-  // 2. Aksi: Tandai semua telah dibaca
+  // Aksi: Tandai semua telah dibaca
   const markAllAsRead = async () => {
     if (notifications.length === 0) return;
 
@@ -94,7 +94,7 @@ const Notification: React.FC = () => {
     }
   };
 
-  // 3. Aksi: Tandai satu notifikasi tertentu sebagai dibaca saat diklik
+  // Aksi: Tandai satu notifikasi tertentu sebagai dibaca saat diklik
   const markAsRead = async (id: string, currentStatus: boolean) => {
     if (currentStatus) return; // Jika sudah dibaca, abaikan
 
@@ -110,7 +110,7 @@ const Notification: React.FC = () => {
     }
   };
 
-  // 4. Aksi: Hapus Notifikasi
+  // Aksi: Hapus Notifikasi
   const deleteNotification = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation(); // Mencegah terpicunya fungsi markAsRead akibat gelembung klik DOM
 

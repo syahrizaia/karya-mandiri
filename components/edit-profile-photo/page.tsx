@@ -98,6 +98,7 @@ export default function EditProfilePhotoDialog({ open, onOpenChange, currentAvat
       setImageSrc(null); // Tutup mode editor cropper
       toast.success("Foto profil berhasil dikustomisasi dan disimpan!");
       onSuccess();
+      window.location.reload();
     } catch (err: any) {
       console.error("Upload Error:", err.message);
       toast.error(err.message || "Gagal mengunggah gambar.");

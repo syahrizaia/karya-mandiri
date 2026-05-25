@@ -146,7 +146,7 @@ const History: React.FC = () => {
   };
 
   return (
-    // 🌟 PERBAIKAN: Menambahkan px-4 w-full dan overflow-x-hidden pada pembungkus utama luar
+    // Menambahkan px-4 w-full dan overflow-x-hidden pada pembungkus utama luar
     <div className="w-full max-w-5xl mx-auto px-4 py-4 space-y-6 md:pt-12 lg:pt-4 overflow-x-hidden">
       
       {/* Header & Filter */}
@@ -192,7 +192,7 @@ const History: React.FC = () => {
       </div>
 
       {/* History List Table */}
-      {/* 🌟 PERBAIKAN: Kontainer tabel diberi max-w-full dan overflow-hidden tulen */}
+      {/* Kontainer tabel diberi max-w-full dan overflow-hidden tulen */}
       <div className="bg-white rounded-2xl md:rounded-3xl border border-slate-200 shadow-sm overflow-hidden max-w-full">
         <div className="w-full overflow-x-auto min-w-0">
           <table className="w-full text-left border-collapse table-auto">
@@ -245,7 +245,7 @@ const History: React.FC = () => {
                             {item.jobs?.profiles?.full_name || 'Ke Rekening Bank'}
                           </p>
                           
-                          {/* 🌟 RESPONSIVE DETAIL: Muncul di bawah judul HANYA saat layar mobile */}
+                          {/* RESPONSIVE DETAIL: Muncul di bawah judul HANYA saat layar mobile */}
                           <div className="flex items-center gap-2 mt-1 sm:hidden">
                             <span className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded font-medium">
                               {formatTanggal(item.created_at)}

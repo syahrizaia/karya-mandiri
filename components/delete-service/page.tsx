@@ -39,6 +39,7 @@ export default function DeleteServiceDialog({ open, onOpenChange, serviceId, ser
 
       toast.success("Tawaran jasa berhasil dihapus.");
       onSuccess(serviceId); // Menghapus item dari array UI secara lokal
+      window.location.reload();
       onOpenChange(false);
     } catch (err: any) {
       toast.error("Gagal menghapus jasa: " + err.message);

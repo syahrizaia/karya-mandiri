@@ -28,11 +28,12 @@ export const metadata: Metadata = {
     "Karya",
     "Mandiri",
     "Syahriza",
-    "pekerjaan",
-    "jasa",
-    "proyek",
-    "crowdsourcing", 
-    "freelance",
+    "Pekerjaan",
+    "Jasa",
+    "Berita",
+    "Proyek",
+    "Crowdsourcing", 
+    "Freelance",
     "Indonesia"
   ],
   icons: {

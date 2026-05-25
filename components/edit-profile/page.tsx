@@ -93,6 +93,7 @@ export default function EditProfileDialog({ open, onOpenChange, userData, onSucc
 
       toast.success("Profil Anda berhasil diperbarui!");
       onSuccess(); // Panggil fungsi refresh di parent
+      window.location.reload();
       onOpenChange(false); // Tutup modal
     } catch (err: any) {
       console.error("Update Error:", err.message);

@@ -243,10 +243,19 @@ const WorkerDashboard: React.FC = () => {
                       href={`/jobs/${job.id}`}
                       className={`px-5 py-2 rounded-lg text-center font-bold transition col-span-3 ${
                       job.status === 'pending' 
-                      ? 'bg-orange-100 text-orange-600 cursor-not-allowed' 
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}>
-                      {job.status === 'pending' ? 'Sedang Ditunda' : 'Lamar Sekarang'}
+                        ? 'bg-orange-100 text-orange-600 cursor-not-allowed' 
+                        : job.status === 'completed'
+                          ? 'bg-slate-600 text-white cursor-not-allowed'
+                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                      }`}
+                      onClick={(e) => (job.status === 'pending' || job.status === 'completed') && e.preventDefault()}
+                    >
+                      {job.status === 'pending' 
+                        ? 'Pekerjaan Sedang Ditunda' 
+                        : job.status === 'completed'
+                          ? 'Pekerjaan Telah Selesai' 
+                          : 'Lihat Detail Pekerjaan'
+                      }
                     </Link>
                     <SaveJobButton
                       is_saved={job.is_saved}

@@ -326,7 +326,7 @@ const Jobs: React.FC = () => {
                                   href={`/jobs/${job.id}`}
                                   className="text-center w-full px-8 py-3 bg-slate-900 text-white font-bold rounded-2xl hover:bg-blue-600 transition shadow-md whitespace-nowrap"
                                 >
-                                  Lamar Sekarang
+                                  Lihat Detail Pekerjaan
                                 </Link>
                                 <SaveJobButton
                                   is_saved={isJobSavedByUser} // Menggunakan pengecekan dinamis user login
@@ -356,7 +356,7 @@ const Jobs: React.FC = () => {
                                 href={`/jobs/${job.id}`}
                                 className="text-center w-full px-6 py-3 bg-slate-100 text-slate-600 font-bold text-xs rounded-2xl hover:bg-slate-200 transition whitespace-nowrap"
                               >
-                                Lihat Detail Proyek
+                                Lihat Detail Pekerjaan
                               </Link>
                             )}
                           </div>

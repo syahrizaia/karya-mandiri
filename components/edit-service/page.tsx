@@ -70,6 +70,7 @@ export default function EditServiceDialog({ open, onOpenChange, service, onSucce
 
       toast.success("Jasa berhasil diperbarui!");
       onSuccess();
+      window.location.reload();
       onOpenChange(false);
     } catch (err: any) {
       toast.error(err.message || "Gagal memperbarui data jasa.");

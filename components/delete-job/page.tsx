@@ -56,6 +56,7 @@ const DeleteProjectDialog = ({ job, id, title, open, onOpenChange, onSuccess }: 
                 setSelectedJob(null);
                 onSuccess();
                 router.refresh();
+                window.location.reload();
             }
             } catch (error) {
                 console.error("Error inserting project:", error);

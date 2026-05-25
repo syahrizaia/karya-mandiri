@@ -18,6 +18,7 @@ interface ApplyJobDialogProps {
 export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: ApplyJobDialogProps) {
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState("");
+  const [isAppliedByUser, setIsAppliedByUser] = useState<boolean>(false);
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,8 +55,8 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
         .from("applications")
         .insert([
           {
-            job_id: job.id,      // Tipe VARCHAR cocok dengan jobs(id)
-            worker_id: user.id,  // Tipe UUID cocok dengan profiles(id)
+            job_id: job.id,
+            worker_id: user.id,
             status: 'pending',    // Status awal pelamar
             notes: notes || "Tanpa catatan tambahan",
           }
@@ -96,6 +97,7 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
       onOpenChange(false);
       setNotes(""); // Reset form input
       window.location.reload()
+      setIsAppliedByUser(true);
 
     } catch (err: any) {
       console.error("DETAIL ERROR 1 TABEL:", JSON.stringify(err, null, 2));
