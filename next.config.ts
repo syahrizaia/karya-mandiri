@@ -31,6 +31,11 @@ const nextConfig: NextConfig = {
         hostname: 'dims.apnews.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        pathname: '/**',
+      },
     ],
   },
 };

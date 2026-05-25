@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import CreateProjectDialog from '../../../components/create-job/page';
 import EditProjectDialog from '@/components/edit-job/page';
 import DeleteProjectDialog from '@/components/delete-job/page';
+import Link from 'next/link';
 
 // Sub-komponen StatCard
 const StatCard = ({ icon, title, value, color }: { icon: any, title: string, value: any, color: string }) => (
@@ -206,7 +207,12 @@ const EmployerDashboard: React.FC = () => {
                   {jobs.map((job) => (
                     <tr key={job.id} className="hover:bg-gray-50 transition">
                       <td className="px-6 py-4 font-medium text-gray-800 whitespace-nowrap">
-                        {job.title}
+                        <Link 
+                          href={`/jobs/${job.id}`} 
+                          className="text-blue-600 hover:text-blue-800 hover:underline transition"
+                        >
+                          {job.title}
+                        </Link>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(job.status ?? 'pending')}`}>

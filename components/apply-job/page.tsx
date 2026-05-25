@@ -38,16 +38,50 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
 
       const existingApplications = (job as any).applications || [];
       const updatedApplications = [...existingApplications, newApplication];
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Anda harus login terlebih dahulu.");
+        return;
+      }
+
+      if (!user) {
+        toast.error("User belum login. Silakan login terlebih dahulu.");
+        setLoading(false);
+        return;
+      }
 
       const { data: updatedJob, error: updateError } = await supabase
-        .from("jobs")
-        .update({
-          taken: job.type === "Crowdsourcing" ? (job.taken ?? 0) + 1 : job.taken, 
-          applications: updatedApplications // Menyimpan riwayat lamaran dalam bentuk JSON Array
-        })
+        .from("applications")
+        .insert([
+          {
+            job_id: job.id,      // Tipe VARCHAR cocok dengan jobs(id)
+            worker_id: user.id,  // Tipe UUID cocok dengan profiles(id)
+            status: 'pending',    // Status awal pelamar
+            notes: notes || "Tanpa catatan tambahan",
+          }
+        ])
         .eq("id", job.id)
         .select()
         .single();
+
+      if (updateError) {
+        // Jika eror karena duplicate (constraint unique_worker_job), tangani di sini
+        if (updateError.code === '23505') {
+          throw new Error("Anda sudah melamar pekerjaan ini sebelumnya.");
+        }
+        throw updateError;
+      }
+
+      const currentTaken = Number(job.taken) || 0;
+    
+      const { error: jobError } = await supabase
+        .from('jobs')
+        .update({ 
+          taken: currentTaken + 1
+        })
+        .eq('id', job.id);
+
+      if (jobError) throw jobError;
 
       if (updateError) throw updateError;
 
@@ -61,6 +95,7 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
       if (onSuccess && updatedJob) onSuccess();
       onOpenChange(false);
       setNotes(""); // Reset form input
+      window.location.reload()
 
     } catch (err: any) {
       console.error("DETAIL ERROR 1 TABEL:", JSON.stringify(err, null, 2));
