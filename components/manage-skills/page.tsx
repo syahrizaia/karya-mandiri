@@ -63,6 +63,7 @@ export default function ManageSkillsDialog({ open, onOpenChange, currentSkills, 
 
       toast.success("Daftar keahlian berhasil diperbarui!");
       onSuccess();
+      window.location.reload();
       onOpenChange(false);
     } catch (err: any) {
       toast.error(err.message || "Gagal menyimpan keahlian.");

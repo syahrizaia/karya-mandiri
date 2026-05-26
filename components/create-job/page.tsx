@@ -78,6 +78,7 @@ const CreateProjectDialog = () => {
       id: crypto.randomUUID(),
       title: rawData.title,
       employer: user.user_metadata?.full_name || "Pengguna KaryaMandiri", // Hidden data
+      user_id: user.user_metadata?.user_id || user.id,
       description: rawData.description,
       requirements: rawData.requirements, // Disimpan sebagai string murni
       deadline: rawData.deadline || null,
