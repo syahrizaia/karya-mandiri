@@ -128,3 +128,10 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  .backdrop-blur-xl {
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+  }
+}

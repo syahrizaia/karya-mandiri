@@ -147,7 +147,7 @@ const History: React.FC = () => {
 
   return (
     // Menambahkan px-4 w-full dan overflow-x-hidden pada pembungkus utama luar
-    <div className="w-full max-w-5xl mx-auto px-4 py-4 space-y-6 md:pt-12 lg:pt-4 overflow-x-hidden">
+    <div className="w-full max-w-5xl mx-auto space-y-6 md:pt-12 lg:pt-4 overflow-x-hidden">
       
       {/* Header & Filter */}
       <section className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

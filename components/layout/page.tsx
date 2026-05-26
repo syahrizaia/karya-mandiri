@@ -128,14 +128,24 @@ export default function ClientDashboardWrapper({
 
   return (
     <div className="flex min-h-screen bg-gray-100 relative w-full">
-      {/* Tombol Hamburger (Hanya muncul di HP) */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
+      {/* HEADER UNTUK MOBILE (Hanya muncul di hp < 1024px) */}
+      <div className="lg:hidden fixed top-0 inset-x-0 bg-white border-b border-gray-200 h-16 px-4 flex items-center justify-between z-40 shadow-sm">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 bg-blue-600 text-white rounded-lg shadow-lg focus:outline-none"
+          className="p-2 bg-blue-600 text-white rounded-lg shadow-md focus:outline-none"
         >
-          {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+          {isOpen ? <FiX size={20} /> : <FiMenu size={20} />}
         </button>
+        
+        {/* Render Judul Dinamis KaryaMandiri di Tengah Atas Navbar Mobile */}
+        <div className="font-bold text-xl text-blue-600 pr-2">
+          {userRole === "employer" || userRole === "worker" ? (
+            "KaryaMandiri"
+          ) : (
+            <Link href="/">KaryaMandiri</Link>
+          )}
+        </div>
+        <div className="w-9"></div> {/* Spacer penyeimbang tombol hamburger agar judul tetap center */}
       </div>
 
       {/* OVERLAY Mobile */}
@@ -149,7 +159,7 @@ export default function ClientDashboardWrapper({
         lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:block lg:pt-0 pt-10
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
-        <div className="p-6">
+        <div className="p-6 hidden lg:block">
             {userRole === "employer" || userRole === "worker" ? (
                 <h1 className="text-2xl font-bold text-blue-600">
                     KaryaMandiri
@@ -207,12 +217,12 @@ export default function ClientDashboardWrapper({
 
       {/* AREA MAIN */}
       <main className="flex-1 flex flex-col min-w-0">
-        <div className="p-4 md:p-4 pt-16 lg:pt-4 flex-1">
+        <div className="p-4 md:p-4 pt-20 lg:pt-4 flex-1">
           {!isAuthorized && !loading ? (
             <div className="flex-1 flex flex-col items-center justify-center bg-white rounded-3xl p-8 border border-slate-200 shadow-sm my-4 max-w-2xl mx-auto text-center h-fit">
               <h2 className="text-2xl font-black text-slate-900 mb-2">Akses Terbatas</h2>
               <p className="text-slate-500 max-w-sm mb-6 text-sm">
-                Silakan login menggunakan akun yang sesuai untuk mengakses halaman <span className="font-semibold text-slate-800">{pathname}</span>.
+                Silakan login menggunakan akun yang sesuai untuk accessing halaman <span className="font-semibold text-slate-800">{pathname}</span>.
               </p>
               <Link href="/login" className="px-6 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md">
                 Login Sekarang

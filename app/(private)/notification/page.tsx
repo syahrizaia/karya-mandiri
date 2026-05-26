@@ -145,7 +145,7 @@ const Notification: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4 py-4 space-y-6 md:pt-12 lg:pt-4 overflow-x-hidden">
+    <div className="w-full max-w-3xl mx-auto space-y-6 md:pt-12 lg:pt-4 overflow-x-hidden">
       {/* Header Notifikasi */}
       <header className="flex justify-between items-center mb-6 gap-2">
         <div>
