@@ -1,5 +1,5 @@
 # KaryaMandiri ![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Logo KaryaMandiri](public/icon.png)
+![Logo KaryaMandiri](public/screenshot-landing-page.png)
 
 **"Memberdayakan Tangan-Tangan Terampil, Membangun Kemandirian Bangsa."**
 
