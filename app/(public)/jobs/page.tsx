@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/static-components */
 "use client";
 
@@ -16,6 +17,7 @@ import supabase from '@/lib/db';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import SubscriptionDialog from '../../../components/subscription/page';
 import SaveJobButton from '@/components/ui/save-job-button/page';
+import Image from 'next/image';
 
 const Jobs: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,7 +69,12 @@ const Jobs: React.FC = () => {
         // Fetch daftar lowongan pekerjaan
         const { data: jobsData, error } = await supabase
           .from('jobs')
-          .select('*')
+          .select(`
+            *,
+            profiles:user_id (
+              avatar_url
+            )
+          `)
           .order('posted_at', { ascending: false });
           
         if (error) {
@@ -292,10 +299,10 @@ const Jobs: React.FC = () => {
                   return (
                     <div key={job.id} className="group bg-white p-6 rounded-3xl border border-slate-100 hover:border-blue-400 hover:shadow-xl transition-all duration-300">
                       <div className='md:grid md:grid-cols-3 flex flex-col'>
-                        <Link href={`/jobs/${job.id}`} className="flex flex-col md:flex-row md:col-span-2 justify-between gap-6">
-                          <div className="space-y-3">
+                        <div className="flex flex-col md:flex-row md:col-span-2 justify-between gap-6">
+                          <div className="space-y-3 flex flex-col gap-1">
                             <div className="flex items-center gap-2">
-                              <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                              <span className={`px-3 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                 job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
                               }`}>
                                 {job.type}
@@ -304,13 +311,33 @@ const Jobs: React.FC = () => {
                                 <FiClock /> {formatRelativeTime(job.posted_at)}
                               </span>
                             </div>
-                            <h2 className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</h2>
+                            <Link href={`/jobs/${job.id}`} className="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition">{job.title}</Link>
                             <div className="flex flex-wrap gap-4 text-sm text-slate-500 font-medium">
-                              <div className="flex items-center gap-1"><FiUser className="text-blue-500"/> {job.employer}</div>
+                              <Link href={`profile/${job.user_id}`} className="flex items-center gap-1 z-10 text-blue-400 hover:text-blue-600 transition">
+                                {(job as any).profiles?.avatar_url ? (
+                                  <Image
+                                    src={(job as any).profiles.avatar_url} 
+                                    alt={job.employer || 'Avatar'} 
+                                    className="w-5 h-5 rounded-xl object-cover border border-slate-200 shrink-0"
+                                    onError={(e) => {
+                                      // Jika link gambar rusak/expired, pasang fallback otomatis
+                                      (e.target as HTMLElement).style.display = 'none';
+                                    }}
+                                    width={50}
+                                    height={50}
+                                  />
+                                ) : (
+                                  // Jika tidak punya avatar_url di DB, fallback ke lingkaran inisial huruf pertama employer
+                                  <div className="w-5 h-5 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold shrink-0 uppercase">
+                                    {job.employer ? job.employer.charAt(0) : 'U'}
+                                  </div>
+                                )}
+                                <span>{job.employer}</span>
+                              </Link>
                               <div className="flex items-center gap-1"><FiMapPin className="text-red-400"/> {job.location}</div>
                             </div>
                           </div>
-                        </Link>
+                        </div>
 
                         <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
                           <div className="text-right w-full">
@@ -365,7 +392,7 @@ const Jobs: React.FC = () => {
 
                       {/* Crowdsourcing Progress Bar */}
                       {job.type === 'Crowdsourcing' && (
-                        <div className="mt-6 pt-4 border-t border-slate-50">
+                        <div className="mt-2 pt-4 border-t border-slate-50">
                           <div className="flex justify-between text-xs font-bold mb-2">
                             <span className="text-slate-500 uppercase">Kuota Crowdsourcing</span>
                             <span className="text-blue-600">{job.taken} / {job.total} Pekerja</span>

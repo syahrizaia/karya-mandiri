@@ -37,6 +37,16 @@ const getStatusStyle = (status: string) => {
   }
 };
 
+const formatDynamicRupiah = (value: number) => {
+  if (value >= 1_000_000_000) {
+    return `Rp${(value / 1_000_000_000).toFixed(1).replace('.0', '')} M`; // Contoh: Rp1.5 M atau Rp2 M
+  }
+  if (value >= 1_000_000) {
+    return `Rp${(value / 1_000_000).toFixed(1).replace('.0', '')} Jt`; // Contoh: Rp750 Jt atau Rp5 Jt
+  }
+  return `Rp${value.toLocaleString('id-ID')}`; // Contoh: Rp450.000 jika di bawah 1 juta
+};
+
 const EmployerDashboard: React.FC = () => {
   const router = useRouter();
   const [jobs, setJobs] = useState<IJobs[]>([]);
@@ -170,7 +180,7 @@ const EmployerDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <StatCard icon={<FiBriefcase />} title="Total Proyek" value={stats.totalProjects} color="bg-blue-500" />
         <StatCard icon={<FiUsers />} title="Tenaga Kerja Aktif" value={stats.activeWorkers} color="bg-green-500" />
-        <StatCard icon={<FiTrendingUp />} title="Investasi Sosial" value={`Rp${(stats.totalInvestment / 1000000).toFixed(1)}M`} color="bg-purple-500" />
+        <StatCard icon={<FiTrendingUp />} title="Investasi Sosial" value={formatDynamicRupiah(stats.totalInvestment)} color="bg-purple-500" />
       </div>
 
       {/* Project Table */}

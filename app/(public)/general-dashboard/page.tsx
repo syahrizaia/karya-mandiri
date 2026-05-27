@@ -14,10 +14,27 @@ import {
   FiPieChart
 } from 'react-icons/fi';
 import supabase from '@/lib/db';
-import type { IEcosystemActivities } from '@/app/types/ecosystem-activity';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import SubscriptionDialog from '../../../components/subscription/page';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import Link from 'next/link';
+import Image from 'next/image';
+
+export interface IEcosystemActivities {
+  id: any; // atau number / string tergantung tipe di DB Anda
+  time: string;
+  action: string;
+  target: string;
+  type: string;
+  user_id: string; // 🌟 TAMBAHKAN INI agar user_id tidak merah
+  profiles?: {     // 🌟 TAMBAHKAN INI agar hasil join query terbaca oleh TS
+    full_name: string;
+    avatar_url: string;
+    role: string;
+  };
+  // Jika kolom "user" di database sudah dihapus, Anda bisa menghapus atau menjadikannya opsional:
+  user?: string; 
+}
 
 // --- Sub Komponen ---
 const SummaryCard = ({ title, value, icon, trend, color, isLoading }: any) => {
@@ -31,7 +48,7 @@ const SummaryCard = ({ title, value, icon, trend, color, isLoading }: any) => {
   if (isLoading) {
     return (
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm animate-pulse">
-        <div className="flex justify-between items-start mb-4">
+        <div className="flex justify-between items-start mb-4 gap-4">
           <div className="w-11 h-11 bg-slate-100 rounded-2xl" />
           <div className="h-4 w-12 bg-slate-100 rounded-md" />
         </div>
@@ -43,7 +60,7 @@ const SummaryCard = ({ title, value, icon, trend, color, isLoading }: any) => {
 
   return (
     <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-4 gap-4">
         <div className={`p-3 rounded-2xl ${colorClasses[color]}`}>
           {icon}
         </div>
@@ -101,11 +118,29 @@ const GeneralDashboard: React.FC = () => {
 
         const { data: activitiesData, error: activitiesError } = await supabase
           .from('ecosystem_activities')
-          .select('*')
+          .select(`
+            id,
+            time,
+            action,
+            target,
+            type,
+            user_id,
+            profiles:user_id (
+              full_name,
+              avatar_url,
+              role
+            )
+          `)
           .order('time', { ascending: false })
 
         if (activitiesError) throw activitiesError;
-        setEcosystemActivities(activitiesData || []);
+
+        setEcosystemActivities(
+          (activitiesData || []).map((activity: any) => ({
+            ...activity,
+            profiles: Array.isArray(activity.profiles) ? activity.profiles[0] : activity.profiles
+          }))
+        );
 
         const { count: projectCount, error: projectError } = await supabase
           .from('jobs')
@@ -203,7 +238,7 @@ const GeneralDashboard: React.FC = () => {
         // Ambil total tugas keseluruhan dari tabel jobs
         const { data: allJobs, error: errTotalJobs } = await supabase
           .from('jobs')
-          .select('id, employer_id');
+          .select('id, user_id');
 
         const totalTasksCount = allJobs ? allJobs.length : 0;
 
@@ -214,7 +249,7 @@ const GeneralDashboard: React.FC = () => {
 
         // Ambil ID employer unik yang sudah pernah memposting proyek dari data jobs yang sudah ditarik
         const uniqueActiveEmployers = allJobs
-          ? new Set(allJobs.map(j => j.employer_id).filter(Boolean)).size
+          ? new Set(allJobs.map(j => j.user_id).filter(Boolean)).size
           : 0;
 
         // Rumus Persentase Retensi Kemitraan
@@ -378,15 +413,46 @@ const GeneralDashboard: React.FC = () => {
                 ecosystemActivities.slice(0, 5).map((ecosystemActivity: IEcosystemActivities) => ( 
                   <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition">
                     <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-xl ${
-                        ecosystemActivity.type === 'project' ? 'bg-blue-50 text-blue-600' : 
-                        ecosystemActivity.type === 'payment' ? 'bg-green-50 text-green-600' : 'bg-purple-50 text-purple-600'
-                      }`}>
-                        {ecosystemActivity.type === 'project' ? <FiLayers /> : ecosystemActivity.type === 'payment' ? <FiTrendingUp /> : <FiUsers />}
-                      </div>
+                      {ecosystemActivity.type === 'project' ? (
+                        <div className="p-3 rounded-xl bg-blue-50 text-blue-600 shrink-0">
+                          <FiLayers />
+                        </div>
+                      ) : ecosystemActivity.type === 'payment' ? (
+                        <div className="p-3 rounded-xl bg-green-50 text-green-600 shrink-0">
+                          <FiTrendingUp />
+                        </div>
+                      ) : (
+                        /* Jika type adalah 'user' / registrasi baru, tampilkan foto profil */
+                        <div className="shrink-0 relative w-10 h-10">
+                          {(ecosystemActivity.profiles as any)?.avatar_url ? (
+                            <Image
+                              src={(ecosystemActivity.profiles as any).avatar_url} 
+                              alt={ecosystemActivity.profiles?.full_name || 'Avatar'} 
+                              className="w-10 h-10 rounded-xl object-cover border border-slate-100"
+                              onError={(e) => {
+                                // Fallback jika URL gambar rusak
+                                (e.target as HTMLElement).style.display = 'none';
+                              }}
+                              width={50}
+                              height={50}
+                            />
+                          ) : (
+                            /* Lingkaran inisial jika belum mengunggah foto profil */
+                            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-100">
+                              {ecosystemActivity.profiles?.full_name 
+                                ? ecosystemActivity.profiles.full_name.charAt(0) 
+                                : ecosystemActivity.user 
+                                  ? ecosystemActivity.user.charAt(0) 
+                                  : 'U'}
+                            </div>
+                          )}
+                        </div>
+                      )}
                       <div>
                         <p className="text-sm text-slate-600">
-                          <span className="font-bold text-slate-900">{ecosystemActivity.user}</span> {ecosystemActivity.action} 
+                          <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900">
+                            {ecosystemActivity.profiles?.full_name || ecosystemActivity.user || "Pengguna"}
+                          </Link> {ecosystemActivity.action} 
                           <span className="font-semibold text-slate-800"> {ecosystemActivity.target}</span>
                         </p>
                         <p className="text-xs text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
@@ -418,15 +484,46 @@ const GeneralDashboard: React.FC = () => {
                   ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => (
                     <div key={`modal-${ecosystemActivity.id}`} className="py-4 flex items-center justify-between hover:bg-slate-50/50 transition px-2 rounded-xl">
                       <div className="flex items-center gap-4">
-                        <div className={`p-3 rounded-xl ${
-                          ecosystemActivity.type === 'project' ? 'bg-blue-50 text-blue-600' : 
-                          ecosystemActivity.type === 'payment' ? 'bg-green-50 text-green-600' : 'bg-purple-50 text-purple-600'
-                        }`}>
-                          {ecosystemActivity.type === 'project' ? <FiLayers /> : ecosystemActivity.type === 'payment' ? <FiTrendingUp /> : <FiUsers />}
-                        </div>
+                        {ecosystemActivity.type === 'project' ? (
+                          <div className="p-3 rounded-xl bg-blue-50 text-blue-600 shrink-0">
+                            <FiLayers />
+                          </div>
+                        ) : ecosystemActivity.type === 'payment' ? (
+                          <div className="p-3 rounded-xl bg-green-50 text-green-600 shrink-0">
+                            <FiTrendingUp />
+                          </div>
+                        ) : (
+                          /* Jika type adalah 'user' / registrasi baru, tampilkan foto profil */
+                          <div className="shrink-0 relative w-10 h-10">
+                            {(ecosystemActivity.profiles as any)?.avatar_url ? (
+                              <Image
+                                src={(ecosystemActivity.profiles as any).avatar_url} 
+                                alt={ecosystemActivity.profiles?.full_name || 'Avatar'} 
+                                className="w-10 h-10 rounded-xl object-cover border border-slate-100"
+                                onError={(e) => {
+                                  // Fallback jika URL gambar rusak
+                                  (e.target as HTMLElement).style.display = 'none';
+                                }}
+                                width={50}
+                                height={50}
+                              />
+                            ) : (
+                              /* Lingkaran inisial jika belum mengunggah foto profil */
+                              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-100">
+                                {ecosystemActivity.profiles?.full_name 
+                                  ? ecosystemActivity.profiles.full_name.charAt(0) 
+                                  : ecosystemActivity.user 
+                                    ? ecosystemActivity.user.charAt(0) 
+                                    : 'U'}
+                              </div>
+                            )}
+                          </div>
+                        )}
                         <div>
                           <p className="text-sm text-slate-600">
-                            <span className="font-bold text-slate-900">{ecosystemActivity.user}</span> {ecosystemActivity.action} 
+                            <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900">
+                              {ecosystemActivity.profiles?.full_name || ecosystemActivity.user || "Pengguna"}
+                            </Link> {ecosystemActivity.action} 
                             <span className="font-semibold text-slate-800"> {ecosystemActivity.target}</span>
                           </p>
                           <p className="text-xs text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>

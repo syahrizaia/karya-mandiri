@@ -78,7 +78,7 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
       const { error: jobError } = await supabase
         .from('jobs')
         .update({ 
-          taken: currentTaken + 1
+          taken: currentTaken + 0
         })
         .eq('id', job.id);
 

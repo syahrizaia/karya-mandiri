@@ -5,13 +5,14 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
-import { FiLoader } from "react-icons/fi";
+import { FiArrowLeft, FiEye, FiEyeOff, FiLoader } from "react-icons/fi";
 import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,6 +51,14 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition mb-6 bg-slate-50 hover:bg-slate-100 px-3 py-2 rounded-xl"
+        >
+          <FiArrowLeft size={14} /> Kembali
+        </button>
+
         <h2 className="text-2xl font-black text-slate-900 text-center mb-2">Gabung KaryaMandiri</h2>
         <p className="text-sm text-slate-500 text-center mb-8">Mulai cari kerja atau rekrut tenaga kerja sekarang</p>
 
@@ -106,14 +115,24 @@ export default function RegisterPage() {
 
           <div>
             <label className="text-xs font-bold text-slate-400 uppercase">Password</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full mt-1 px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
-              placeholder="••••••••"
-            />
+            <div className="relative mt-1">
+              <input
+                type={showPassword ? "text" : "password"} // Berubah dinamis tergantung state
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pr-12 px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500"
+                placeholder="••••••••"
+              />
+              {/* Tombol Toggle Mata */}
+              <button
+                type="button" // Sangat penting agar tidak memicu submit form secara tidak sengaja
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition focus:outline-none"
+              >
+                {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
+              </button>
+            </div>
           </div>
 
           <button

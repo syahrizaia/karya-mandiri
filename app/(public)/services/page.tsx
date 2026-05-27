@@ -12,6 +12,8 @@ import {
   FiSend, 
   FiCalendar 
 } from "react-icons/fi";
+import Image from "next/image";
+import Link from "next/link";
 
 interface IServiceFeed {
   id: string;
@@ -22,8 +24,10 @@ interface IServiceFeed {
   created_at: string;
   // Relasi join untuk mengambil data nama pembuat jasa dari tabel profiles
   profiles: {
+    id: string;
     full_name: string;
     phone: string | null;
+    avatar_url?: string | null;
   } | null;
 }
 
@@ -61,8 +65,10 @@ export default function Services() {
             category,
             created_at,
             profiles (
+              id,
               full_name,
-              phone
+              phone,
+              avatar_url
             )
           `)
           .order("created_at", { ascending: false });
@@ -188,17 +194,32 @@ export default function Services() {
               </div>
 
               {/* Bagian Bawah: Profil Pembuat, Tarif & Tombol Aksi */}
-              <div className="mt-6 pt-4 border-t border-slate-100 space-y-4">
+              <div className="mt-2 pt-4 border-t border-slate-300 space-y-4">
                 <div className="flex justify-between items-center text-sm">
                   {/* Nama Pekerja */}
-                  <div className="flex items-center gap-2 text-slate-700 font-semibold">
-                    <div className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
-                      <FiUser size={14} />
-                    </div>
+                  <Link href={`/profile/${service.profiles?.id}`} className="flex items-center gap-2 text-blue-400 hover:text-blue-600 transition font-semibold">
+                    {(service.profiles as any)?.avatar_url ? (
+                      <Image
+                        src={(service.profiles as any).avatar_url} 
+                        alt={service.profiles?.full_name || 'Avatar'} 
+                        className="w-6 h-6 rounded-xl object-cover border border-slate-200 shrink-0"
+                        onError={(e) => {
+                          // Fallback jika url gambar bermasalah/broken link
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                        width={50}
+                        height={50}
+                      />
+                    ) : (
+                      // Lingkaran inisial jika pekerja belum mengunggah foto profil
+                      <div className="w-6 h-6 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold shrink-0 uppercase">
+                        {service.profiles?.full_name ? service.profiles.full_name.charAt(0) : 'W'}
+                      </div>
+                    )}
                     <span className="truncate max-w-30">
                       {service.profiles?.full_name || "Anonymous Worker"}
                     </span>
-                  </div>
+                  </Link>
 
                   {/* Tarif Jasa */}
                   <div className="text-right">

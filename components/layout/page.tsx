@@ -5,10 +5,11 @@ import Link from "next/link";
 import { FiBriefcase, FiUser, FiHome, FiSettings, FiBell, FiMenu, FiX, FiLogOut } from "react-icons/fi";
 import { usePathname, useRouter } from "next/navigation";
 import Footer from "@/components/footer/page";
-import { MdHistory } from "react-icons/md";
+import { MdHistory, MdWorkspacesOutline } from "react-icons/md";
 import { useState, useEffect } from "react";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
+import { TbNews } from "react-icons/tb";
 
 export default function ClientDashboardWrapper({
   children,
@@ -77,8 +78,8 @@ export default function ClientDashboardWrapper({
 
   const allNavLinks = [
     { href: "/general-dashboard", label: "Dashboard Umum", icon: <FiHome />, roles: ["employer", "worker", "guest"] },
-    { href: "/maintenance", label: "Berita", icon: <FiHome />, roles: ["employer", "worker", "guest"] },
-    { href: "/employer", label: "Ruang Kerja", icon: <FiUser />, roles: ["employer"] },
+    { href: "/maintenance", label: "Berita", icon: <TbNews />, roles: ["employer", "worker", "guest"] },
+    { href: "/employer", label: "Ruang Kerja", icon: <MdWorkspacesOutline />, roles: ["employer"] },
     { href: "/worker", label: "Ruang Kerja", icon: <FiUser />, roles: ["worker"] },
     { href: "/jobs", label: "Pekerjaan", icon: <FiBriefcase />, roles: ["employer", "worker", "guest"] },
     { href: "/services", label: "Jasa", icon: <FiBriefcase />, roles: ["employer", "worker", "guest"] },

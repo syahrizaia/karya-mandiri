@@ -8,8 +8,11 @@ import {
   FiInfo, 
   FiTrash2, 
   FiCircle,
+  FiUserPlus,
+  FiMessageSquare,
 } from 'react-icons/fi';
 import supabase from '@/lib/db';
+import Link from 'next/link';
 
 // Interface menyesuaikan skema PostgreSQL asli
 interface NotificationItem {
@@ -17,8 +20,9 @@ interface NotificationItem {
   title: string;
   message: string;
   created_at: string;
-  type: 'payment' | 'job' | 'system';
+  type: 'payment' | 'job' | 'system' | 'applicant' | 'lead';
   is_read: boolean;
+  sender_id?: string;
 }
 
 // Helper Functions
@@ -27,6 +31,8 @@ const getIcon = (type: string) => {
     case 'payment': return <FiDollarSign className="text-green-600" />;
     case 'job': return <FiCheckCircle className="text-blue-600" />;
     case 'system': return <FiInfo className="text-purple-600" />;
+    case 'applicant': return <FiUserPlus className="text-orange-600" />;
+    case 'lead': return <FiMessageSquare className="text-teal-600" />;
     default: return <FiBell className="text-slate-600" />;
   }
 };
@@ -36,6 +42,8 @@ const getIconBg = (type: string) => {
     case 'payment': return 'bg-green-50';
     case 'job': return 'bg-blue-50';
     case 'system': return 'bg-purple-50';
+    case 'applicant': return 'bg-orange-50';
+    case 'lead': return 'bg-teal-50';
     default: return 'bg-slate-50';
   }
 };
@@ -131,7 +139,7 @@ const Notification: React.FC = () => {
   const formatWaktu = (isoString: string) => {
     const selisihMili = new Date().getTime() - new Date(isoString).getTime();
     const selisihMenit = Math.floor(selisihMili / 60000);
-    const selisihJam = Math.floor(selisihMenit / 600);
+    const selisihJam = Math.floor(selisihMenit / 60);
 
     if (selisihMenit < 1) return 'Baru saja';
     if (selisihMenit < 60) return `${selisihMenit} menit lalu`;
@@ -142,6 +150,36 @@ const Notification: React.FC = () => {
       month: 'short',
       year: 'numeric'
     });
+  };
+
+  // Mengubah string nama pertama di dalam pesan menjadi link profil jika sender_id tersedia
+  const renderMessageContent = (notif: NotificationItem) => {
+    if (!notif.sender_id) return notif.message;
+
+    // Menghandle jika tipe pelamar atau peminat klik hubungi jasa
+    if (notif.type === 'applicant' || notif.type === 'lead') {
+      const kata = notif.message.split(' ');
+      const namaPelamar = notif.title.includes('Lamaran') || notif.title.includes('Kontak') 
+        ? kata.slice(0, 2).join(' ') 
+        : '';
+        
+      if (namaPelamar) {
+        const sisaPesan = notif.message.replace(namaPelamar, '');
+        return (
+          <>
+            <Link 
+              href={`/profile/${notif.sender_id}`} 
+              className="font-bold text-blue-600 hover:underline inline-block"
+              onClick={(e) => e.stopPropagation()} // Supaya tidak tabrakan dengan fungsi markAsRead
+            >
+              {namaPelamar}
+            </Link>
+            {sisaPesan}
+          </>
+        );
+      }
+    }
+    return notif.message;
   };
 
   return (
@@ -204,7 +242,7 @@ const Notification: React.FC = () => {
                   )}
                 </div>
                 <p className="text-xs md:text-sm text-slate-600 leading-relaxed break-words">
-                  {notif.message}
+                  {renderMessageContent(notif)}
                 </p>
                 <p className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest pt-0.5">
                   {formatWaktu(notif.created_at)}

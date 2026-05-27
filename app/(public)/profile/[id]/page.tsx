@@ -167,6 +167,32 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 md:pt-12 lg:pt-0">
+      {/* BANNER PERINGATAN VERIFIKASI AKUN (Hanya muncul jika profil milik sendiri & belum verifikasi) */}
+      {isOwnProfile && !userData.isVerified && (
+        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex gap-3 items-start">
+            <div className="p-2 bg-amber-100 text-amber-700 rounded-2xl shrink-0 mt-0.5 sm:mt-0">
+              <FiShield size={20} />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-800">Akun Anda Belum Terverifikasi</h3>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Segera lakukan verifikasi akun untuk membuka akses penuh fitur lamar kerja crowdsourcing, jaminan sistem escrow aman, dan penarikan saldo dompet tanpa kendala.
+              </p>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Lengkapi data Nama Lengkap, Nomor Telepon, dan Email untuk proses verifikasi yang cepat dan mudah.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowSubModal(true)}
+            className="w-full sm:w-auto px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-sm"
+          >
+            Verifikasi Sekarang
+          </button>
+        </div>
+      )}
+
       {/* Profil Header Card */}
       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
         <div className="relative h-48 w-full">
@@ -355,7 +381,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
         </div>
 
         {/* Sisi Kanan: Pengaturan & Keamanan */}
-        <div className="md:col-span-2">
+        <div className={isOwnProfile ? 'md:col-span-2' : ''}>
           {isOwnProfile ? (
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100">
               <div className="p-6">

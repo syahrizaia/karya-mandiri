@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { IJobs } from "@/app/types/jobs";
@@ -7,7 +8,7 @@ import { id } from "date-fns/locale/id";
 import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FiAlertCircle, FiCalendar, FiChevronLeft, FiClock, FiMail, FiMapPin, FiShield, FiUser } from "react-icons/fi";
+import { FiAlertCircle, FiCalendar, FiChevronLeft, FiClock, FiMail, FiMapPin, FiShield } from "react-icons/fi";
 import SubscriptionDialog from "../../../../components/subscription/page";
 import SaveJobButton from "@/components/ui/save-job-button/page";
 import ApplyJobDialog from "@/components/apply-job/page";
@@ -17,7 +18,7 @@ import Link from "next/link";
 
 interface IApplicant {
   id: string;
-  worker_id: string;
+  user_id: string;
   status: string;
   applied_at: string;
   notes?: string;
@@ -80,7 +81,7 @@ const DetailJob: React.FC = () => {
               .from('applications')
               .select('id')
               .eq('job_id', jobId)      // Ambil dari params id pekerjaan saat ini
-              .eq('worker_id', user.id) // Filter berdasarkan ID user aktif
+              .eq('user_id', user.id) // Filter berdasarkan ID user aktif
               .maybeSingle();
 
             if (application) {
@@ -88,12 +89,22 @@ const DetailJob: React.FC = () => {
             }
           }
 
-          const { data, error } = await supabase.from('jobs').select('*').eq('id', params.id).single();
+          const { data, error } = await supabase
+            .from('jobs')
+            .select(`
+              *,
+              profiles:user_id (
+                avatar_url
+              )
+            `)
+            .eq('id', params.id)
+            .single();
+          
           if (error) throw error;
           setJob(data);
 
-          // Fallback sekunder jika skema simpan Anda langsung menggunakan kolom 'worker_id' di tabel 'jobs'
-          if (user && data && data.is_saved && data.worker_id === user.id) {
+          // Fallback sekunder jika skema simpan Anda langsung menggunakan kolom 'user_id' di tabel 'jobs'
+          if (user && data && data.is_saved && data.user_id === user.id) {
             setIsSavedByUser(true);
           }
 
@@ -122,7 +133,12 @@ const DetailJob: React.FC = () => {
 
         const { data: jobData, error: jobError } = await supabase
           .from('jobs')
-          .select('*')
+          .select(`
+            *,
+            profiles:user_id (
+              avatar_url
+            )
+          `)
           .eq('id', jobId)
           .single();
 
@@ -138,11 +154,12 @@ const DetailJob: React.FC = () => {
           .from('applications')
           .select(`
             id,
-            worker_id,
+            job_id,
+            user_id:user_id,
             status,
             applied_at,
             notes,
-            profiles:worker_id (
+            profiles!user_id (
               full_name,
               email,
               avatar_url
@@ -156,7 +173,12 @@ const DetailJob: React.FC = () => {
         setRoleLoading(false);
 
         if (applicantsError) {
-          console.error('Error fetching applicants:', applicantsError);
+          console.error('Detail Error Supabase:', {
+            Pesan: applicantsError.message,
+            Detail: applicantsError.details,
+            Petunjuk: applicantsError.hint,
+            Kode: applicantsError.code
+          });
         } else {
           setApplicants(applicantsData as unknown as IApplicant[]);
         }
@@ -173,17 +195,51 @@ const DetailJob: React.FC = () => {
   // Fungsi untuk memperbarui status lamaran worker (Terima / Tolak)
   const handleUpdateStatus = async (applicationId: string, newStatus: 'accepted' | 'rejected') => {
     try {
-      const { error } = await supabase
+      const targetApplicant = applicants.find(app => app.id === applicationId);
+      const previousStatus = targetApplicant ? targetApplicant.status : 'pending';
+
+      const { error: appError } = await supabase
         .from('applications')
         .update({ status: newStatus })
         .eq('id', applicationId);
 
-      if (error) throw error;
+      if (appError) throw appError;
+
+      let newTaken = job?.taken ?? 0;
+      let shouldUpdateJob = false;
+
+      if (newStatus === 'accepted' && previousStatus !== 'accepted') {
+        newTaken = Math.min(job?.total ?? 0, newTaken + 1);
+        shouldUpdateJob = true;
+      } else if (newStatus === 'rejected' && previousStatus === 'accepted') {
+        newTaken = Math.max(0, newTaken - 1);
+        shouldUpdateJob = true;
+      }
+
+      if (shouldUpdateJob && job?.id) {
+        const { error: jobUpdateError } = await supabase
+          .from('jobs')
+          .update({ taken: newTaken })
+          .eq('id', job.id);
+
+        if (jobUpdateError) throw jobUpdateError;
+      }
 
       // Update state lokal agar UI langsung sinkron tanpa reload
       setApplicants((prev) =>
         prev.map((app) => (app.id === applicationId ? { ...app, status: newStatus } : app))
       );
+
+      setJob((prevJob) => {
+        if (!prevJob) return null;
+        return {
+          ...prevJob,
+          taken: newTaken
+        };
+      });
+
+      // Sinkronisasi komponen Next.js server jika diperlukan
+      router.refresh();
     } catch (err) {
       alert('Gagal memperbarui status pelamar');
       console.error(err);
@@ -245,7 +301,27 @@ const DetailJob: React.FC = () => {
               <h1 className="text-3xl font-bold text-slate-900 mb-4">{job.title}</h1>
               
               <div className="flex flex-wrap gap-6 text-slate-500 mb-8">
-                <div className="flex items-center gap-2"><FiUser className="text-blue-600"/> {job.employer}</div>
+                <Link href={`/profile/${job.user_id}`} className="flex items-center gap-2 text-blue-400 hover:text-blue-600 transition">
+                  {(job as any).profiles?.avatar_url ? (
+                    <Image
+                      src={(job as any).profiles.avatar_url} 
+                      alt={job.employer || 'Avatar'} 
+                      className="w-6 h-6 rounded-xl object-cover border border-slate-200 shrink-0"
+                      onError={(e) => {
+                        // Fallback jika url gambar bermasalah atau rusak
+                        (e.target as HTMLElement).style.display = 'none';
+                      }}
+                      width={50}
+                      height={50}
+                    />
+                  ) : (
+                    // Lingkaran inisial jika employer tidak mengunggah foto profil
+                    <div className="w-6 h-6 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 uppercase">
+                      {job.employer ? job.employer.charAt(0) : 'E'}
+                    </div>
+                  )}
+                  <span>{job.employer}</span>
+                </Link>
                 <div className="flex items-center gap-2"><FiMapPin className="text-red-400"/> {job.location}</div>
                 <div className="flex items-center gap-2">
                   <FiClock /> {formatDistanceToNow(new Date(job.posted_at), { addSuffix: true, locale: id })}
@@ -375,25 +451,9 @@ const DetailJob: React.FC = () => {
         </div>
 
         {userRole !== 'employer' || job.user_id !== userId ? (
-          /* Tampilan jika Worker atau user lain mencoba mengakses halaman ini */
-          // <div className="p-12 bg-white rounded-2xl border border-red-100 text-center flex flex-col items-center justify-center space-y-3 shadow-sm">
-          //   <div className="p-4 bg-red-50 text-red-500 rounded-full">
-          //     <FiAlertCircle size={36} />
-          //   </div>
-          //   <h3 className="text-lg font-bold text-gray-800">Akses Ditolak</h3>
-          //   <p className="text-sm text-gray-500 max-w-sm">
-          //     Halaman detail pelamar ini hanya dapat diakses oleh akun dengan peran <span className="font-semibold text-red-600">Employer</span>.
-          //   </p>
-          //   <button
-          //     onClick={() => router.push('/dashboard')}
-          //     className="mt-2 px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-xl hover:bg-gray-700 transition"
-          //   >
-          //     Kembali ke Dashboard
-          //   </button>
-          // </div>
           <></>
         ) : (
-          /* TAMPILAN KHUSUS EMPLOYER (Kode Asli Anda) */
+          /* TAMPILAN KHUSUS EMPLOYER */
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Ringkasan Informasi Job */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
@@ -437,7 +497,7 @@ const DetailJob: React.FC = () => {
                       {/* Profil Worker */}
                       <div className="flex flex-col items-start gap-2">
                         <div className="flex gap-2">
-                          <Link href={`/profile/${applicant.worker_id}`} className="bg-blue-100 text-blue-600 p-1 rounded-2xl w-fit h-fit">
+                          <Link href={`/profile/${applicant.user_id}`} className="bg-blue-100 text-blue-600 p-1 rounded-2xl w-fit h-fit">
                             {/* <FiUser size={20} /> */}
                             <Image
                               src={applicant.profiles?.avatar_url || 'https://api.dicebear.com/7.x/initials/svg?seed=Worker'}
@@ -448,7 +508,7 @@ const DetailJob: React.FC = () => {
                             />
                           </Link>
                           <div className="space-y-1">
-                            <Link href={`/profile/${applicant.worker_id}`} className="font-semibold text-gray-800 text-base">{applicant.profiles?.full_name || 'Worker Anonim'}</Link>
+                            <Link href={`/profile/${applicant.user_id}`} className="font-semibold text-gray-800 text-base">{applicant.profiles?.full_name || 'Worker Anonim'}</Link>
                             <div className="flex flex-col items-start gap-y-1 text-sm text-gray-500">
                               <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                                 <span className="flex items-center gap-1">
@@ -487,14 +547,25 @@ const DetailJob: React.FC = () => {
                             </button>
                           </div>
                         ) : (
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
-                            applicant.status === 'accepted' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                          }`}>
-                            {applicant.status === 'accepted' ? 'Diterima' : 'Ditolak'}
-                          </span>
+                          <div className="flex items-center gap-3">
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
+                              applicant.status === 'accepted' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                            }`}>
+                              {applicant.status === 'accepted' ? 'Diterima' : 'Ditolak'}
+                            </span>
+                            
+                            {/* Tombol ganti pikiran jika statusnya sudah 'accepted' agar bisa mengurangi kuota taken */}
+                            {applicant.status === 'accepted' && (
+                              <button
+                                onClick={() => handleUpdateStatus(applicant.id, 'rejected')}
+                                className="text-xs text-red-500 hover:underline font-medium"
+                              >
+                                Batalkan & Tolak
+                              </button>
+                            )}
+                          </div>
                         )}
                       </div>
-
                     </div>
                   ))}
                 </div>
