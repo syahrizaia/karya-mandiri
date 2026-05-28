@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -8,9 +9,10 @@ import {
   FiSearch, 
   FiLoader, 
   FiLayers, 
-  FiUser, 
   FiSend, 
-  FiCalendar 
+  FiCalendar,
+  FiChevronLeft,
+  FiChevronRight
 } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,7 +24,6 @@ interface IServiceFeed {
   price: number;
   category: string;
   created_at: string;
-  // Relasi join untuk mengambil data nama pembuat jasa dari tabel profiles
   profiles: {
     id: string;
     full_name: string;
@@ -39,6 +40,10 @@ export default function Services() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Semua Kategori");
 
+  // State Utama untuk Keperluan Navigasi Halaman Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15; // Batas maksimal data per halaman sesuai instruksi
+
   const categories = [
     "Semua Kategori",
     "Web Development",
@@ -54,7 +59,6 @@ export default function Services() {
       try {
         setLoading(true);
         
-        // Mengambil data jasa sekalian melakukan JOIN ke tabel profiles untuk tahu siapa yang memposting
         const { data, error } = await supabase
           .from("services")
           .select(`
@@ -85,6 +89,11 @@ export default function Services() {
     fetchAllServices();
   }, []);
 
+  // Reset halaman aktif kembali ke 1 jika filter pencarian/kategori diubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
+
   // Filter Logik di Sisi Klien
   const filteredServices = services.filter((service) => {
     const matchesSearch = service.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -94,22 +103,31 @@ export default function Services() {
     return matchesSearch && matchesCategory;
   });
 
+  // LOGIKA UTAMA SPLICING DATA PAGINATION
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentServices = filteredServices.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredServices.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    // Auto-scroll kembali ke bagian atas katalog saat pindah halaman demi UX yang baik
+    window.scrollTo({ top: 250, behavior: "smooth" });
+  };
+
   const handleHireClick = (service: IServiceFeed) => {
     const rawPhone = service.profiles?.phone;
 
-    // Validasi jika penyedia jasa belum mendaftarkan nomor telepon
     if (!rawPhone) {
       toast.error(`Gagal menghubungi: ${service.profiles?.full_name || "Penyedia Jasa"} belum mengatur nomor telepon di profil mereka.`);
       return;
     }
 
-    // Standardisasi nomor telepon ke format internasional WhatsApp (menghapus karakter non-angka & mengubah '08' menjadi '62')
     let cleanPhone = rawPhone.replace(/\D/g, "");
     if (cleanPhone.startsWith("0")) {
       cleanPhone = "62" + cleanPhone.slice(1);
     }
 
-    // Aksi ketika tombol hubungi diklik
     const message = encodeURIComponent(`Halo, saya tertarik dengan jasa Anda di KaryaMandiri: "${service.title}". Bisa berdiskusi lebih lanjut?`);
     
     toast.info(`Membuka komunikasi dengan ${service.profiles?.full_name}`);
@@ -165,82 +183,126 @@ export default function Services() {
           Tidak ada penawaran jasa yang cocok dengan kriteria pencarian Anda saat ini.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredServices.map((service) => (
-            <div 
-              key={service.id} 
-              className="bg-white rounded-3xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden p-6 relative group hover:border-blue-300"
-            >
-              <div className="space-y-4">
-                {/* Kategori Badge */}
-                <div className="flex justify-between items-center">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-600 font-bold rounded-lg text-[10px] uppercase tracking-wider">
-                    <FiLayers /> {service.category}
-                  </span>
-                  <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                    <FiCalendar /> {new Date(service.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
-                  </span>
-                </div>
-
-                {/* Judul & Deskripsi */}
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
-                    {service.title}
-                  </h3>
-                  <p className="text-slate-500 text-sm mt-2 line-clamp-4 leading-relaxed">
-                    {service.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* Bagian Bawah: Profil Pembuat, Tarif & Tombol Aksi */}
-              <div className="mt-2 pt-4 border-t border-slate-300 space-y-4">
-                <div className="flex justify-between items-center text-sm">
-                  {/* Nama Pekerja */}
-                  <Link href={`/profile/${service.profiles?.id}`} className="flex items-center gap-2 text-blue-400 hover:text-blue-600 transition font-semibold">
-                    {(service.profiles as any)?.avatar_url ? (
-                      <Image
-                        src={(service.profiles as any).avatar_url} 
-                        alt={service.profiles?.full_name || 'Avatar'} 
-                        className="w-6 h-6 rounded-xl object-cover border border-slate-200 shrink-0"
-                        onError={(e) => {
-                          // Fallback jika url gambar bermasalah/broken link
-                          (e.target as HTMLElement).style.display = 'none';
-                        }}
-                        width={50}
-                        height={50}
-                      />
-                    ) : (
-                      // Lingkaran inisial jika pekerja belum mengunggah foto profil
-                      <div className="w-6 h-6 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold shrink-0 uppercase">
-                        {service.profiles?.full_name ? service.profiles.full_name.charAt(0) : 'W'}
-                      </div>
-                    )}
-                    <span className="truncate max-w-30">
-                      {service.profiles?.full_name || "Anonymous Worker"}
+        <>
+          {/* Loop diarahkan ke data page aktif (currentServices) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {currentServices.map((service) => (
+              <div 
+                key={service.id} 
+                className="bg-white rounded-3xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden p-6 relative group hover:border-blue-300"
+              >
+                <Link href={`/services/${service.id}`} className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 text-slate-600 font-bold rounded-lg text-[10px] uppercase tracking-wider">
+                      <FiLayers /> {service.category}
                     </span>
-                  </Link>
+                    <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                      <FiCalendar /> {new Date(service.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
+                    </span>
+                  </div>
 
-                  {/* Tarif Jasa */}
-                  <div className="text-right">
-                    <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tarif Mulai</p>
-                    <p className="text-base font-black text-green-600">
-                      Rp{service.price.toLocaleString("id-ID")}
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
+                      {service.title}
+                    </h3>
+                    <p className="text-slate-500 text-sm mt-2 line-clamp-4 leading-relaxed">
+                      {service.description}
                     </p>
                   </div>
-                </div>
+                </Link>
 
-                {/* Tombol Hubungi */}
+                <div className="mt-2 pt-4 border-t border-slate-300 space-y-4">
+                  <div className="flex justify-between items-center text-sm">
+                    <Link href={`/profile/${service.profiles?.id}`} className="flex items-center gap-2 text-blue-400 hover:text-blue-600 transition font-semibold">
+                      {(service.profiles as any)?.avatar_url ? (
+                        <Image
+                          src={(service.profiles as any).avatar_url} 
+                          alt={service.profiles?.full_name || 'Avatar'} 
+                          className="w-6 h-6 rounded-xl object-cover border border-slate-200 shrink-0"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                          }}
+                          width={50}
+                          height={50}
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold shrink-0 uppercase">
+                          {service.profiles?.full_name ? service.profiles.full_name.charAt(0) : 'W'}
+                        </div>
+                      )}
+                      <span className="truncate max-w-30">
+                        {service.profiles?.full_name || "Anonymous Worker"}
+                      </span>
+                    </Link>
+
+                    <div className="text-right">
+                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Tarif Mulai</p>
+                      <p className="text-base font-black text-green-600">
+                        Rp{service.price.toLocaleString("id-ID")}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleHireClick(service)}
+                    className="w-full py-3 bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition group-hover:shadow-sm"
+                  >
+                    <FiSend size={14} /> Hubungi Penyedia Jasa
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* NAVIGASI PAGINATION FOOTER */}
+          {totalPages > 1 && (
+            <div className="pt-6 flex flex-col sm:flex-row gap-4 justify-between items-center text-center sm:text-left text-sm">
+              <p className="text-xs text-slate-400 font-semibold w-full sm:w-auto">
+                Menampilkan <span className="text-slate-700">{indexOfFirstItem + 1}</span> -{" "}
+                <span className="text-slate-700">
+                  {Math.min(indexOfLastItem, filteredServices.length)}
+                </span>{" "}
+                dari <span className="text-slate-700">{filteredServices.length}</span> penawaran jasa
+              </p>
+
+              {/* Tetap di tengah pada device mobile berkat utilitas `mx-auto sm:mx-0` */}
+              <div className="flex items-center justify-center gap-1 mx-auto sm:mx-0">
+                {/* Tombol Back */}
                 <button
-                  onClick={() => handleHireClick(service)}
-                  className="w-full py-3 bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition group-hover:shadow-sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="p-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 disabled:opacity-40 transition cursor-pointer disabled:cursor-not-allowed"
                 >
-                  <FiSend size={14} /> Hubungi Penyedia Jasa
+                  <FiChevronLeft size={16} />
+                </button>
+
+                {/* Iterasi Angka Halaman */}
+                {Array.from({ length: totalPages }, (_, idx) => (
+                  <button
+                    key={idx + 1}
+                    onClick={() => handlePageChange(idx + 1)}
+                    className={`w-9 h-9 text-xs font-bold rounded-xl transition cursor-pointer ${
+                      currentPage === idx + 1
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+
+                {/* Tombol Next */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="p-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 disabled:opacity-40 transition cursor-pointer disabled:cursor-not-allowed"
+                >
+                  <FiChevronRight size={16} />
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );

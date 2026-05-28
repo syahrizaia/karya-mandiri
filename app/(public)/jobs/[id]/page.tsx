@@ -41,7 +41,7 @@ const DetailJob: React.FC = () => {
   const [selectedApplyJob, setSelectedApplyJob] = useState<IJobs | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [roleLoading, setRoleLoading] = useState(true);
+  const [, setRoleLoading] = useState(true);
   const [isSavedByUser, setIsSavedByUser] = useState<boolean>(false);
   const [isAppliedByUser, setIsAppliedByUser] = useState<boolean>(false);
 

@@ -18,7 +18,7 @@ interface ApplyJobDialogProps {
 export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: ApplyJobDialogProps) {
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState("");
-  const [isAppliedByUser, setIsAppliedByUser] = useState<boolean>(false);
+  const [, setIsAppliedByUser] = useState<boolean>(false);
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();

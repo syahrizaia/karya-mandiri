@@ -189,7 +189,7 @@ const WorkerDashboard: React.FC = () => {
         </div>
       </div>
 
-      <Services />
+      <Services itemsPerPage={5} />
 
       {/* Cari Tugas Baru */}
       <section className="mb-8">

@@ -12,7 +12,12 @@ import {
   FiShield,
   FiCamera,
   FiPhone,
-  FiMoreVertical
+  FiMoreVertical,
+  FiBriefcase,
+  FiStar,
+  FiFolder,
+  FiCheckCircle,
+  FiAward
 } from 'react-icons/fi';
 import Image from 'next/image';
 import SubscriptionDialog from '../../../../components/subscription/page';
@@ -24,16 +29,14 @@ import ManageSkillsDialog from '@/components/manage-skills/page';
 import EditProfilePhotoDialog from '@/components/edit-profile-photo/page';
 import EditProfileBannerDialog from '@/components/edit-profile-banner/page';
 import ShareProfileButton from '@/components/ui/share-profile-button/page';
-import ProfileSkeleton from '@/components/ui/skeleton-profile/page';
 
-// Sub-komponen untuk baris pengaturan
 const SettingsItem = ({ label, value, status, onClick }: { label: string, value: string, status: string, onClick?: () => void }) => (
-  <div className="p-6 flex justify-between items-center hover:bg-slate-50 transition cursor-pointer" onClick={onClick}>
-    <div>
-      <p className="text-sm font-semibold text-slate-700">{label}</p>
-      <p className="text-xs text-slate-500 mt-0.5">{value}</p>
+  <div className="p-4 sm:p-6 flex justify-between items-center hover:bg-slate-50 transition cursor-pointer" onClick={onClick}>
+    <div className="min-w-0 flex-1 pr-2">
+      <p className="text-sm font-semibold text-slate-700 truncate">{label}</p>
+      <p className="text-xs text-slate-500 mt-0.5 truncate">{value}</p>
     </div>
-    <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
+    <div className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest shrink-0 ${
       status === 'success' ? 'bg-green-100 text-green-700' : 
       status === 'warning' ? 'bg-orange-100 text-orange-700' : 'bg-slate-100 text-slate-500'
     }`}>
@@ -56,8 +59,10 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
   const [showMediaProfile, setShowMediaProfile] = useState(false);
   const [showMediaBanner, setShowMediaBanner] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'reviews' | 'settings'>('portfolio');
 
-  // State mandiri untuk menampung data user login asli
+  // State Utama User Profil
   const [userData, setUserData] = useState<{
     full_name: string;
     email: string;
@@ -81,32 +86,43 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
     skills: [],
     isVerified: false,
     balance: 0,
-    avatarUrl: "https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff", // Default avatar fallback
-    bannerUrl: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200", // Default banner fallback
+    avatarUrl: "",
+    bannerUrl: "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200",
     joinedDate: "Memuat tanggal...",
   });
+
+  const [stats, setStats] = useState({ jobCompleted: 0, successRate: 100, rating: 0.0 });
+  const [portfolios, setPortfolios] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+
+  // Fungsi Helper untuk membuat inisial dari Nama Lengkap
+  const getInitials = (name: string) => {
+    if (!name) return "KM";
+    const cleanName = name.trim();
+    const parts = cleanName.split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return cleanName.substring(0, 2).toUpperCase();
+  };
 
   const fetchCurrentProfile = async () => {
     try {
       setLoading(true);
 
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', profileId)
-        .maybeSingle();
+      const [profileRes, portfoliosRes, reviewsRes] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', profileId).maybeSingle(),
+        supabase.from('portfolios').select('*').eq('profile_id', profileId).order('created_at', { ascending: false }),
+        supabase.from('reviews').select('*').eq('profile_id', profileId).order('created_at', { ascending: false })
+      ]);
 
-      // Abaikan error "Row not found" (PGRST116) karena user baru mungkin belum punya row di tabel profiles
-      if (profileError && profileError.code !== 'PGRST116') {
-        console.error("Database Error:", profileError);
-      }
-
-      if (profileError) {
-        console.error("Database Error:", profileError);
+      if (profileRes.error && profileRes.error.code !== 'PGRST116') {
+        console.error("Profile Fetch Error:", profileRes.error);
         toast.error("Gagal memuat profil.");
         return;
       }
 
+      const profile = profileRes.data;
       if (!profile) {
         toast.error("Profil tidak ditemukan.");
         return;
@@ -114,42 +130,53 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
 
       const { data: authData } = await supabase.auth.getUser();
       const currentUser = authData?.user;
-
       const ownsProfile = !!(currentUser && currentUser.id === profileId);
       setIsOwnProfile(ownsProfile);
 
-      // Siapkan variabel nama untuk generator avatar
       const fallbackName = currentUser?.user_metadata?.full_name || "Pengguna KaryaMandiri";
-      const generatedAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(fallbackName)}&background=0D8ABC&color=fff&size=256`;
-
       const displayPhone = ownsProfile 
-        ? (profile?.phone || currentUser?.user_metadata?.phone || "Nomor telepon tidak tersedia") 
-        : "Nomor telepon disembunyikan";
-
+        ? (profile?.phone || currentUser?.user_metadata?.phone || "Nomor tidak tersedia") 
+        : "Nomor disembunyikan";
       const displayEmail = profile?.email || currentUser?.email || "Email tidak tersedia";
-
       const rawJoinedDate = profile?.created_at;
 
-      // Jika profile belum terbentuk di DB, gunakan data fallback metadata auth
       setUserData({
         full_name: profile?.full_name || currentUser?.user_metadata?.full_name || fallbackName,
         email: displayEmail,
         phone: displayPhone,
         role: profile?.role || currentUser?.user_metadata?.role || "worker",
-        bio: (profile as any)?.bio || "Belum ada bio profil. Ceritakan sedikit tentang diri Anda.",
-        location: (profile as any)?.location || "Belum mengatur lokasi.",
-        skills: (profile as any)?.skills || [],
-        isVerified: (profile as any)?.is_verified || false,
-        balance: (profile as any)?.balance || 0,
-        avatarUrl: (profile as any)?.avatar_url || generatedAvatar,
-        bannerUrl: (profile as any)?.banner_url || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200",
+        bio: profile?.bio || "Belum ada bio profil. Ceritakan sedikit tentang diri Anda.",
+        location: profile?.location || "Belum mengatur lokasi.",
+        skills: profile?.skills || [],
+        isVerified: profile?.is_verified || false,
+        balance: profile?.balance || 0,
+        avatarUrl: profile?.avatar_url || "", // Dikosongkan jika null agar merender inisial teks
+        bannerUrl: profile?.banner_url || "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=1200",
         joinedDate: rawJoinedDate 
           ? new Date(rawJoinedDate).toLocaleDateString("id-ID", { month: "long", year: "numeric" })
           : "Baru Saja",
       });
 
+      const fetchedPortfolios = portfoliosRes.data || [];
+      const fetchedReviews = reviewsRes.data || [];
+      setPortfolios(fetchedPortfolios);
+      setReviews(fetchedReviews);
+
+      const completedCount = profile?.job_completed || fetchedReviews.length || 0;
+      const successRatePercent = profile?.success_rate || 100;
+      
+      const averageRating = fetchedReviews.length > 0 
+        ? parseFloat((fetchedReviews.reduce((acc: number, curr: any) => acc + curr.rating, 0) / fetchedReviews.length).toFixed(1))
+        : parseFloat((profile?.rating || 0.0).toFixed(1));
+
+      setStats({
+        jobCompleted: completedCount,
+        successRate: successRatePercent,
+        rating: averageRating
+      });
+
     } catch (err: any) {
-      console.error("Error mengambil data profil:", err.message);
+      console.error("Error global saat memuat profil:", err.message);
     } finally {
       setLoading(false);
     }
@@ -161,26 +188,56 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
     }
   }, [profileId]);
 
+  // 🌟 TAMPILAN LOADING SKELETON YANG DISESUAIKAN (PREVENT LAYOUT SHIFT)
   if (loading) {
-     return <ProfileSkeleton isOwnProfile={isOwnProfile} />;
-   }
+    return (
+      <div className="w-full max-w-4xl mx-auto space-y-6 px-4 py-4 md:py-12 lg:pt-4 animate-pulse">
+        <div className="w-full bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="h-36 sm:h-48 w-full bg-slate-200" />
+          <div className="px-4 sm:px-6 pb-6">
+            <div className="relative flex justify-between items-end -mt-14 md:-mt-20 mb-4 sm:mb-6">
+              {/* Menyesuaikan ukuran skeleton avatar agar tepat sama dengan w-28 h-28 / w-40 h-40 */}
+              <div className="w-28 h-28 md:w-40 md:h-40 rounded-3xl border-4 border-white bg-slate-300 shrink-0" />
+              <div className="w-24 h-8 bg-slate-200 rounded-xl mb-2 md:mb-4" />
+            </div>
+            <div className="space-y-3">
+              <div className="h-6 bg-slate-300 rounded-md w-1/3" />
+              <div className="h-4 bg-slate-200 rounded-md w-2/3" />
+            </div>
+            <div className="flex flex-wrap gap-4 mt-6 pt-5 border-t border-slate-100">
+              <div className="h-4 bg-slate-200 rounded-md w-24" />
+              <div className="h-4 bg-slate-200 rounded-md w-32" />
+              <div className="h-4 bg-slate-200 rounded-md w-28" />
+            </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-16 sm:h-20 bg-slate-200 rounded-2xl border border-slate-100" />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="h-44 bg-slate-200 rounded-2xl" />
+          <div className="md:col-span-2 h-44 bg-slate-200 rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 md:pt-12 lg:pt-0">
-      {/* BANNER PERINGATAN VERIFIKASI AKUN (Hanya muncul jika profil milik sendiri & belum verifikasi) */}
+    <div className="w-full max-w-4xl mx-auto space-y-6 px-4 py-4 md:py-12 lg:pt-4">
+      
+      {/* BANNER PERINGATAN VERIFIKASI AKUN */}
       {isOwnProfile && !userData.isVerified && (
-        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex gap-3 items-start">
-            <div className="p-2 bg-amber-100 text-amber-700 rounded-2xl shrink-0 mt-0.5 sm:mt-0">
+        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex gap-3 items-start min-w-0">
+            <div className="p-2 bg-amber-100 text-amber-700 rounded-2xl shrink-0 mt-0.5">
               <FiShield size={20} />
             </div>
-            <div>
+            <div className="min-w-0">
               <h3 className="text-sm font-bold text-slate-800">Akun Anda Belum Terverifikasi</h3>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Segera lakukan verifikasi akun untuk membuka akses penuh fitur lamar kerja crowdsourcing, jaminan sistem escrow aman, dan penarikan saldo dompet tanpa kendala.
-              </p>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Lengkapi data Nama Lengkap, Nomor Telepon, dan Email untuk proses verifikasi yang cepat dan mudah.
+                Segera lakukan verifikasi identitas untuk membuka akses penuh seluruh fitur crowdsourcing KaryaMandiri.
               </p>
             </div>
           </div>
@@ -194,62 +251,69 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
       )}
 
       {/* Profil Header Card */}
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="relative h-48 w-full">
+      <div className="w-full bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="relative h-36 sm:h-48 w-full">
           <Image
-              src={userData.bannerUrl}
-              alt={userData.full_name}
-              fill
-              className="object-cover"
-              priority
-            />
-            {isOwnProfile && (
-              <button
-                className="flex items-center gap-2 p-2 absolute bottom-2 right-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
-                onClick={() => setShowMediaBanner(true)}
-              >
-                <FiCamera size={18} />
-              </button>
-            )}
+            src={userData.bannerUrl}
+            alt={userData.full_name}
+            fill
+            className="object-cover"
+            priority
+          />
+          {isOwnProfile && (
+            <button
+              className="flex items-center gap-2 p-2 absolute bottom-3 right-3 bg-white/80 hover:bg-white backdrop-blur-md text-slate-700 rounded-xl font-semibold transition shadow-xs"
+              onClick={() => setShowMediaBanner(true)}
+            >
+              <FiCamera size={16} />
+            </button>
+          )}
         </div>
-        <div className="px-6 pb-6">
-          <div className="relative flex justify-between items-end -mt-12 mb-6">
-            <div className="relative w-32 h-32">
-              <Image
-                src={userData.avatarUrl} 
-                alt={userData.full_name} 
-                fill
-                className="rounded-2xl border-4 border-white bg-white shadow-md object-cover"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              />
+        <div className="px-4 sm:px-6 pb-6">
+          {/* Baris Foto Profil Besar dan Tombol Aksi */}
+          <div className="relative flex justify-between items-end -mt-14 md:-mt-20 mb-4 sm:mb-6">            
+            <div className="relative w-28 h-28 md:w-40 md:h-40 shrink-0">
+              {/* 🌟 LOGIK KONDISIONAL FOTO PROFIL / INISIAL TEKS */}
+              {userData.avatarUrl ? (
+                <Image
+                  src={userData.avatarUrl} 
+                  alt={userData.full_name} 
+                  fill
+                  className="rounded-3xl border-4 border-white bg-white shadow-md object-cover"
+                  sizes="(max-width: 768px) 112px, 160px"
+                  priority
+                />
+              ) : (
+                <div className="w-full h-full rounded-3xl border-4 border-white bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md flex items-center justify-center text-white text-3xl md:text-5xl font-black tracking-wide select-none">
+                  {getInitials(userData.full_name)}
+                </div>
+              )}
+              
               {isOwnProfile && (
                 <button
-                  className="flex items-center gap-2 p-2 absolute -top-2 -right-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                  className="flex items-center gap-2 p-2 absolute -top-1 -right-1 bg-white text-slate-700 rounded-xl border border-slate-200 shadow-xs hover:bg-slate-50 transition-all z-10"
                   onClick={() => setShowMediaProfile(true)}
                 >
-                  <FiCamera size={18} />
+                  <FiCamera size={14} />
                 </button>
               )}
-              {(userData.isVerified || (userData as any).is_verified) && (
-                <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white p-1.5 rounded-full border-2 border-white z-10 shadow-sm animate-in zoom-in-50 duration-200">
+              {userData.isVerified && (
+                <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1.5 rounded-full border-2 border-white z-10 shadow-sm">
                   <MdVerified size={16} />
                 </div>
               )}
             </div>
 
-            {/* Flex container untuk tombol aksi (Desktop & Mobile) */}
-            <div className="relative flex items-center gap-2">
-              <div className="hidden md:grid md:grid-cols-2 items-center gap-2">
-                <ShareProfileButton 
-                  profileId={profileId} 
-                  fullName={userData.full_name} 
-                />
+            {/* Tombol Menu / Aksi Kanan */}
+            <div className="relative flex items-center gap-2 mb-2 md:mb-4">
+              <div className="hidden md:flex items-center gap-2">
+                <ShareProfileButton profileId={profileId} fullName={userData.full_name} />
                 {isOwnProfile && (
                   <button
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold transition"
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs rounded-xl transition shadow-xs"
                     onClick={() => setShowEditProfile(true)}
                   >
-                    <FiEdit2 size={18} /> Edit Profil
+                    <FiEdit2 size={14} /> Edit Profil
                   </button>
                 )}
               </div>
@@ -257,42 +321,28 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
               <div className="md:hidden relative">
                 <button
                   onClick={() => setShowMobileMenu(!showMobileMenu)}
-                  className="p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full transition focus:outline-hidden"
+                  className="p-2.5 sm:p-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full transition focus:outline-hidden"
                   aria-label="Menu Opsi"
                 >
-                  <FiMoreVertical size={20} />
+                  <FiMoreVertical size={18} />
                 </button>
-
-                {/* Dropdown Menu Popup */}
                 {showMobileMenu && (
                   <>
-                    {/* Backdrop transparan untuk menutup menu saat area luar diklik */}
-                    <div 
-                      className="fixed inset-0 z-20" 
-                      onClick={() => setShowMobileMenu(false)} 
-                    />
-                    
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-30 animate-in fade-in slide-in-from-top-2 duration-150">
-                      
-                      {/* Opsi Bagian 1: Share Profile (Selalu Muncul untuk Semua Pengunjung) */}
+                    <div className="fixed inset-0 z-20" onClick={() => setShowMobileMenu(false)} />
+                    <div className="absolute right-0 mt-2 w-44 bg-white border border-slate-200 rounded-2xl shadow-xl py-2 z-30 animate-in fade-in slide-in-from-top-2 duration-150">
                       <div className="px-2 pb-1 border-b border-slate-100">
-                        <ShareProfileButton 
-                          profileId={profileId} 
-                          fullName={userData.full_name} 
-                        />
+                        <ShareProfileButton profileId={profileId} fullName={userData.full_name} />
                       </div>
-
-                      {/* Opsi Bagian 2: Edit Profil (Hanya Muncul Jika Pemilik Akun) */}
                       {isOwnProfile && (
                         <div className="px-2 pt-1">
                           <button
-                            className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50 font-semibold rounded-xl transition"
+                            className="w-full flex items-center gap-3 px-4 py-2 text-left text-xs text-slate-700 hover:bg-slate-50 font-bold rounded-xl transition"
                             onClick={() => {
                               setShowEditProfile(true);
-                              setShowMobileMenu(false); // Tutup menu setelah diklik
+                              setShowMobileMenu(false);
                             }}
                           >
-                            <FiEdit2 size={16} className="text-slate-500" /> 
+                            <FiEdit2 size={14} className="text-slate-500" /> 
                             <span>Edit Profil</span>
                           </button>
                         </div>
@@ -304,57 +354,74 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
             </div>
           </div>
 
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-3xl font-bold text-slate-900">{userData.full_name}</h1>
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">
+          <div className="space-y-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 break-words max-w-full">{userData.full_name}</h1>
+              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 border border-blue-200 text-[9px] font-bold rounded-sm uppercase tracking-wider shrink-0">
                 {userData.role}
               </span>
             </div>
-            <p className="text-slate-500 max-w-2xl leading-relaxed">{userData.bio}</p>
+            <p className="text-slate-500 text-xs sm:text-sm max-w-2xl leading-relaxed break-words">{userData.bio}</p>
           </div>
 
-          <div className="flex flex-wrap gap-6 mt-6 pt-6 border-t border-slate-100 text-sm text-slate-600">
-            <div className="flex items-center gap-2">
-              <FiMapPin className="text-blue-500" /> {userData.location}
-            </div>
-            <div className="flex items-center gap-2">
-              <FiMail className="text-blue-500" /> {userData.email}
-            </div>
-            <div className="flex items-center gap-2">
-              <FiPhone className="text-blue-500" /> {userData.phone}
-            </div>
-            <div className="flex items-center gap-2">
-              <FiCalendar className="text-blue-500" /> Bergabung {userData.joinedDate}
-            </div>
+          <div className="flex flex-wrap gap-x-4 gap-y-2 mt-5 pt-5 border-t border-slate-100 text-[11px] sm:text-xs text-slate-500 font-medium overflow-hidden">
+            <div className="flex items-center gap-1.5 min-w-0 max-w-full"><FiMapPin className="text-slate-400 shrink-0" /> <span className="truncate">{userData.location}</span></div>
+            <div className="flex items-center gap-1.5 min-w-0 max-w-full"><FiMail className="text-slate-400 shrink-0" /> <span className="truncate">{userData.email}</span></div>
+            <div className="flex items-center gap-1.5 min-w-0 max-w-full"><FiPhone className="text-slate-400 shrink-0" /> <span className="truncate">{userData.phone}</span></div>
+            <div className="flex items-center gap-1.5 min-w-0 max-w-full"><FiCalendar className="text-slate-400 shrink-0" /> <span className="whitespace-nowrap">Bergabung {userData.joinedDate}</span></div>
           </div>
         </div>
       </div>
 
-      <div className={'grid grid-cols-1 gap-6 ' + (isOwnProfile ? 'md:grid-cols-3' : 'md:grid-cols-1')}>
-        {/* Sisi Kiri: Skills & Trust */}
-        <div className={isOwnProfile ? 'md:col-span-1 space-y-6' : 'space-y-6'}>
-          <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      {/* KARTU STRATEGIS STATISTIK PERFORMA */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="bg-white border border-slate-200 p-3 sm:p-4 rounded-2xl flex items-center gap-3 shadow-xs min-w-0">
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-xl hidden sm:block shrink-0"><FiBriefcase size={18}/></div>
+          <div className="min-w-0">
+            <p className="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Selesai</p>
+            <p className="text-base sm:text-2xl font-black text-slate-800 truncate">{stats.jobCompleted}</p>
+          </div>
+        </div>
+        <div className="bg-white border border-slate-200 p-3 sm:p-4 rounded-2xl flex items-center gap-3 shadow-xs min-w-0">
+          <div className="p-3 bg-green-50 text-green-600 rounded-xl hidden sm:block shrink-0"><FiCheckCircle size={18}/></div>
+          <div className="min-w-0">
+            <p className="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Sukses</p>
+            <p className="text-base sm:text-2xl font-black text-green-600 truncate">{stats.successRate}%</p>
+          </div>
+        </div>
+        <div className="bg-white border border-slate-200 p-3 sm:p-4 rounded-2xl flex items-center gap-3 shadow-xs min-w-0">
+          <div className="p-3 bg-yellow-50 text-yellow-500 rounded-xl hidden sm:block shrink-0"><FiStar size={18}/></div>
+          <div className="min-w-0">
+            <p className="text-[9px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider truncate">Rating</p>
+            <p className="text-base sm:text-2xl font-black text-slate-800 flex items-center gap-1 truncate">
+              {stats.rating > 0 ? stats.rating : "-"} 
+              <span className="text-[10px] text-slate-400 font-normal hidden sm:inline">/5.0</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Sisi Kiri: Skills & Wallet */}
+        <div className="space-y-6 w-full min-w-0">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <FiShield className="text-blue-600" /> Keahlian
+              <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                <FiAward className="text-blue-600" /> Keahlian
               </h2>
-              {/* Tombol Tambah / Edit Keahlian */}
               {isOwnProfile && (
                 <button
                   onClick={() => setShowManageSkills(true)}
-                  className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1"
+                  className="text-[11px] font-bold text-blue-600 hover:underline transition-colors flex items-center gap-1"
                 >
-                  <FiEdit2 size={12} /> Kelola
+                  Kelola
                 </button>
               )}
             </div>
-
-            {/* Daftar Tag Keahlian */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {userData.skills.length > 0 ? (
                 userData.skills.map((skill) => (
-                  <span key={skill} className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium border border-slate-200">
+                  <span key={skill} className="px-2.5 py-1 bg-slate-50 text-slate-600 rounded-lg text-xs font-semibold border border-slate-200 break-words max-w-full">
                     {skill}
                   </span>
                 ))
@@ -365,32 +432,113 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
           </div>
 
           {isOwnProfile && (
-            <div className="bg-blue-600 p-6 rounded-2xl shadow-lg text-white">
-              <h2 className="text-sm font-semibold opacity-80 mb-1 flex items-center gap-2">
-                Saldo Dompet
-              </h2>
-              <p className="text-3xl font-bold">Rp{userData.balance.toLocaleString("id-ID")}</p>
+            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-5 sm:p-6 rounded-2xl shadow-md text-white">
+              <h2 className="text-xs font-semibold opacity-80 mb-1">Saldo Dompet</h2>
+              <p className="text-2xl sm:text-3xl font-black truncate">Rp{userData.balance.toLocaleString("id-ID")}</p>
               <button
-                className="w-full mt-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold transition backdrop-blur-sm"
+                className="w-full mt-4 py-2.5 bg-white/20 hover:bg-white/30 text-xs font-bold rounded-xl transition backdrop-blur-xs"
                 onClick={() => setShowSubModal(true)}
               >
-                Tarik Tunai
+                Tarik Tunai Dana
               </button>
             </div>
           )}
         </div>
 
-        {/* Sisi Kanan: Pengaturan & Keamanan */}
-        <div className={isOwnProfile ? 'md:col-span-2' : ''}>
-          {isOwnProfile ? (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100">
-              <div className="p-6">
-                <h2 className="text-lg font-bold text-slate-900">Keamanan & Privasi</h2>
-                <p className="text-sm text-slate-500">Kelola informasi akun dan kata sandi Anda.</p>
-              </div>
+        {/* Sisi Kanan: SISTEM TAB PANEL */}
+        <div className="md:col-span-2 space-y-4 w-full min-w-0">
+          <div className="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 bg-white px-2 pt-2 rounded-t-2xl border border-b-0 border-slate-200 scrollbar-none">
+            <button
+              onClick={() => setActiveTab('portfolio')}
+              className={`pb-3 px-3 sm:px-4 text-xs font-bold tracking-wide uppercase border-b-2 transition-all flex items-center gap-2 shrink-0 ${
+                activeTab === 'portfolio' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <FiFolder /> Portofolio ({portfolios.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`pb-3 px-3 sm:px-4 text-xs font-bold tracking-wide uppercase border-b-2 transition-all flex items-center gap-2 shrink-0 ${
+                activeTab === 'reviews' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <FiStar /> Ulasan ({reviews.length})
+            </button>
+            {isOwnProfile && (
+              <button
+                onClick={() => setActiveTab('settings')}
+                className={`pb-3 px-3 sm:px-4 text-xs font-bold tracking-wide uppercase border-b-2 transition-all flex items-center gap-2 shrink-0 ${
+                  activeTab === 'settings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-400 hover:text-slate-600'
+                }`}
+              >
+                <FiShield /> Privasi
+              </button>
+            )}
+          </div>
+
+          {/* PANEL 1: PORTOFOLIO */}
+          {activeTab === 'portfolio' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-200 w-full">
+              {portfolios.length > 0 ? (
+                portfolios.map((item) => (
+                  <div key={item.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden group hover:border-blue-300 transition-all shadow-2xs w-full">
+                    <div className="relative h-36 bg-slate-100 w-full">
+                      {item.image_url ? (
+                        <Image src={item.image_url} alt={item.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300"><FiFolder size={32}/></div>
+                      )}
+                    </div>
+                    <div className="p-4 min-w-0">
+                      <span className="text-[9px] uppercase font-bold text-blue-600 tracking-wider bg-blue-50 px-2 py-0.5 rounded-sm inline-block max-w-full truncate">{item.category || "Karya"}</span>
+                      <h4 className="text-sm font-bold text-slate-800 mt-2 line-clamp-1 break-words">{item.title}</h4>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full bg-white border border-slate-200 rounded-2xl p-8 text-center text-xs text-slate-400 italic">
+                  Belum ada portofolio karya yang diunggah.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* PANEL 2: ULASAN */}
+          {activeTab === 'reviews' && (
+            <div className="space-y-3 animate-in fade-in duration-200 w-full">
+              {reviews.length > 0 ? (
+                reviews.map((rev) => (
+                  <div key={rev.id} className="bg-white p-4 sm:p-5 border border-slate-200 rounded-2xl shadow-2xs space-y-2 w-full min-w-0">
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="min-w-0">
+                        <h4 className="text-sm font-bold text-slate-800 truncate">{rev.client_name || "Klien Anonim"}</h4>
+                        <p className="text-[10px] text-slate-400 font-medium">
+                          {rev.created_at ? new Date(rev.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "Baru saja"}
+                        </p>
+                      </div>
+                      <div className="flex text-yellow-400 gap-0.5 shrink-0">
+                        {Array.from({ length: rev.rating || 5 }).map((_, i) => (
+                          <FiStar key={i} size={12} fill="currentColor" />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-600 leading-relaxed italic break-words">&quot;{rev.comment}&quot;</p>
+                  </div>
+                ))
+              ) : (
+                <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center text-xs text-slate-400 italic">
+                  Belum memiliki riwayat ulasan dari klien.
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* PANEL 3: PENGATURAN PRIVASI */}
+          {activeTab === 'settings' && isOwnProfile && (
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm divide-y divide-slate-100 overflow-hidden animate-in fade-in duration-200 w-full">
               <SettingsItem 
                 label="Verifikasi Identitas (KTP)" 
-                value={userData.isVerified ? "Terverifikasi" : "Belum Verifikasi"} 
+                value={userData.isVerified ? "Terverifikasi Resmi" : "Belum Verifikasi"} 
                 status={userData.isVerified ? "success" : "warning"}
                 onClick={() => setShowSubModal(true)}
               />
@@ -401,35 +549,20 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
                 onClick={() => setShowSubModal(true)}
               />
               <SettingsItem 
-                label="Metode Pembayaran" 
+                label="Metode Rekening Utama" 
                 value="Bank Central Asia (BCA)" 
                 status="success"
                 onClick={() => setShowSubModal(true)}
               />
             </div>
-          ) : (
-            /* Opsional: Tampilan alternatif jika pengunjung adalah orang lain/guest */
-            <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center text-slate-500 italic">
-              Terima kasih telah mengunjungi profil saya. Jika ada keperluan bisnis atau kerja sama, silakan hubungi saya melalui kontak di atas.
-            </div>
           )}
         </div>
       </div>
       
-      <EditProfilePhotoDialog 
-        open={showMediaProfile} 
-        onOpenChange={setShowMediaProfile} 
-        currentAvatar={userData.avatarUrl} 
-        onSuccess={fetchCurrentProfile}
-      />
-      <EditProfileBannerDialog 
-        open={showMediaBanner} 
-        onOpenChange={setShowMediaBanner} 
-        currentBanner={userData.bannerUrl} 
-        onSuccess={fetchCurrentProfile}
-      />
-      <EditProfileDialog open={showEditProfile} onOpenChange={setShowEditProfile} userData={userData} onSuccess={() => {}} />
-      <ManageSkillsDialog open={showManageSkills} onOpenChange={setShowManageSkills} currentSkills={userData.skills} onSuccess={() => {}} />
+      <EditProfilePhotoDialog open={showMediaProfile} onOpenChange={setShowMediaProfile} currentAvatar={userData.avatarUrl} onSuccess={fetchCurrentProfile} />
+      <EditProfileBannerDialog open={showMediaBanner} onOpenChange={setShowMediaBanner} currentBanner={userData.bannerUrl} onSuccess={fetchCurrentProfile} />
+      <EditProfileDialog open={showEditProfile} onOpenChange={setShowEditProfile} userData={userData} onSuccess={fetchCurrentProfile} />
+      <ManageSkillsDialog open={showManageSkills} onOpenChange={setShowManageSkills} currentSkills={userData.skills} onSuccess={fetchCurrentProfile} />
       <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
     </div>
   );

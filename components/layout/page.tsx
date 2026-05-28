@@ -80,7 +80,7 @@ export default function ClientDashboardWrapper({
     { href: "/general-dashboard", label: "Dashboard Umum", icon: <FiHome />, roles: ["employer", "worker", "guest"] },
     { href: "/maintenance", label: "Berita", icon: <TbNews />, roles: ["employer", "worker", "guest"] },
     { href: "/employer", label: "Ruang Kerja", icon: <MdWorkspacesOutline />, roles: ["employer"] },
-    { href: "/worker", label: "Ruang Kerja", icon: <FiUser />, roles: ["worker"] },
+    { href: "/worker", label: "Ruang Kerja", icon: <MdWorkspacesOutline />, roles: ["worker"] },
     { href: "/jobs", label: "Pekerjaan", icon: <FiBriefcase />, roles: ["employer", "worker", "guest"] },
     { href: "/services", label: "Jasa", icon: <FiBriefcase />, roles: ["employer", "worker", "guest"] },
     { href: "/history", label: "Riwayat", icon: <MdHistory />, roles: ["employer", "worker"] },

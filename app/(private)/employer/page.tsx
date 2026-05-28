@@ -1,10 +1,21 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable react-hooks/static-components */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
-import { FiUsers, FiBriefcase, FiTrendingUp, FiTrash2, FiEdit2, FiAlertCircle } from 'react-icons/fi';
+import { 
+  FiUsers, 
+  FiBriefcase, 
+  FiTrendingUp, 
+  FiTrash2, 
+  FiEdit2, 
+  FiAlertCircle,
+  FiChevronLeft,
+  FiChevronRight,
+  FiSearch
+} from 'react-icons/fi';
 import { EmployerData } from '../types';
 import supabase from '@/lib/db';
 import { IJobs } from '@/app/types/jobs';
@@ -39,12 +50,12 @@ const getStatusStyle = (status: string) => {
 
 const formatDynamicRupiah = (value: number) => {
   if (value >= 1_000_000_000) {
-    return `Rp${(value / 1_000_000_000).toFixed(1).replace('.0', '')} M`; // Contoh: Rp1.5 M atau Rp2 M
+    return `Rp${(value / 1_000_000_000).toFixed(1).replace('.0', '')} M`; 
   }
   if (value >= 1_000_000) {
-    return `Rp${(value / 1_000_000).toFixed(1).replace('.0', '')} Jt`; // Contoh: Rp750 Jt atau Rp5 Jt
+    return `Rp${(value / 1_000_000).toFixed(1).replace('.0', '')} Jt`; 
   }
-  return `Rp${value.toLocaleString('id-ID')}`; // Contoh: Rp450.000 jika di bawah 1 juta
+  return `Rp${value.toLocaleString('id-ID')}`; 
 };
 
 const EmployerDashboard: React.FC = () => {
@@ -56,6 +67,12 @@ const EmployerDashboard: React.FC = () => {
     job: IJobs;
     action: "edit" | "delete";
   } | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // State Utama untuk Keperluan Navigasi Halaman Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Batas maksimal baris data per halaman di sini
 
   // Perhitungan State Statis dari Database Secara Dinamis
   const [stats, setStats] = useState<EmployerData>({
@@ -78,7 +95,6 @@ const EmployerDashboard: React.FC = () => {
           return;
         }
 
-        // Ambil Nama Lengkap dari profil untuk menyapa user di header
         const { data: profile } = await supabase
           .from('profiles')
           .select('full_name')
@@ -89,7 +105,6 @@ const EmployerDashboard: React.FC = () => {
           setEmployerName(profile.full_name);
         }
 
-        // Ambil data pekerjaan yang dibuat KHUSUS oleh user ini saja
         const { data: jobsData, error: jobsError } = await supabase
           .from('jobs')
           .select('*')
@@ -101,7 +116,6 @@ const EmployerDashboard: React.FC = () => {
         } else if (jobsData) {
           setJobs(jobsData);
 
-          // Hitung akumulasi statistik riil berdasarkan data pekerjaan di database
           const totalJobsCreated = jobsData.length;
           const totalWorkersGathered = jobsData.reduce((acc, job) => acc + (job.taken || 0), 0);
           const totalBudgetSpent = jobsData.reduce((acc, job) => acc + ((job.reward || 0) * (job.taken || 0)), 0);
@@ -124,10 +138,40 @@ const EmployerDashboard: React.FC = () => {
     fetchEmployerDashboardData();
   }, [router]);
 
+  // 🌟 Reset halaman aktif ke 1 setiap kali query pencarian berubah
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  // 🌟 FILTER DATA BERDASARKAN INPUT PENCARIAN (Judul Proyek)
+  const filteredJobs = jobs.filter((job) =>
+    job.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // LOGIKA HITUNGAN SLICE DATA PAGINATION
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentJobs = jobs.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(jobs.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Callback penanganan pasca-hapus agar halaman tidak bug jika kosong
+  const handleDeleteSuccess = (deletedId: string) => {
+    const updatedJobs = jobs.filter((item) => item.id !== deletedId);
+    setJobs(updatedJobs);
+    
+    const newTotalPages = Math.ceil(updatedJobs.length / itemsPerPage);
+    if (currentPage > newTotalPages && newTotalPages > 0) {
+      setCurrentPage(newTotalPages);
+    }
+  };
+
   const TableLoading = () => {
     return (
       <div className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
-        {/* Header Loading */}
         <div className="p-6 border-b border-gray-100 flex justify-between items-center">
           <div className="h-5 w-48 bg-gray-200 rounded-md"></div>
         </div>
@@ -188,13 +232,26 @@ const EmployerDashboard: React.FC = () => {
         <TableLoading />
       ) : (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-100">
+          {/* Header Tabel & Input Fitur Cari */}
+          <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h2 className="text-lg font-semibold text-gray-800">Status Proyek Crowdsourcing</h2>
+
+            {jobs.length > 0 && (
+              <div className="relative w-full sm:w-64">
+                <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari judul proyek..."
+                  className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition bg-gray-50/50"
+                />
+              </div>
+            )}
           </div>
 
           <div className="overflow-x-auto">
             {jobs.length === 0 ? (
-              /* Tampilan State Jika Employer Belum Membuat Lowongan Apapun */
               <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
                 <div className="p-4 bg-slate-50 text-slate-400 rounded-full">
                   <FiAlertCircle size={32} />
@@ -202,61 +259,117 @@ const EmployerDashboard: React.FC = () => {
                 <h3 className="text-md font-bold text-slate-700">Belum Ada Proyek</h3>
                 <p className="text-sm text-slate-400 max-w-xs">Anda belum mempublikasikan lowongan proyek crowdsourcing apa pun saat ini.</p>
               </div>
+            ) : filteredJobs.length === 0 ? (
+              /* Kondisi jika ada proyek tapi hasil ketikan search tidak cocok */
+              <div className="p-12 text-center text-gray-400 font-medium text-sm">
+                Tidak ada proyek yang cocok dengan kata kunci &quot;{searchQuery}&quot;.
+              </div>
             ) : (
-              <table className="w-full text-left border-collapse min-w-175"> 
-                <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
-                  <tr>
-                    <th className="px-6 py-4 font-medium">Judul Proyek</th>
-                    <th className="px-6 py-4 font-medium">Status</th>
-                    <th className="px-6 py-4 font-medium">Kontributor</th>
-                    <th className="px-6 py-4 font-medium">Anggaran per Orang</th>
-                    <th className="px-6 py-4 font-medium text-center">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {jobs.map((job) => (
-                    <tr key={job.id} className="hover:bg-gray-50 transition">
-                      <td className="px-6 py-4 font-medium text-gray-800 whitespace-nowrap">
-                        <Link 
-                          href={`/jobs/${job.id}`} 
-                          className="text-blue-600 hover:text-blue-800 hover:underline transition"
-                        >
-                          {job.title}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(job.status ?? 'pending')}`}>
-                          { (job.status?.toUpperCase()) ?? "PENDING" }
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
-                        {job.taken} dari {job.total} Orang
-                      </td>
-                      <td className="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap">
-                        Rp{job.reward.toLocaleString()}
-                      </td>
-                      <td className='px-4 py-2 whitespace-nowrap'>
-                        <div className="flex items-center gap-2 justify-center">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedJob({ job, action: "edit" })}
-                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition"
-                          >
-                            <FiEdit2 size={18} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setSelectedJob({ job, action: "delete" })}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
-                          >
-                            <FiTrash2 size={18} />
-                          </button>
-                        </div>
-                      </td>
+              <>
+                <table className="w-full text-left border-collapse min-w-175"> 
+                  <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                    <tr>
+                      <th className="px-6 py-4 font-medium">Judul Proyek</th>
+                      <th className="px-6 py-4 font-medium">Status</th>
+                      <th className="px-6 py-4 font-medium">Kontributor</th>
+                      <th className="px-6 py-4 font-medium">Anggaran per Orang</th>
+                      <th className="px-6 py-4 font-medium text-center">Aksi</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {/* Loop menggunakan currentJobs hasil filter dan slice */}
+                    {currentJobs.map((job) => (
+                      <tr key={job.id} className="hover:bg-gray-50 transition">
+                        <td className="px-6 py-4 font-medium text-gray-800 whitespace-nowrap">
+                          <Link 
+                            href={`/jobs/${job.id}`} 
+                            className="text-blue-600 hover:text-blue-800 hover:underline transition"
+                          >
+                            {job.title}
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusStyle(job.status ?? 'pending')}`}>
+                            { (job.status?.toUpperCase()) ?? "PENDING" }
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                          {job.taken} dari {job.total} Orang
+                        </td>
+                        <td className="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap">
+                          Rp{job.reward.toLocaleString()}
+                        </td>
+                        <td className='px-4 py-2 whitespace-nowrap'>
+                          <div className="flex items-center gap-2 justify-center">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedJob({ job, action: "edit" })}
+                              className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition"
+                            >
+                              <FiEdit2 size={18} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedJob({ job, action: "delete" })}
+                              className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
+                            >
+                              <FiTrash2 size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* BILAH NAVIGASI BAR FOOTER PAGINATION */}
+                {totalPages > 1 && (
+                  <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row gap-4 justify-between items-center text-sm">
+                    <p className="text-xs text-gray-400 font-semibold">
+                      Menampilkan <span className="text-gray-700">{indexOfFirstItem + 1}</span> -{" "}
+                      <span className="text-gray-700">
+                        {Math.min(indexOfLastItem, jobs.length)}
+                      </span>{" "}
+                      dari <span className="text-gray-700">{jobs.length}</span> proyek
+                    </p>
+
+                    <div className="flex items-center gap-1">
+                      {/* Tombol Back */}
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="p-2 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 disabled:opacity-40 transition cursor-pointer disabled:cursor-not-allowed"
+                      >
+                        <FiChevronLeft size={16} />
+                      </button>
+
+                      {/* Baris Iterasi Angka Halaman */}
+                      {Array.from({ length: totalPages }, (_, idx) => (
+                        <button
+                          key={idx + 1}
+                          onClick={() => handlePageChange(idx + 1)}
+                          className={`w-8 h-8 text-xs font-bold rounded-xl transition cursor-pointer ${
+                            currentPage === idx + 1
+                              ? "bg-blue-600 text-white shadow-xs"
+                              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                          }`}
+                        >
+                          {idx + 1}
+                        </button>
+                      ))}
+
+                      {/* Tombol Next */}
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="p-2 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 disabled:opacity-40 transition cursor-pointer disabled:cursor-not-allowed"
+                      >
+                        <FiChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -285,7 +398,7 @@ const EmployerDashboard: React.FC = () => {
             if (!open) setSelectedJob(null);
           } }
           onSuccess={() => {
-            setJobs((prev) => prev.filter((item) => item.id !== selectedJob.job.id));
+            handleDeleteSuccess(selectedJob.job.id);
             setSelectedJob(null);
           } }
         />

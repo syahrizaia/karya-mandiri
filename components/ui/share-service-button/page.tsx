@@ -13,24 +13,24 @@ import { FaWhatsapp, FaTelegram } from "react-icons/fa";
 import { toast } from "sonner";
 import Link from "next/link";
 
-interface ShareJobButtonProps {
-  jobId: string;
-  jobTitle: string;
+interface ShareServiceButtonProps {
+  serviceId: string;
+  serviceTitle: string;
 }
 
-export default function ShareJobButton({ jobId, jobTitle }: ShareJobButtonProps) {
+export default function ShareServiceButton({ serviceId, serviceTitle }: ShareServiceButtonProps) {
   const [copied, setCopied] = useState(false);
 
   // Mengenerate URL detail pekerjaan (sesuaikan dengan routing project Next.js kamu)
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const shareUrl = `${origin}/jobs/${jobId}`;
+  const shareUrl = `${origin}/services/${serviceId}`;
 
   // Logika Salin Tautan (Copy to Clipboard)
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      toast.success("Tautan lowongan berhasil disalin!");
+      toast.success("Tautan jasa berhasil disalin!");
       
       // Kembalikan icon semula setelah 2 detik
       setTimeout(() => setCopied(false), 2000);
@@ -40,7 +40,7 @@ export default function ShareJobButton({ jobId, jobTitle }: ShareJobButtonProps)
   };
 
   // Setup template pesan share
-  const shareText = encodeURIComponent(`Halo! Cek lowongan pekerjaan menarik ini di KaryaMandiri: "${jobTitle}". Lihat detail selengkapnya di sini: `);
+  const shareText = encodeURIComponent(`Halo! Cek jasa menarik ini di KaryaMandiri: "${serviceTitle}". Lihat detail selengkapnya di sini: `);
 
   return (
     <Popover>
@@ -48,7 +48,7 @@ export default function ShareJobButton({ jobId, jobTitle }: ShareJobButtonProps)
       <PopoverTrigger asChild>
         <button 
           className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition shadow-sm"
-          title="Bagikan lowongan"
+          title="Bagikan jasa"
         >
           <FiShare2 className="text-base" /> Bagikan
         </button>
