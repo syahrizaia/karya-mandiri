@@ -125,10 +125,10 @@ export default function LandingPage() {
       <div className="absolute bottom-1/4 left-10 w-80 h-80 bg-emerald-600/5 rounded-full blur-[100px] pointer-events-none" />
 
       {/* NAVBAR */}
-      <nav className="fixed top-4 inset-x-0 z-50 bg-slate-950/35 backdrop-blur-2xl border border-white/10 border-t-white/25 border-l-white/20 px-6 py-3.5 w-11/12 max-w-5xl mx-auto rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.6),inset_0_1px_2px_rgba(255,255,255,0.15)] transition-all duration-500 hover:bg-slate-950/45">
+      <nav className="fixed top-4 inset-x-0 z-50 bg-slate-950/35 backdrop-blur-2xl border border-white/10 border-t-white/25 border-l-white/20 px-6 py-3.5 w-fit max-w-5xl mx-auto rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.6),inset_0_1px_2px_rgba(255,255,255,0.15)] transition-all duration-500 hover:bg-slate-950/45">
         <div className="flex items-center justify-between w-full">
           {/* Logo */}
-          <Link href="/" className="text-lg md:text-xl font-black tracking-wider bg-linear-to-r from-blue-400 via-teal-400 to-indigo-400 bg-clip-text text-transparent flex items-center gap-2 drop-shadow-[0_2px_10px_rgba(56,189,248,0.3)]">
+          <Link href="/" className="text-lg md:text-xl font-black tracking-wider bg-linear-to-r from-blue-400 via-teal-400 to-indigo-400 bg-clip-text text-transparent flex items-center gap-2 drop-shadow-[0_2px_10px_rgba(56,189,248,0.3)] pr-6 md:pr-10">
             <FiZap className="text-blue-400 fill-blue-400/20 animate-pulse" /> KARYAMANDIRI
           </Link>
 

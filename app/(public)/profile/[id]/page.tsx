@@ -225,7 +225,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 px-4 py-4 md:py-12 lg:pt-4">
+    <div className="w-full max-w-4xl mx-auto space-y-6 md:py-12 lg:pt-4">
       
       {/* BANNER PERINGATAN VERIFIKASI AKUN */}
       {isOwnProfile && !userData.isVerified && (
