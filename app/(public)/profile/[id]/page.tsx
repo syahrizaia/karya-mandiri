@@ -237,7 +237,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
             <div className="min-w-0">
               <h3 className="text-sm font-bold text-slate-800">Akun Anda Belum Terverifikasi</h3>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Segera lakukan verifikasi identitas untuk membuka akses penuh seluruh fitur crowdsourcing KaryaMandiri.
+                Segera lakukan verifikasi identitas untuk mendapatkan lencana verifikasi dan membuka akses penuh seluruh fitur crowdsourcing KaryaMandiri. Klik tombol <strong>Edit Profil</strong> untuk  melengkapi data Nama Lengkap dan Nomor Telepon. Sistem akan otomatis memproses verifikasi Anda.
               </p>
             </div>
           </div>

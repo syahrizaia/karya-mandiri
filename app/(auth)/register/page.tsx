@@ -25,14 +25,16 @@ export default function RegisterPage() {
     try {
       // Mendaftarkan user baru ke Supabase Auth
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: email,
+        password: password,
         options: {
           // Menyimpan data tambahan (Metadata) seperti nama lengkap ke tabel auth
           data: {
             full_name: fullName,
             phone: phone,
             role: role,
+            location: '',
+            avatar_url: '',
           },
         },
       });

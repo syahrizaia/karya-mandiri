@@ -286,15 +286,28 @@ const GeneralDashboard: React.FC = () => {
     .on(
       'postgres_changes',
       {
-        event: 'INSERT', // Kita hanya mendengarkan jika ada data masuk baru
+        event: 'INSERT',
         schema: 'public',
         table: 'ecosystem_activities'
       },
-      (payload) => {
-        // Begitu ada baris baru masuk, selipkan ke urutan paling atas array state
-        setEcosystemActivities((prevActivities) => {
-          return [payload.new as IEcosystemActivities, ...prevActivities];
-        });
+      async (payload) => {
+        const newActivity = payload.new as any;
+
+        // Ambil data profil dari user_id secara instan untuk melengkapi relasi
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url, role')
+          .eq('id', newActivity.user_id)
+          .single();
+
+        // Gabungkan data aktivitas baru dengan objek profilnya
+        const completeActivity: IEcosystemActivities = {
+          ...newActivity,
+          profiles: profileData || { full_name: 'Pengguna Baru', avatar_url: '', role: 'Pekerja Mandiri' }
+        };
+
+        // Selipkan ke urutan paling atas state
+        setEcosystemActivities((prevActivities) => [completeActivity, ...prevActivities]);
       }
     )
     .subscribe();
