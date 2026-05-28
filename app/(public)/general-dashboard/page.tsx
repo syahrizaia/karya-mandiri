@@ -26,8 +26,8 @@ export interface IEcosystemActivities {
   action: string;
   target: string;
   type: string;
-  user_id: string; // 🌟 TAMBAHKAN INI agar user_id tidak merah
-  profiles?: {     // 🌟 TAMBAHKAN INI agar hasil join query terbaca oleh TS
+  user_id: string;
+  profiles?: {
     full_name: string;
     avatar_url: string;
     role: string;
@@ -451,7 +451,7 @@ const GeneralDashboard: React.FC = () => {
                       <div>
                         <p className="text-sm text-slate-600">
                           <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900">
-                            {ecosystemActivity.profiles?.full_name || ecosystemActivity.user || "Pengguna"}
+                            {ecosystemActivity.profiles?.full_name}
                           </Link> {ecosystemActivity.action} 
                           <span className="font-semibold text-slate-800"> {ecosystemActivity.target}</span>
                         </p>

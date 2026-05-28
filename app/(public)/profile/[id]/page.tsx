@@ -241,12 +241,6 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => setShowSubModal(true)}
-            className="w-full sm:w-auto px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl transition-colors whitespace-nowrap shrink-0 shadow-sm"
-          >
-            Verifikasi Sekarang
-          </button>
         </div>
       )}
 
