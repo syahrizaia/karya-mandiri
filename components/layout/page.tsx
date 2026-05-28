@@ -22,6 +22,7 @@ export default function ClientDashboardWrapper({
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Daftar rute yang benar-benar publik dan bisa diakses tanpa login/tanpa role khusus
   const publicRoutes = ["/", "/general-dashboard", "/news", "/jobs", "/services", "/profile", "/login", "/register", "/maintenance"];
@@ -70,6 +71,31 @@ export default function ClientDashboardWrapper({
 
     fetchUserSessionAndRole();
   }, [pathname, router]);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchUnreadNotifications = async () => {
+      const { count, error } = await supabase
+        .from("notifications")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", userId)
+        .eq("is_read", false);
+
+      if (!error) setUnreadCount(count || 0);
+    };
+
+    fetchUnreadNotifications();
+
+    // Opsional: Tambahkan realtime subscription agar angka update otomatis
+    const channel = supabase
+      .channel('notifications_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` }, 
+      () => fetchUnreadNotifications())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [userId]);
 
   // Tutup sidebar otomatis saat berpindah halaman (khusus mobile)
   useEffect(() => {
@@ -184,13 +210,20 @@ export default function ClientDashboardWrapper({
               <Link
                 key={link.href}
                 href={targetHref}
-                className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                  isActive 
-                    ? 'bg-blue-600 text-white shadow-md' 
-                    : 'text-gray-700 hover:bg-blue-50'
+                className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
+                  isActive ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-blue-50'
                 }`}
               >
-                {link.icon} {link.label}
+                <div className="flex items-center gap-3">
+                  {link.icon} {link.label}
+                </div>
+                
+                {/* Indikator Notifikasi */}
+                {link.href === "/notification" && unreadCount > 0 && (
+                  <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-bounce">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </Link>
             )
           })}

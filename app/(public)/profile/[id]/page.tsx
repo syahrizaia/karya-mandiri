@@ -29,6 +29,8 @@ import ManageSkillsDialog from '@/components/manage-skills/page';
 import EditProfilePhotoDialog from '@/components/edit-profile-photo/page';
 import EditProfileBannerDialog from '@/components/edit-profile-banner/page';
 import ShareProfileButton from '@/components/ui/share-profile-button/page';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import ManagePortofolio from '@/components/manage-portofolio/page';
 
 const SettingsItem = ({ label, value, status, onClick }: { label: string, value: string, status: string, onClick?: () => void }) => (
   <div className="p-4 sm:p-6 flex justify-between items-center hover:bg-slate-50 transition cursor-pointer" onClick={onClick}>
@@ -59,6 +61,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
   const [showMediaProfile, setShowMediaProfile] = useState(false);
   const [showMediaBanner, setShowMediaBanner] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showManagePortfolio, setShowManagePortfolio] = useState(false);
   
   const [activeTab, setActiveTab] = useState<'portfolio' | 'reviews' | 'settings'>('portfolio');
 
@@ -112,7 +115,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
 
       const [profileRes, portfoliosRes, reviewsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', profileId).maybeSingle(),
-        supabase.from('portfolios').select('*').eq('profile_id', profileId).order('created_at', { ascending: false }),
+        supabase.from('portfolios').select('*').eq('user_id', profileId).order('created_at', { ascending: false }),
         supabase.from('reviews').select('*').eq('profile_id', profileId).order('created_at', { ascending: false })
       ]);
 
@@ -441,7 +444,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
 
         {/* Sisi Kanan: SISTEM TAB PANEL */}
         <div className="md:col-span-2 space-y-4 w-full min-w-0">
-          <div className="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 bg-white px-2 pt-2 rounded-t-2xl border border-b-0 border-slate-200 scrollbar-none">
+          <div className="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 bg-white px-2 pt-4 rounded-t-2xl border border-b-0 border-slate-200 scrollbar-none">
             <button
               onClick={() => setActiveTab('portfolio')}
               className={`pb-3 px-3 sm:px-4 text-xs font-bold tracking-wide uppercase border-b-2 transition-all flex items-center gap-2 shrink-0 ${
@@ -472,28 +475,41 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
 
           {/* PANEL 1: PORTOFOLIO */}
           {activeTab === 'portfolio' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-200 w-full">
-              {portfolios.length > 0 ? (
-                portfolios.map((item) => (
-                  <div key={item.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden group hover:border-blue-300 transition-all shadow-2xs w-full">
-                    <div className="relative h-36 bg-slate-100 w-full">
-                      {item.image_url ? (
-                        <Image src={item.image_url} alt={item.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300"><FiFolder size={32}/></div>
-                      )}
-                    </div>
-                    <div className="p-4 min-w-0">
-                      <span className="text-[9px] uppercase font-bold text-blue-600 tracking-wider bg-blue-50 px-2 py-0.5 rounded-sm inline-block max-w-full truncate">{item.category || "Karya"}</span>
-                      <h4 className="text-sm font-bold text-slate-800 mt-2 line-clamp-1 break-words">{item.title}</h4>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full bg-white border border-slate-200 rounded-2xl p-8 text-center text-xs text-slate-400 italic">
-                  Belum ada portofolio karya yang diunggah.
+            <div className="space-y-4 w-full">
+              {isOwnProfile && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setShowManagePortfolio(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-300 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition"
+                  >
+                    <FiFolder /> Kelola Portofolio
+                  </button>
                 </div>
               )}
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-200">
+                {portfolios.length > 0 ? (
+                  portfolios.map((item) => (
+                    <div key={item.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden group hover:border-blue-300 transition-all shadow-2xs w-full">
+                      <div className="relative h-36 bg-slate-100 w-full">
+                        {item.image_url ? (
+                          <Image src={item.image_url} alt={item.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-300"><FiFolder size={32}/></div>
+                        )}
+                      </div>
+                      <div className="p-4 min-w-0">
+                        <h4 className="text-sm font-bold text-slate-800 mt-2 line-clamp-1 break-words">{item.title}</h4>
+                        <p className="text-xs text-slate-600 mt-1 line-clamp-2 break-words">{item.description}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full bg-white border border-slate-200 rounded-2xl p-8 text-center text-xs text-slate-400 italic">
+                    Belum ada portofolio karya yang diunggah.
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -558,6 +574,16 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
       <EditProfileDialog open={showEditProfile} onOpenChange={setShowEditProfile} userData={userData} onSuccess={fetchCurrentProfile} />
       <ManageSkillsDialog open={showManageSkills} onOpenChange={setShowManageSkills} currentSkills={userData.skills} onSuccess={fetchCurrentProfile} />
       <SubscriptionDialog open={showSubModal} onOpenChange={setShowSubModal} />
+      <Dialog open={showManagePortfolio} onOpenChange={setShowManagePortfolio}>
+      <DialogContent className="max-w-2xl rounded-3xl">
+        <DialogHeader>
+          <DialogTitle>Kelola Portofolio</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
+          <ManagePortofolio userId={profileId} />
+        </div>
+      </DialogContent>
+    </Dialog>
     </div>
   );
 };

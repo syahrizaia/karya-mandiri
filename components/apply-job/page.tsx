@@ -56,12 +56,11 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
         .insert([
           {
             job_id: job.id,
-            worker_id: user.id,
+            user_id: user.id,
             status: 'pending',    // Status awal pelamar
             notes: notes || "Tanpa catatan tambahan",
           }
         ])
-        .eq("id", job.id)
         .select()
         .single();
 

@@ -22,7 +22,7 @@ interface NotificationItem {
   created_at: string;
   type: 'payment' | 'job' | 'system' | 'applicant' | 'lead';
   is_read: boolean;
-  sender_id?: string;
+  user_id?: string;
 }
 
 // Helper Functions
@@ -152,9 +152,9 @@ const Notification: React.FC = () => {
     });
   };
 
-  // Mengubah string nama pertama di dalam pesan menjadi link profil jika sender_id tersedia
+  // Mengubah string nama pertama di dalam pesan menjadi link profil jika user_id tersedia
   const renderMessageContent = (notif: NotificationItem) => {
-    if (!notif.sender_id) return notif.message;
+    if (!notif.user_id) return notif.message;
 
     // Menghandle jika tipe pelamar atau peminat klik hubungi jasa
     if (notif.type === 'applicant' || notif.type === 'lead') {
@@ -168,7 +168,7 @@ const Notification: React.FC = () => {
         return (
           <>
             <Link 
-              href={`/profile/${notif.sender_id}`} 
+              href={`/profile/${notif.user_id}`} 
               className="font-bold text-blue-600 hover:underline inline-block"
               onClick={(e) => e.stopPropagation()} // Supaya tidak tabrakan dengan fungsi markAsRead
             >
