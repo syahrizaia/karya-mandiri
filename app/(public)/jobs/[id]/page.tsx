@@ -250,6 +250,50 @@ const DetailJob: React.FC = () => {
     }
   };
 
+  const formatDescription = (text: string) => {
+    if (!text) return null;
+
+    return text.split('\n').map((line, index) => {
+      const trimmedLine = line.trim();
+
+      // Deteksi Judul Utama / Sub-heading (Teks berhuruf kapital semua)
+      if (/^[A-Z\s()\-–]{5,}$/.test(trimmedLine)) {
+        return (
+          <h4 key={index} className="text-md font-black text-slate-900 uppercase tracking-wide mt-6 mb-2 first:mt-0">
+            {trimmedLine}
+          </h4>
+        );
+      }
+
+      // Deteksi Poin List Numerik (Contoh: 1. Perencanaan)
+      if (/^\d+\.\s/.test(trimmedLine)) {
+        return (
+          <p key={index} className="font-bold text-slate-800 mt-3 mb-1 pl-1">
+            {trimmedLine}
+          </p>
+        );
+      }
+
+      // Deteksi Poin List Strip (Contoh: - Melakukan riset)
+      if (trimmedLine.startsWith('-')) {
+        return (
+          <span key={index} className="block text-slate-600 pl-4 py-0.5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-500">
+            {trimmedLine.substring(1).trim()}
+          </span>
+        );
+      }
+
+      // Paragraf Teks Biasa atau baris kosong
+      return trimmedLine === "" ? (
+        <span key={index} className="block h-2" />
+      ) : (
+        <p key={index} className="text-slate-600 leading-relaxed mb-2">
+          {trimmedLine}
+        </p>
+      );
+    });
+  };
+
   if (loading) return (
     <div className="flex h-screen items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
@@ -334,7 +378,7 @@ const DetailJob: React.FC = () => {
 
               <div className="prose prose-slate max-w-none">
                 <h3 className="text-lg font-bold text-slate-900">Deskripsi Tugas</h3>
-                <p className="text-slate-600 leading-relaxed">{job.description}</p>
+                <div className="text-slate-600 leading-relaxed whitespace-pre-wrap">{formatDescription(job.description)}</div>
                 
                 <h3 className="text-lg font-bold text-slate-900 mt-6">Persyaratan & Kualifikasi</h3>
                 <ul className="list-disc pl-5 text-slate-600 space-y-2">

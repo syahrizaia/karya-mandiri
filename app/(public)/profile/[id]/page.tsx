@@ -266,11 +266,12 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
             </button>
           )}
         </div>
+
         <div className="px-4 sm:px-6 pb-6">
           {/* Baris Foto Profil Besar dan Tombol Aksi */}
           <div className="relative flex justify-between items-end -mt-14 md:-mt-20 mb-4 sm:mb-6">            
             <div className="relative w-28 h-28 md:w-40 md:h-40 shrink-0">
-              {/* 🌟 LOGIK KONDISIONAL FOTO PROFIL / INISIAL TEKS */}
+              {/* LOGIK KONDISIONAL FOTO PROFIL / INISIAL TEKS */}
               {userData.avatarUrl ? (
                 <Image
                   src={userData.avatarUrl} 
@@ -358,7 +359,7 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
                 {userData.role}
               </span>
             </div>
-            <p className="text-slate-500 text-xs sm:text-sm max-w-2xl leading-relaxed break-words">{userData.bio}</p>
+            <p className="text-slate-600 text-xs sm:text-sm max-w-2xl leading-relaxed break-words whitespace-pre-wrap mt-2 text-justify">{userData.bio}</p>
           </div>
 
           <div className="flex flex-wrap gap-x-4 gap-y-2 mt-5 pt-5 border-t border-slate-100 text-[11px] sm:text-xs text-slate-500 font-medium overflow-hidden">

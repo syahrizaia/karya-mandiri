@@ -11,7 +11,7 @@ import {
   DialogDescription, 
   DialogFooter 
 } from "@/components/ui/dialog";
-import { FiLoader, FiUser, FiMapPin, FiEdit3, FiAlignLeft, FiPhone } from "react-icons/fi";
+import { FiLoader, FiUser, FiMapPin, FiEdit3, FiAlignLeft, FiPhone, FiZap } from "react-icons/fi";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
 
@@ -24,12 +24,12 @@ interface EditProfileDialogProps {
 
 export default function EditProfileDialog({ open, onOpenChange, userData, onSuccess }: EditProfileDialogProps) {
   const [loading, setLoading] = useState(false);
-  
-  // State Form
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [bio, setBio] = useState("");
   const [location, setLocation] = useState("");
+  const [brief, setBrief] = useState("");
+  const [isEnhancing, setIsEnhancing] = useState(false);
 
   // Sinkronisasi state saat modal dibuka dengan data terbaru
   useEffect(() => {
@@ -103,6 +103,44 @@ export default function EditProfileDialog({ open, onOpenChange, userData, onSucc
     }
   };
 
+  const handleEnhanceWithAI = async () => {
+    if (!bio.trim()) {
+      toast.error("Tulis draf singkat mengenai keahlian atau latar belakang Anda terlebih dahulu!");
+      return;
+    }
+
+    try {
+      setIsEnhancing(true);
+
+      const userSkills = userData?.skills || [];
+      
+      const response = await fetch("/api/ai/enhance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: bio,
+          type: "profile",
+          skills: userSkills,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || "Terjadi kesalahan");
+
+      // Bersihkan markdown bawaan AI
+      const cleanText = data.enhancedText.replace(/[#*`_~]/g, "").trim();
+      
+      setBio(cleanText); // Memasukkan hasil AI langsung ke state bio
+      toast.success("Bio Anda berhasil diperhebat oleh AI KaryaMandiri!");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Gagal menggunakan fitur AI.");
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-125 rounded-3xl p-8 border-none shadow-2xl">
@@ -167,12 +205,23 @@ export default function EditProfileDialog({ open, onOpenChange, userData, onSucc
               <FiAlignLeft /> Bio Singkat
             </label>
             <textarea
+              placeholder="Tulis draf singkat mengenai keahlian, pengalaman, atau layanan profesional yang Anda tawarkan..."
               value={bio}
               onChange={(e) => setBio(e.target.value)}
               rows={4}
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none resize-none"
-              placeholder="Ceritakan sedikit tentang keahlian atau pengalaman Anda..."
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none resize-none placeholder:text-slate-400"
             />
+            
+            {/* TOMBOL PANDUAN AI UNTUK BIO */}
+            <button
+              type="button"
+              onClick={handleEnhanceWithAI}
+              disabled={isEnhancing}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 rounded-xl transition-all duration-200 shadow-sm shadow-indigo-100"
+            >
+              <FiZap className={`${isEnhancing ? "animate-spin" : ""}`} size={14} />
+              {isEnhancing ? "Sedang Merangkai Kata..." : "Poles Bio dengan AI"}
+            </button>
           </div>
 
           <DialogFooter className="pt-4 gap-3">

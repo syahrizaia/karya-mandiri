@@ -251,7 +251,7 @@ export default function Services() {
                     <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-2 leading-snug">
                       {service.title}
                     </h3>
-                    <p className="text-slate-500 text-sm mt-2 line-clamp-4 leading-relaxed">
+                    <p className="text-slate-500 text-sm mt-2 line-clamp-3 leading-relaxed">
                       {service.description}
                     </p>
                   </div>

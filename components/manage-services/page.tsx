@@ -16,6 +16,7 @@ import {
 } from "react-icons/fi";
 import EditServiceDialog from "../edit-service/page";
 import DeleteServiceDialog from "../delete-service/page";
+import Link from "next/link";
 
 interface IService {
   id: string;
@@ -165,7 +166,7 @@ export default function Services({ itemsPerPage = 5 }: IServicesProps) {
                   {currentItems.map((service) => (
                     <tr key={service.id} className="hover:bg-slate-50/50 transition">
                       <td className="py-4 px-6 max-w-xs md:max-w-md">
-                        <p className="font-bold text-slate-800 line-clamp-2">{service.title}</p>
+                        <Link href={`/services/${service.id}`} className="font-bold text-blue-500 hover:text-blue-600 hover:underline line-clamp-2">{service.title}</Link>
                         <p className="text-xs text-slate-400 line-clamp-2 mt-0.5">{service.description}</p>
                       </td>
                       <td className="py-4 px-6">

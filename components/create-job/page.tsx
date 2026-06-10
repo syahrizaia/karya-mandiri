@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -13,6 +14,7 @@ import supabase from "@/lib/db";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { IJobs } from "@/app/types/jobs";
+import { Star } from "lucide-react";
 
 const CreateProjectDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +22,8 @@ const CreateProjectDialog = () => {
   const [, setJobs] = useState<IJobs[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
+  const [brief, setBrief] = useState("");
+  const [isEnhancing, setIsEnhancing] = useState(false);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -115,6 +119,46 @@ const CreateProjectDialog = () => {
     }
   }
 
+  const handleEnhanceWithAI = async () => {
+    if (!brief.trim()) {
+      toast.error("Tulis draf singkat proyek Anda terlebih dahulu sebelum ditingkatkan!");
+      return;
+    }
+
+    try {
+      setIsEnhancing(true);
+      
+      const response = await fetch("/api/ai/enhance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: brief,
+          type: "brief",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || "Terjadi kesalahan");
+
+      const cleanText = stripMarkdown(data.enhancedText);
+      setBrief(cleanText);
+      toast.success("Deskripsi proyek berhasil diperhebat oleh AI KaryaMandiri!");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Gagal menggunakan fitur AI.");
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
+
+  const stripMarkdown = (text: string) => {
+    return text
+      .replace(/[#*`_~]/g, "") // Menghapus karakter #, *, `, _, dan ~
+      // .replace(/^\s*[-+]\s+/gm, "") // Menghapus tanda minus (-) atau plus (+) di awal baris untuk list
+      .trim();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -145,12 +189,31 @@ const CreateProjectDialog = () => {
           {/* Baris 2: Deskripsi */}
           <div className="space-y-2">
             <label className="text-xs font-bold uppercase text-slate-400">Deskripsi Tugas</label>
+            <p className="text-xs text-slate-500 mb-3">
+              Tuliskan detail pekerjaan yang Anda butuhkan. Anda bisa menulis draf kasarnya, lalu gunakan tombol AI di bawah untuk menyempurnakannya secara instan.
+            </p>
             <textarea
               name="description"
               required
-              rows={3}
+              rows={6}
               className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 outline-none transition"
-            ></textarea>
+              value={brief}
+              onChange={(e) => setBrief(e.target.value)}
+              placeholder="Contoh kasar: butuh editor video buat tiktok jualan baju gue, yang bisa potong video sama kasih teks keren. kontrak 1 bulan..."
+            />
+          </div>
+
+          <div className="flex justify-between items-center">
+            {/* Tombol Pemicu AI */}
+            <button
+              type="button"
+              onClick={handleEnhanceWithAI}
+              disabled={isEnhancing}
+              className="flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 rounded-xl transition-all duration-200 shadow-sm shadow-indigo-100"
+            >
+              <Star className={`${isEnhancing ? "animate-spin" : ""}`} size={16} />
+              {isEnhancing ? "Sedang Menyempurnakan..." : "Perjelas & Rapikan dengan AI"}
+            </button>
           </div>
 
           {/* Baris 3: Requirements */}
@@ -235,7 +298,7 @@ const CreateProjectDialog = () => {
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isEnhancing || loading}
               className="px-8 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition flex items-center gap-2 disabled:bg-blue-300"
             >
               {loading ? <FiLoader className="animate-spin" /> : "Buat Proyek"}

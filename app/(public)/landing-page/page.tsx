@@ -203,7 +203,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Sistem Validasi Berlapis</h3>
             <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
-              Menerapkan metode *Peer-Review* silang yang ketat di database Supabase. Setiap hasil dikonfirmasi acak oleh sesama pekerja ahli sebelum dana dilepaskan.
+              Menerapkan metode <span className='italic'>Peer-Review</span> silang yang ketat di database Supabase. Setiap hasil dikonfirmasi acak oleh sesama pekerja ahli sebelum dana dilepaskan.
             </p>
           </motion.div>
 
@@ -213,7 +213,7 @@ export default function LandingPage() {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Escrow Dana Real-time</h3>
             <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
-              Jaminan mutlak bagi *Employer* maupun *Worker*. Dana proyek ditahan aman di sistem escrow digital dan otomatis dikreditkan ke saldo akun pengguna saat tugas tervalidasi.
+              Jaminan mutlak bagi <span className='italic'>Employer</span> maupun <span className='italic'>Worker</span>. Dana proyek ditahan aman di sistem escrow digital dan otomatis dikreditkan ke saldo akun pengguna saat tugas tervalidasi.
             </p>
           </motion.div>
         </motion.div>
@@ -233,7 +233,7 @@ export default function LandingPage() {
                 { title: 'Sektor Production', desc: 'Pembuatan esai, transkripsi audio, penerjemahan, dan jurnalisme mikro.' },
                 { title: 'Sektor Jasa', desc: 'Riset pasar terdistribusi, pengisian kuesioner produk, dan audit lapangan.' },
                 { title: 'Sektor Logistik', desc: 'Entri data masal, anotasi objek AI, serta kurasi visual e-commerce.' },
-                { title: 'Sektor Construction', desc: 'Uji fungsionalitas UI, pelaporan *bug* aplikasi, dan QA perangkat lunak.' }
+                { title: 'Sektor Construction', desc: 'Uji fungsionalitas UI, pelaporan bug aplikasi, dan QA perangkat lunak.' }
               ].map((item, i) => (
                 <div key={i} className="flex items-start gap-3 text-xs md:text-sm font-semibold text-slate-300">
                   <FiCheckCircle className="text-blue-500 shrink-0 mt-0.5" /> 

@@ -11,7 +11,7 @@ import {
   DialogDescription, 
   DialogFooter 
 } from "@/components/ui/dialog";
-import { FiLoader, FiEdit, FiFileText, FiLayers, FiDollarSign } from "react-icons/fi";
+import { FiLoader, FiEdit, FiFileText, FiLayers, FiDollarSign, FiZap } from "react-icons/fi";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
 
@@ -33,6 +33,7 @@ interface EditServiceDialogProps {
 
 export default function EditServiceDialog({ open, onOpenChange, service, onSuccess }: EditServiceDialogProps) {
   const [loading, setLoading] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
   
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -76,6 +77,43 @@ export default function EditServiceDialog({ open, onOpenChange, service, onSucce
       toast.error(err.message || "Gagal memperbarui data jasa.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEnhanceWithAI = async () => {
+    if (!description.trim()) {
+      toast.error("Tulis draf deskripsi jasamu terlebih dahulu sebelum ditingkatkan!");
+      return;
+    }
+
+    try {
+      setIsEnhancing(true);
+      
+      const response = await fetch("/api/ai/enhance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: description,
+          type: "service",      // Menggunakan prompt khusus penawaran jasa
+          title: title,         // Mengirim konteks judul saat ini
+          category: category,   // Mengirim konteks kategori saat ini
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.error || "Terjadi kesalahan");
+
+      // Menghapus sintaks markdown bawaan AI agar teks bersih
+      const cleanText = data.enhancedText.replace(/[#*`_~]/g, "").trim();
+      
+      setDescription(cleanText);
+      toast.success("Deskripsi jasa berhasil diperhebat oleh AI KaryaMandiri!");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "Gagal menggunakan fitur AI.");
+    } finally {
+      setIsEnhancing(false);
     }
   };
 
@@ -146,12 +184,23 @@ export default function EditServiceDialog({ open, onOpenChange, service, onSucce
               rows={4}
               className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-blue-500 resize-none transition-colors"
             />
+
+            {/* TOMBOL PANDUAN AI UNTUK EDIT DESKRIPSI JASA */}
+            <button
+              type="button"
+              onClick={handleEnhanceWithAI}
+              disabled={isEnhancing || loading}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 disabled:from-slate-400 disabled:to-slate-400 rounded-xl transition-all duration-200 shadow-sm"
+            >
+              <FiZap className={`${isEnhancing ? "animate-spin" : ""}`} size={14} />
+              {isEnhancing ? "Sedang Menyusun Ulang..." : "Poles Deskripsi Jasa"}
+            </button>
           </div>
 
           <DialogFooter className="flex sm:justify-end gap-2 pt-4 border-t border-slate-100 mt-6">
             <button
               type="button"
-              disabled={loading}
+              disabled={loading || isEnhancing}
               onClick={() => onOpenChange(false)}
               className="px-5 py-3 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition"
             >
@@ -159,7 +208,7 @@ export default function EditServiceDialog({ open, onOpenChange, service, onSucce
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isEnhancing}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 transition shadow-md"
             >
               {loading ? <FiLoader className="animate-spin text-lg" /> : "Simpan Perubahan"}

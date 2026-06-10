@@ -180,7 +180,7 @@ const DetailService: React.FC = () => {
               {/* Konten Deskripsi */}
               <div className="prose prose-slate max-w-none">
                 <h3 className="text-base font-black text-slate-900 uppercase tracking-wide mb-3">Deskripsi Jasa & Layanan</h3>
-                <p className="text-slate-600 leading-relaxed whitespace-pre-line text-sm md:text-base">
+                <p className="text-slate-600 leading-relaxed whitespace-pre-wrap text-sm md:text-base mt-2">
                   {service.description}
                 </p>
               </div>

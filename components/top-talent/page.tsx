@@ -1,3 +1,5 @@
+"use client";
+
 import supabase from "@/lib/db";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -24,9 +26,19 @@ export default function TopTalent() {
         const fetchTopTalents = async () => {
             try {
                 setIsLoadingTalents(true);
+                
                 const { data, error } = await supabase
                 .from('profiles')
                 .select('id, full_name, role, location, skills, rating, job_completed, is_verified, avatar_url')
+                // FILTER 1: Hanya user yang sudah terverifikasi
+                .eq('is_verified', true) 
+                // FILTER 2: Foto profil tidak boleh null atau string kosong
+                .not('avatar_url', 'is', null)
+                .neq('avatar_url', '')
+                // FILTER 3: Kolom keahlian tidak boleh null atau berupa array kosong '{}'
+                .not('skills', 'is', null)
+                .neq('skills', '{}') 
+                // Urutkan berdasarkan rating tertinggi
                 .order('rating', { ascending: false }) 
                 .limit(3);
 
@@ -54,7 +66,6 @@ export default function TopTalent() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {isLoadingTalents ? (
-            // Skeleton Loading State untuk Talents
             [...Array(3)].map((_, i) => (
               <div key={i} className="bg-slate-900/50 border border-slate-800 p-6 rounded-3xl h-56 animate-pulse flex flex-col justify-between">
                 <div className="flex items-center gap-4">
@@ -73,15 +84,18 @@ export default function TopTalent() {
             topTalents.map((talent, idx) => (
               <div key={idx} className="bg-slate-900/50 border border-slate-800 p-6 rounded-3xl flex flex-col justify-between hover:scale-[1.01] transition duration-300">
                 <div className="space-y-4">
-                  <Link href={`profile/${talent.id}`} className="flex items-center gap-4">
+                  {/* Perbaikan: Menambahkan slash '/' di awal path agar routing absolut tidak menumpuk */}
+                  <Link href={`/profile/${talent.id}`} className="flex items-center gap-4">
                     <div className="relative w-14 h-14 shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={talent.avatar_url || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256"} alt={talent.full_name} className="w-full h-full object-cover rounded-2xl border border-slate-700" />
-                      {talent.is_verified && (
-                        <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-0.5 rounded-full border border-slate-900">
-                          <MdVerified size={14} />
-                        </div>
-                      )}
+                      <img 
+                        src={talent.avatar_url} 
+                        alt={talent.full_name} 
+                        className="w-full h-full object-cover rounded-2xl border border-slate-700" 
+                      />
+                      <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-0.5 rounded-full border border-slate-900">
+                        <MdVerified size={14} />
+                      </div>
                     </div>
                     <div className="min-w-0">
                       <h4 className="font-bold text-sm md:text-base text-white truncate">{talent.full_name}</h4>
@@ -89,9 +103,8 @@ export default function TopTalent() {
                     </div>
                   </Link>
 
-                  {/* Kemampuan (Array Teks dari Kolom SQL TEXT[]) */}
                   <div className="flex flex-wrap gap-1">
-                    {talent.skills?.map((skill, sIdx) => (
+                    {talent.skills.map((skill, sIdx) => (
                       <span key={sIdx} className="text-[10px] px-2.5 py-0.5 bg-slate-800 text-slate-300 rounded-md font-medium border border-slate-700/50">
                         {skill}
                       </span>
@@ -99,7 +112,6 @@ export default function TopTalent() {
                   </div>
                 </div>
 
-                {/* Statistik Kerja sesuai Atribut Profil */}
                 <div className="grid grid-cols-2 gap-2 mt-6 pt-4 border-t border-slate-800/80 text-center">
                   <div className="bg-slate-950/40 p-2 rounded-xl">
                     <p className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Selesai</p>
