@@ -76,6 +76,11 @@ const DetailService: React.FC = () => {
 
         if (error) throw error;
         setService(data as any);
+
+        await supabase.from('interaction_logs').insert([
+          { item_id: serviceId, item_type: 'service', interaction_type: 'view' }
+        ]);
+
       } catch (err: any) {
         console.error("Error fetching service detail:", err);
         toast.error("Gagal memuat detail jasa.");
@@ -88,7 +93,7 @@ const DetailService: React.FC = () => {
     fetchServiceDetail();
   }, [serviceId, router]);
 
-  const handleContactClick = () => {
+  const handleContactClick = async () => {
     if (!service || !service.profiles) return;
 
     const rawPhone = service.profiles.phone;
@@ -96,6 +101,14 @@ const DetailService: React.FC = () => {
     if (!rawPhone) {
       toast.error(`Gagal menghubungi: ${service.profiles.full_name} belum mengatur nomor telepon di profil.`);
       return;
+    }
+
+    try {
+      await supabase.from('interaction_logs').insert([
+        { item_id: serviceId, item_type: 'service', interaction_type: 'interest' }
+      ]);
+    } catch (err) {
+      console.error("Gagal mencatat log minat:", err);
     }
 
     // Standardisasi nomor telepon ke format WhatsApp Internasional (62)

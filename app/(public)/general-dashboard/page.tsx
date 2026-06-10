@@ -360,7 +360,7 @@ const GeneralDashboard: React.FC = () => {
           <p className="text-slate-500">Pantau ekosistem inklusi ekonomi KaryaMandiri hari ini.</p>
         </div>
         <div className="bg-white px-4 py-2 rounded-2xl border border-slate-200 flex items-center gap-3 shadow-sm text-green-500 text-sm font-medium">
-          <span className="flex h-3 w-3 rounded-full bg-green-500 animate-pulse" />
+          <span className="flex h-3 w-3 rounded-full bg-green-500 animate-caret-blink" />
           Sistem Online: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
         </div>
       </section>

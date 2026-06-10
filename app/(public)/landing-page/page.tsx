@@ -15,11 +15,16 @@ import {
   FiMenu,
   FiStar,
   FiHelpCircle,
-  FiChevronDown
+  FiChevronDown,
+  FiPlusCircle,
+  FiSearch,
+  FiEye,
+  FiLayers
 } from 'react-icons/fi';
 import { MdVerified } from 'react-icons/md';
 import Link from 'next/link';
 import supabase from '@/lib/db';
+import Image from 'next/image';
 
 // Definisi Interface untuk TypeScript
 interface Talent {
@@ -44,6 +49,16 @@ interface Job {
   user_id: string;
 }
 
+interface Service {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  owner_name: string;
+  owner_avatar: string;
+}
+
 // Varian Animasi untuk Efek Fade-up sekuensial (Staggered)
 const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
@@ -63,11 +78,18 @@ const staggerContainer: Variants = {
 export default function LandingPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+
+  const [activeJobTab, setActiveJobTab] = useState<'interested' | 'searched' | 'posted'>('interested');
+  const [activeServiceTab, setActiveServiceTab] = useState<'interested' | 'searched' | 'posted'>('interested');
   
-  // State untuk data dinamis Supabase
   const [topTalents, setTopTalents] = useState<Talent[]>([]);
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
+
+  const [trendingJobs, setTrendingJobs] = useState<Job[]>([]);
+  const [trendingServices, setTrendingServices] = useState<Service[]>([]);
+
   const [isLoadingJobs, setIsLoadingJobs] = useState(true);
+  const [isLoadingServices, setIsLoadingServices] = useState(true);
   const [isLoadingTalents, setIsLoadingTalents] = useState(true);
 
   // Fetch data dari Supabase saat komponen di-mount
@@ -111,6 +133,55 @@ export default function LandingPage() {
     fetchRecentJobs();
     fetchTopTalents();
   }, []);
+
+  // Fetching Data Berdasarkan Tab Tren Proyek
+  useEffect(() => {
+    const fetchTrendingJobs = async () => {
+      setIsLoadingJobs(true);
+      let viewName = 'view_trending_jobs_interested';
+      if (activeJobTab === 'searched') viewName = 'view_trending_jobs_searched';
+      if (activeJobTab === 'posted') viewName = 'view_trending_jobs_posted';
+
+      try {
+        const { data, error } = await supabase.from(viewName).select('*').limit(3);
+        if (error) throw error;
+        setTrendingJobs((data as Job[]) || []);
+      } catch (err) {
+        console.error('Error fetching trending jobs:', err);
+      } finally {
+        setIsLoadingJobs(false);
+      }
+    };
+    fetchTrendingJobs();
+  }, [activeJobTab]);
+
+  // Fetching Data Berdasarkan Tab Tren Jasa
+  useEffect(() => {
+    const fetchTrendingServices = async () => {
+      setIsLoadingServices(true);
+      let viewName = 'view_trending_services_interested';
+      if (activeServiceTab === 'searched') viewName = 'view_trending_services_searched';
+      if (activeServiceTab === 'posted') viewName = 'view_trending_services_posted';
+
+      try {
+        const { data, error } = await supabase.from(viewName).select('*').limit(3);
+        if (error) throw error;
+        setTrendingServices((data as Service[]) || []);
+      } catch (err) {
+        console.error('Error fetching trending services:', err);
+      } finally {
+        setIsLoadingServices(false);
+      }
+    };
+    fetchTrendingServices();
+  }, [activeServiceTab]);
+
+  // Handler Log Interaksi untuk Tracking Data Akurat secara Real-time
+  const handleInteractionLog = async (itemId: string, type: 'job' | 'service') => {
+    await supabase.from('interaction_logs').insert([
+      { item_id: itemId, item_type: type, interaction_type: 'interest' }
+    ]);
+  };
 
   const toggleFaq = (index: number) => {
     setActiveFaq(activeFaq === index ? null : index);
@@ -163,13 +234,13 @@ export default function LandingPage() {
           <motion.div 
             initial={{ opacity: 0, y: -15, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            className="md:hidden absolute top-full left-0 w-full mt-4 bg-slate-950/60 backdrop-blur-3xl border border-white/10 border-t-white/20 p-6 space-y-4 flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.7)] rounded-3xl"
+            className="md:hidden absolute top-full left-0 w-full mt-4 bg-slate-950/80 backdrop-blur-3xl border border-white/10 border-t-white/20 p-6 space-y-4 flex flex-col shadow-[0_20px_50px_rgba(0,0,0,0.7)] rounded-3xl"
           >
-            <Link href="/general-dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-white font-semibold text-sm px-3 py-2 rounded-xl hover:bg-white/5 transition-all">Ringkasan Platform</Link>
-            <Link href="/jobs" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-white font-semibold text-sm px-3 py-2 rounded-xl hover:bg-white/5 transition-all">Cari Lowongan</Link>
-            <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-400 hover:text-white font-semibold text-sm px-3 py-2 rounded-xl hover:bg-white/5 transition-all">Cari Jasa</Link>
+            <Link href="/general-dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-200 hover:text-white font-semibold text-sm px-3 py-2 rounded-xl hover:bg-white/5 transition-all">Ringkasan Platform</Link>
+            <Link href="/jobs" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-200 hover:text-white font-semibold text-sm px-3 py-2 rounded-xl hover:bg-white/5 transition-all">Cari Lowongan</Link>
+            <Link href="/services" onClick={() => setIsMobileMenuOpen(false)} className="text-slate-200 hover:text-white font-semibold text-sm px-3 py-2 rounded-xl hover:bg-white/5 transition-all">Cari Jasa</Link>
             <div className="h-px bg-white/10 my-1" />
-            <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-center font-bold text-slate-300 py-2.5 rounded-xl hover:bg-white/5 border border-white/5 transition-all text-sm">
+            <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-center font-bold text-slate-200 py-2.5 rounded-xl hover:bg-white/5 border border-white/5 transition-all text-sm">
               Masuk
             </Link>
             <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="text-center font-bold bg-linear-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl shadow-lg text-sm active:scale-98 transition-transform">
@@ -264,6 +335,113 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* SECTION TREN PROYEK/TUGAS (3 KATEGORI TREN) */}
+      <section className="py-24 px-6 max-w-6xl mx-auto border-b border-slate-900">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
+          <div className="space-y-2">
+            <h2 className="text-xs uppercase font-bold tracking-widest text-blue-500 flex items-center gap-1.5"><FiTrendingUp /> Live Intelligence</h2>
+            <p className="text-2xl md:text-4xl font-extrabold">Tren Proyek & Tugas Mikro</p>
+          </div>
+          
+          {/* Navigasi Filter Tab Tren */}
+          <div className="flex flex-wrap p-1.5 bg-slate-900/80 border border-slate-800 rounded-xl gap-1">
+            <button onClick={() => setActiveJobTab('interested')} className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${activeJobTab === 'interested' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}><FiEye size={14}/> Paling Diminati</button>
+            <button onClick={() => setActiveJobTab('searched')} className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${activeJobTab === 'searched' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}><FiSearch size={14}/> Banyak Dicari</button>
+            <button onClick={() => setActiveJobTab('posted')} className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${activeJobTab === 'posted' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}><FiPlusCircle size={14}/> Gencar Diposting</button>
+          </div>
+        </div>
+
+        {/* List Tampilan Hasil Tren Tugas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {isLoadingJobs ? (
+            [...Array(3)].map((_, i) => (
+              <div key={i} className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl h-48 animate-pulse flex flex-col justify-between"/>
+            ))
+          ) : trendingJobs.length === 0 ? (
+            <p className="text-slate-500 text-sm col-span-3 text-center py-8">Tidak ada data tren pada klaster ini.</p>
+          ) : (
+            trendingJobs.map((job) => (
+              <div key={job.id} className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl flex flex-col justify-between hover:border-slate-700 transition group relative overflow-hidden">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-[10px] font-bold gap-2">
+                    <span className="px-2.5 py-1 bg-slate-800 text-slate-300 rounded-md">{job.category}</span>
+                    <span className="text-blue-400 border border-blue-500/20 bg-blue-500/5 px-2.5 py-1 rounded-md max-w-[130px] truncate">{job.employer || 'Anonim Corporation'}</span>
+                  </div>
+                  <Link href={`/jobs/${job.id}`} onClick={() => handleInteractionLog(job.id, 'job')} className="font-bold text-white text-base leading-snug group-hover:text-blue-400 transition block">{job.title}</Link>
+                </div>
+                <div className="mt-6 pt-4 border-t border-slate-800/60 flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Upah Bersih</p>
+                    <p className="text-sm font-black text-emerald-400">Rp {job.reward?.toLocaleString('id-ID')}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Sisa Kuota</p>
+                    <p className="text-xs font-semibold text-slate-300">{job.total} Slot</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* SECTION TREN JASA/SERVICES (3 KATEGORI TREN) */}
+      <section className="py-24 px-6 max-w-6xl mx-auto border-b border-slate-900">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6">
+          <div className="space-y-2">
+            <h2 className="text-xs uppercase font-bold tracking-widest text-purple-400 flex items-center gap-1.5"><FiLayers /> Freelance Economy</h2>
+            <p className="text-2xl md:text-4xl font-extrabold">Katalog Jasa Paling Menanjak</p>
+          </div>
+          
+          {/* Navigasi Filter Tab Tren Jasa */}
+          <div className="flex flex-wrap p-1.5 bg-slate-900/80 border border-slate-800 rounded-xl gap-1">
+            <button onClick={() => setActiveServiceTab('interested')} className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${activeServiceTab === 'interested' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}><FiEye size={14}/> Paling Diminati</button>
+            <button onClick={() => setActiveServiceTab('searched')} className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${activeServiceTab === 'searched' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}><FiSearch size={14}/> Banyak Dicari</button>
+            <button onClick={() => setActiveServiceTab('posted')} className={`px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${activeServiceTab === 'posted' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}><FiPlusCircle size={14}/> Gencar Ditawarkan</button>
+          </div>
+        </div>
+
+        {/* List Tampilan Hasil Tren Jasa */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {isLoadingServices ? (
+            [...Array(3)].map((_, i) => (
+              <div key={i} className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl h-48 animate-pulse flex flex-col justify-between"/>
+            ))
+          ) : trendingServices.length === 0 ? (
+            <p className="text-slate-500 text-sm col-span-3 text-center py-8">Tidak ada penawaran jasa pada klaster ini.</p>
+          ) : (
+            trendingServices.map((service) => (
+              <div key={service.id} className="p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl flex flex-col justify-between hover:border-purple-500/40 transition group">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <Image 
+                      width={32}
+                      height={32}
+                      src={service.owner_avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256"} 
+                      alt={service.owner_name} 
+                      className="w-8 h-8 rounded-full object-cover border border-slate-700"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-200 truncate">{service.owner_name}</p>
+                      <p className="text-[10px] text-purple-400 font-medium">{service.category}</p>
+                    </div>
+                  </div>
+                  <Link href={`/services/${service.id}`} onClick={() => handleInteractionLog(service.id, 'service')} className="font-bold text-white text-base leading-snug group-hover:text-purple-400 transition block truncate">{service.title}</Link>
+                  <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{service.description}</p>
+                </div>
+                <div className="mt-6 pt-4 border-t border-slate-800/60 flex justify-between items-center">
+                  <div>
+                    <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Mulai Dari</p>
+                    <p className="text-sm font-black text-purple-400">Rp {service.price?.toLocaleString('id-ID')}</p>
+                  </div>
+                  <Link href={`/services/${service.id}`} className="text-xs font-bold bg-slate-800 group-hover:bg-purple-600 group-hover:text-white transition px-3 py-1.5 rounded-lg text-slate-300">Detail</Link>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
       {/* TUGAS MIKRO TERBARU (SUPABASE INTEGRATED) */}
       <section className="py-24 px-6 max-w-6xl mx-auto border-b border-slate-900">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
@@ -317,52 +495,6 @@ export default function LandingPage() {
             ))
           )}
         </div>
-      </section>
-
-      {/* FITUR UTAMA */}
-      <section className="py-24 px-6 max-w-6xl mx-auto border-b border-slate-900">
-        <div className="text-center space-y-3 mb-16">
-          <h2 className="text-xs uppercase font-bold tracking-widest text-blue-500">Kenapa Memilih Kami</h2>
-          <p className="text-3xl md:text-5xl font-extrabold tracking-tight">Arsitektur Kerja Masa Depan</p>
-        </div>
-
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8"
-        >
-          <motion.div variants={fadeInUp} className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/50 transition-all group hover:shadow-[0_0_30px_rgba(37,99,235,0.1)]">
-            <div className="p-4 bg-blue-600/10 rounded-2xl w-fit text-blue-500 mb-6 group-hover:scale-110 transition-transform">
-              <FiCpu size={26} />
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">Distribusi Tugas Cerdas</h3>
-            <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
-              Sistem mikro memecah proyek kompleks korporasi menjadi pecahan sub-tugas independen otomatis yang langsung terdistribusi ke dasbor pekerja dalam hitungan detik.
-            </p>
-          </motion.div>
-
-          <motion.div variants={fadeInUp} className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800/80 hover:border-purple-500/50 transition-all group hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]">
-            <div className="p-4 bg-purple-600/10 rounded-2xl w-fit text-purple-500 mb-6 group-hover:scale-110 transition-transform">
-              <FiCheckCircle size={26} />
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">Sistem Validasi Berlapis</h3>
-            <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
-              Menerapkan metode *Peer-Review* silang yang ketat di database Supabase. Setiap hasil dikonfirmasi acak oleh sesama pekerja ahli sebelum dana dilepaskan.
-            </p>
-          </motion.div>
-
-          <motion.div variants={fadeInUp} className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800/80 hover:border-emerald-500/50 transition-all group hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-            <div className="p-4 bg-emerald-600/10 rounded-2xl w-fit text-emerald-500 mb-6 group-hover:scale-110 transition-transform">
-              <FiShield size={26} />
-            </div>
-            <h3 className="text-lg font-bold text-white mb-2">Escrow Dana Real-time</h3>
-            <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
-              Jaminan mutlak bagi *Employer* maupun *Worker*. Dana proyek ditahan aman di sistem escrow digital dan otomatis dikreditkan ke saldo akun pengguna saat tugas tervalidasi.
-            </p>
-          </motion.div>
-        </motion.div>
       </section>
 
       {/* TALENTA UNGGULAN (SUPABASE INTEGRATED) */}
@@ -439,6 +571,52 @@ export default function LandingPage() {
             ))
           )}
         </div>
+      </section>
+
+      {/* FITUR UTAMA */}
+      <section className="py-24 px-6 max-w-6xl mx-auto border-b border-slate-900">
+        <div className="text-center space-y-3 mb-16">
+          <h2 className="text-xs uppercase font-bold tracking-widest text-blue-500">Kenapa Memilih Kami</h2>
+          <p className="text-3xl md:text-5xl font-extrabold tracking-tight">Arsitektur Kerja Masa Depan</p>
+        </div>
+
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        >
+          <motion.div variants={fadeInUp} className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800/80 hover:border-blue-500/50 transition-all group hover:shadow-[0_0_30px_rgba(37,99,235,0.1)]">
+            <div className="p-4 bg-blue-600/10 rounded-2xl w-fit text-blue-500 mb-6 group-hover:scale-110 transition-transform">
+              <FiCpu size={26} />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Distribusi Tugas Cerdas</h3>
+            <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
+              Sistem mikro memecah proyek kompleks korporasi menjadi pecahan sub-tugas independen otomatis yang langsung terdistribusi ke dasbor pekerja dalam hitungan detik.
+            </p>
+          </motion.div>
+
+          <motion.div variants={fadeInUp} className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800/80 hover:border-purple-500/50 transition-all group hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]">
+            <div className="p-4 bg-purple-600/10 rounded-2xl w-fit text-purple-500 mb-6 group-hover:scale-110 transition-transform">
+              <FiCheckCircle size={26} />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Sistem Validasi Berlapis</h3>
+            <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
+              Menerapkan metode *Peer-Review* silang yang ketat di database Supabase. Setiap hasil dikonfirmasi acak oleh sesama pekerja ahli sebelum dana dilepaskan.
+            </p>
+          </motion.div>
+
+          <motion.div variants={fadeInUp} className="p-8 rounded-3xl bg-slate-900/60 border border-slate-800/80 hover:border-emerald-500/50 transition-all group hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]">
+            <div className="p-4 bg-emerald-600/10 rounded-2xl w-fit text-emerald-500 mb-6 group-hover:scale-110 transition-transform">
+              <FiShield size={26} />
+            </div>
+            <h3 className="text-lg font-bold text-white mb-2">Escrow Dana Real-time</h3>
+            <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
+              Jaminan mutlak bagi *Employer* maupun *Worker*. Dana proyek ditahan aman di sistem escrow digital dan otomatis dikreditkan ke saldo akun pengguna saat tugas tervalidasi.
+            </p>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* SEKTOR PEKERJAAN */}
@@ -559,8 +737,12 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer className="py-12 border-t border-slate-900 text-center text-xs text-slate-600 px-6">
-        <p className="mb-2 font-semibold text-slate-500">© 2026 KaryaMandiri Syahriza. Hak Cipta Dilindungi.</p>
-        <p>Built with Next.js, Tailwind CSS and Supabase Server Architecture.</p>
+        <p className="mb-2 font-semibold text-slate-500">© 2026 <span className='text-blue-600'>KaryaMandiri Syahriza</span>. Hak Cipta Dilindungi.</p>
+        <p>Built with 
+          <Link href="https://nextjs.org" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600"> Next.js</Link>,
+          <Link href="https://tailwindcss.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600"> Tailwind CSS</Link>, and 
+          <Link href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600"> Supabase Server Architecture</Link>.
+        </p>
       </footer>
     </div>
   );

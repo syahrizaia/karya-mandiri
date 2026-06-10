@@ -23,6 +23,7 @@ interface NotificationItem {
   type: 'payment' | 'job' | 'system' | 'applicant' | 'lead';
   is_read: boolean;
   user_id?: string;
+  sender_id?: string;
 }
 
 // Helper Functions
@@ -152,33 +153,52 @@ const Notification: React.FC = () => {
     });
   };
 
-  // Mengubah string nama pertama di dalam pesan menjadi link profil jika user_id tersedia
   const renderMessageContent = (notif: NotificationItem) => {
-    if (!notif.user_id) return notif.message;
+    // Jika tidak ada ID pengirim, langsung kembalikan teks biasa
+    if (!notif.sender_id) return notif.message;
 
-    // Menghandle jika tipe pelamar atau peminat klik hubungi jasa
-    if (notif.type === 'applicant' || notif.type === 'lead') {
-      const kata = notif.message.split(' ');
-      const namaPelamar = notif.title.includes('Lamaran') || notif.title.includes('Kontak') 
-        ? kata.slice(0, 2).join(' ') 
-        : '';
-        
-      if (namaPelamar) {
-        const sisaPesan = notif.message.replace(namaPelamar, '');
-        return (
-          <>
-            <Link 
-              href={`/profile/${notif.user_id}`} 
-              className="font-bold text-blue-600 hover:underline inline-block"
-              onClick={(e) => e.stopPropagation()} // Supaya tidak tabrakan dengan fungsi markAsRead
-            >
-              {namaPelamar}
-            </Link>
-            {sisaPesan}
-          </>
-        );
-      }
+    // Menangani Notifikasi Kontak Jasa Baru (Type: lead)
+    if (notif.type === 'lead' && notif.message.includes(' tertarik dengan keahlian Anda')) {
+      // Memisahkan nama berdasarkan teks konstan dari trigger postgres
+      const parameterPemisah = ' tertarik dengan keahlian Anda';
+      const parts = notif.message.split(parameterPemisah);
+      const namaPencari = parts[0];
+      const sisaPesan = parameterPemisah + (parts[1] || '');
+
+      return (
+        <>
+          <Link 
+            href={`/profile/${notif.sender_id}`} // <--- Mengarah ke profil pengirim klik
+            className="font-bold text-blue-600 hover:underline inline-block mr-1"
+            onClick={(e) => e.stopPropagation()} // Mencegah bentrok dengan markAsRead bawaan card
+          >
+            {namaPencari}
+          </Link>
+          {sisaPesan}
+        </>
+      );
     }
+
+    // Menangani Notifikasi Lamaran Baru (Type: applicant) jika ada
+    if (notif.type === 'applicant' && notif.message.includes(' telah melamar')) {
+      const parts = notif.message.split(' telah melamar');
+      const namaPelamar = parts[0];
+      const sisaPesan = ' telah melamar' + (parts[1] || '');
+
+      return (
+        <>
+          <Link 
+            href={`/profile/${notif.sender_id}`}
+            className="font-bold text-blue-600 hover:underline inline-block mr-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {namaPelamar}
+          </Link>
+          {sisaPesan}
+        </>
+      );
+    }
+
     return notif.message;
   };
 

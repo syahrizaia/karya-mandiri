@@ -16,6 +16,7 @@ import {
 } from "react-icons/fi";
 import Image from "next/image";
 import Link from "next/link";
+import { createClient } from "@/lib/supabase-browser";
 
 interface IServiceFeed {
   id: string;
@@ -115,23 +116,68 @@ export default function Services() {
     window.scrollTo({ top: 250, behavior: "smooth" });
   };
 
-  const handleHireClick = (service: IServiceFeed) => {
-    const rawPhone = service.profiles?.phone;
+  const handleHireClick = async (service: IServiceFeed) => {
+    const supabase = createClient();
 
-    if (!rawPhone) {
-      toast.error(`Gagal menghubungi: ${service.profiles?.full_name || "Penyedia Jasa"} belum mengatur nomor telepon di profil mereka.`);
-      return;
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        toast.error("Anda harus login terlebih dahulu untuk menghubungi penyedia jasa!");
+        return;
+      }
+
+      const workerId = service.profiles?.id; 
+      if (!workerId) {
+        toast.error("Data penyedia jasa tidak valid.");
+        return;
+      }
+
+      if (user.id === workerId) {
+        toast.error("Anda tidak bisa menyewa atau menghubungi jasa Anda sendiri.");
+        return;
+      }
+
+      const rawPhone = service.profiles?.phone;
+      if (!rawPhone) {
+        toast.error(`Gagal menghubungi: ${service.profiles?.full_name || "Penyedia Jasa"} belum mengatur nomor telepon di profil mereka.`);
+        return;
+      }
+
+      let cleanPhone = rawPhone.replace(/\D/g, "");
+      if (cleanPhone.startsWith("0")) {
+        cleanPhone = "62" + cleanPhone.slice(1);
+      }
+
+      const { error: insertError } = await supabase
+        .from('service_clicks')
+        .insert([
+          {
+            pencari_jasa_id: user.id,
+            worker_id: workerId
+          }
+        ]);
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      const message = encodeURIComponent(
+        `Halo, saya tertarik dengan jasa Anda di KaryaMandiri: "${service.title}". Bisa berdiskusi lebih lanjut?`
+      );
+      
+      toast.info(`Membuka komunikasi dengan ${service.profiles?.full_name || "Penyedia Jasa"}`);
+      window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
+
+    } catch (error: any) {
+      // Jangan membungkus objek di dalam kurung kurawal baru agar properti aslinya terlihat
+      console.error("Ditemukan Error Supabase:", error); 
+      
+      // Atau paksa konversi ke string
+      console.log("Stringified Error:", JSON.stringify(error, null, 2));
+
+      toast.error(`Gagal mencatat lead: ${error?.message || "Kesalahan sistem"}`);
     }
-
-    let cleanPhone = rawPhone.replace(/\D/g, "");
-    if (cleanPhone.startsWith("0")) {
-      cleanPhone = "62" + cleanPhone.slice(1);
-    }
-
-    const message = encodeURIComponent(`Halo, saya tertarik dengan jasa Anda di KaryaMandiri: "${service.title}". Bisa berdiskusi lebih lanjut?`);
-    
-    toast.info(`Membuka komunikasi dengan ${service.profiles?.full_name}`);
-    window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
   };
 
   return (
@@ -243,12 +289,21 @@ export default function Services() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleHireClick(service)}
-                    className="w-full py-3 bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs rounded-2xl flex items-center justify-center gap-2 transition group-hover:shadow-sm"
-                  >
-                    <FiSend size={14} /> Hubungi Penyedia Jasa
-                  </button>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <Link
+                      href={`/services/${service.id}`}
+                      className="py-3 bg-white border border-slate-200 hover:border-blue-600 hover:bg-blue-100 text-slate-700 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 transition text-center"
+                    >
+                      Lihat Detail
+                    </Link>
+                    
+                    <button
+                      onClick={() => handleHireClick(service)}
+                      className="py-3 bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 transition group-hover:shadow-sm"
+                    >
+                      <FiSend size={13} /> Hubungi Jasa
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

@@ -291,12 +291,12 @@ const WorkerDashboard: React.FC = () => {
         <div className="relative z-10">
           <h3 className="text-lg font-bold mb-2">Tingkatkan Skill-mu! 🚀</h3>
           <p className="text-indigo-200 text-sm mb-4">Ikuti pelatihan singkat gratis untuk mendapatkan akses ke tugas dengan upah lebih tinggi.</p>
-          <button
-            onClick={() => setShowSubModal(true)}
+          <Link
+            href="/training"
             className="bg-white text-indigo-900 px-4 py-2 rounded-lg font-bold text-sm"
           >
             Mulai Belajar
-          </button>
+          </Link>
         </div>
         <FiStar className="absolute -right-4 -bottom-4 text-indigo-800 text-9xl opacity-50" />
       </div>

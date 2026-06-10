@@ -35,10 +35,10 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-white border-t border-slate-200 pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 md:gap-12 mb-12">
           
-          {/* Brand & Mission */}
-          <div className="space-y-6">
+          {/* Brand & Mission (Memakan 2 kolom penuh pada mobile agar teks deskripsi tidak sempit) */}
+          <div className="space-y-6 col-span-2 md:col-span-1">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
                 K
@@ -56,30 +56,30 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
+          {/* Quick Links (Platform - Berdampingan 50:50 dengan Dukungan pada mobile) */}
+          <div className="col-span-1">
             <h3 className="font-bold text-slate-900 mb-6">Platform</h3>
             <ul className="space-y-4 text-sm font-medium text-slate-500">
               <li><FooterLink href="/jobs">Cari Pekerjaan</FooterLink></li>
               <li><FooterLink href="/employer">Menjadi Employer</FooterLink></li>
-              <li><FooterLink href="#">Cara Kerja Crowd</FooterLink></li>
-              <li><FooterLink href="#">Pusat Pelatihan</FooterLink></li>
+              <li><FooterLink href="/how-it-works">Cara Kerja Crowd</FooterLink></li>
+              <li><FooterLink href="/training">Pusat Pelatihan</FooterLink></li>
             </ul>
           </div>
 
-          {/* Legal & Support */}
-          <div>
+          {/* Legal & Support (Dukungan - Berdampingan 50:50 dengan Platform pada mobile) */}
+          <div className="col-span-1">
             <h3 className="font-bold text-slate-900 mb-6">Dukungan</h3>
             <ul className="space-y-4 text-sm font-medium text-slate-500">
-              <li><FooterLink href="#">Pusat Bantuan</FooterLink></li>
-              <li><FooterLink href="#">Syarat & Ketentuan</FooterLink></li>
-              <li><FooterLink href="#">Kebijakan Privasi</FooterLink></li>
-              <li><FooterLink href="#">Kontak Kami</FooterLink></li>
+              <li><FooterLink href="/help-center">Pusat Bantuan</FooterLink></li>
+              <li><FooterLink href="/terms">Syarat & Ketentuan</FooterLink></li>
+              <li><FooterLink href="/privacy">Kebijakan Privasi</FooterLink></li>
+              <li><FooterLink href="/contact">Kontak Kami</FooterLink></li>
             </ul>
           </div>
 
-          {/* Contact Info */}
-          <div>
+          {/* Contact Info (Memakan 2 kolom penuh pada mobile agar info alamat tidak patah-patah) */}
+          <div className="col-span-2 md:col-span-1">
             <h3 className="font-bold text-slate-900 mb-6">Hubungi Kami</h3>
             <ul className="space-y-4 text-sm text-slate-500">
               <li className="flex items-start gap-3">
@@ -102,14 +102,14 @@ const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
-            © {currentYear} KaryaMandiri Syahriza. All Rights Reserved.
+            © {currentYear} <span className='text-blue-600'>KaryaMandiri Syahriza</span>. All Rights Reserved.
           </p>
           <div className="flex items-center gap-6 text-xs font-bold text-slate-400">
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 bg-green-500 rounded-full"></span> 
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-caret-blink"></span> 
               Sistem Terverifikasi
             </span>
-            <Link href="#" className="hover:text-blue-600 flex items-center gap-1">
+            <Link href="/security" className="hover:text-blue-600 flex items-center gap-1">
               Keamanan Data <FiExternalLink size={12} />
             </Link>
           </div>

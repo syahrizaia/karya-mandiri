@@ -103,6 +103,10 @@ const DetailJob: React.FC = () => {
           if (error) throw error;
           setJob(data);
 
+          await supabase.from('interaction_logs').insert([
+            { item_id: jobId, item_type: 'job', interaction_type: 'view' }
+          ]);
+
           // Fallback sekunder jika skema simpan Anda langsung menggunakan kolom 'user_id' di tabel 'jobs'
           if (user && data && data.is_saved && data.user_id === user.id) {
             setIsSavedByUser(true);
