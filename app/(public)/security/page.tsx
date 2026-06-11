@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   FiShield, 
@@ -67,10 +67,10 @@ const DataSecurity: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen pb-20">
       
       {/* HERO SECTION */}
-      <section className="bg-white border-b border-slate-200 py-16 px-6 text-center relative overflow-hidden">
+      <section className="bg-white border-b border-slate-200 py-8 px-6 text-center relative overflow-hidden">
         <div className="max-w-3xl mx-auto space-y-4 relative z-10">
           <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
             <FiShield /> Infrastruktur Aman
@@ -91,7 +91,7 @@ const DataSecurity: React.FC = () => {
       </section>
 
       {/* CORE INFRASTRUCTURE PILLARS */}
-      <main className="max-w-5xl mx-auto px-4 md:px-6 mt-16 space-y-16">
+      <main className="max-w-5xl mx-auto mt-8 space-y-16">
         
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {securityPillars.map((pillar, idx) => (

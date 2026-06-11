@@ -4,8 +4,6 @@ import React, { useState } from 'react';
 import { 
   FiLock, 
   FiClock, 
-  FiEye, 
-  FiDatabase, 
   FiUserCheck,
   FiArrowRight
 } from 'react-icons/fi';
@@ -46,10 +44,10 @@ const PrivacyPolicy: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen pb-20">
       
       {/* HERO HEADER */}
-      <section className="bg-white border-b border-slate-200 py-12 px-6">
+      <section className="bg-white border-b border-slate-200 py-8 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-green-600 font-bold text-sm bg-green-50 w-fit px-3 py-1 rounded-full">
@@ -74,7 +72,7 @@ const PrivacyPolicy: React.FC = () => {
       </section>
 
       {/* TWO COLUMN LAYOUT */}
-      <main className="max-w-5xl mx-auto px-4 md:px-6 mt-12 grid grid-cols-1 lg:grid-cols-4 gap-10">
+      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-4 gap-10">
         
         {/* STICKY SIDEBAR NAVIGATION */}
         <aside className="lg:col-span-1 hidden lg:block">
@@ -168,10 +166,10 @@ const PrivacyPolicy: React.FC = () => {
             </h2>
             <div className="text-slate-600 text-sm md:text-base leading-relaxed space-y-3">
               <p>
-                Seluruh berkas identitas sensitif seperti foto KTP disimpan secara terpisah menggunakan penyimpanan cloud terenkripsi (*encrypted object storage*).
+                Seluruh berkas identitas sensitif seperti foto KTP disimpan secara terpisah menggunakan penyimpanan cloud terenkripsi (encrypted object storage).
               </p>
               <p>
-                Sesuai dengan regulasi Penyelenggaraan Sistem dan Transaksi Elektronik di Indonesia, kami berupaya memprioritaskan penggunaan server pusat data (*data center*) yang berlokasi di dalam negeri untuk menjamin kedaulatan digital dan proses penegakan hukum perlindungan data yang optimal.
+                Sesuai dengan regulasi Penyelenggaraan Sistem dan Transaksi Elektronik di Indonesia, kami berupaya memprioritaskan penggunaan server pusat data (data center) yang berlokasi di dalam negeri untuk menjamin kedaulatan digital dan proses penegakan hukum perlindungan data yang optimal.
               </p>
             </div>
           </article>
@@ -187,7 +185,7 @@ const PrivacyPolicy: React.FC = () => {
               <ul className="list-disc pl-5 space-y-2">
                 <li>Mengakses dan meminta salinan data pribadi Anda yang tersimpan di server kami.</li>
                 <li>Memperbarui atau membetulkan kesalahan informasi (misalnya mengubah nomor telepon atau nama toko/profil jasa) kapan saja melalui menu pengaturan profil.</li>
-                <li>Meminta penghapusan atau pemusnahan akun beserta seluruh data riwayatnya secara permanen (*Right to be Forgotten*), dengan catatan Anda tidak sedang terikat dalam sengketa proyek aktif atau utang Escrow yang belum selesai.</li>
+                <li>Meminta penghapusan atau pemusnahan akun beserta seluruh data riwayatnya secara permanen (Right to be Forgotten), dengan catatan Anda tidak sedang terikat dalam sengketa proyek aktif atau utang Escrow yang belum selesai.</li>
               </ul>
             </div>
           </article>
@@ -200,7 +198,7 @@ const PrivacyPolicy: React.FC = () => {
             </h2>
             <div className="text-slate-600 text-sm md:text-base leading-relaxed space-y-3">
               <p>
-                Platform kami menggunakan cookies dan sistem log interaksi otomatis (*interaction logs*). Saat Anda menjelajahi katalog lowongan kerja atau detail penawaran jasa, sistem kami mencatat aktivitas log berupa interaksi `view` (kunjungan halaman) maupun `interest` (klik kontak).
+                Platform kami menggunakan cookies dan sistem log interaksi otomatis (interaction logs). Saat Anda menjelajahi katalog lowongan kerja atau detail penawaran jasa, sistem kami mencatat aktivitas log berupa interaksi `view` (kunjungan halaman) maupun `interest` (klik kontak).
               </p>
               <p>
                 Data log ini dianonimkan dan diolah murni untuk keperluan algoritma rekomendasi AI guna menyajikan tren lowongan &quot;Paling Diminati&quot; serta mengoptimalkan pengalaman navigasi antarmuka Anda agar lebih responsif.

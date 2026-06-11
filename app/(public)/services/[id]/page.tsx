@@ -149,7 +149,7 @@ const DetailService: React.FC = () => {
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto mt-6 px-4 md:px-6 flex flex-col gap-6">
+      <main className="max-w-5xl mx-auto mt-6 flex flex-col gap-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* KOLOM KIRI: DETAIL UTAMA */}

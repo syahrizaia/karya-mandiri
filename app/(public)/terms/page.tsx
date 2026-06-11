@@ -3,9 +3,7 @@
 import { Scale } from 'lucide-react';
 import React, { useState } from 'react';
 import { 
-  FiFileText, 
   FiClock, 
-  FiShield, 
   FiAlertCircle, 
   FiArrowRight, 
 } from 'react-icons/fi';
@@ -46,10 +44,10 @@ const TermsAndConditions: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen pb-20">
       
       {/* HERO HEADER */}
-      <section className="bg-white border-b border-slate-200 py-12 px-6">
+      <section className="bg-white border-b border-slate-200 py-8 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-blue-600 font-bold text-sm bg-blue-50 w-fit px-3 py-1 rounded-full">
@@ -74,7 +72,7 @@ const TermsAndConditions: React.FC = () => {
       </section>
 
       {/* TWO COLUMN CONTENT LAYOUT */}
-      <main className="max-w-5xl mx-auto px-4 md:px-6 mt-12 grid grid-cols-1 lg:grid-cols-4 gap-10">
+      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-4 gap-10">
         
         {/* STICKY SIDEBAR NAVIGATION */}
         <aside className="lg:col-span-1 hidden lg:block">
@@ -122,7 +120,7 @@ const TermsAndConditions: React.FC = () => {
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>KaryaMandiri:</strong> Platform crowdsourcing dan manajemen jasa sektor informal yang dikelola di bawah yurisdiksi Republik Indonesia.</li>
                 <li><strong>Employer (Pemberi Kerja):</strong> Pengguna perorangan atau badan usaha yang membuka lowongan pekerjaan atau membeli penawaran jasa dari Mitra Mandiri melalui platform.</li>
-                <li><strong>Worker (Pekerja / Mitra Mandiri):</strong> Pengguna sektor informal terverifikasi yang melamar pekerjaan mikro (*micro-tasks*) atau menyediakan jasa keahlian mandiri.</li>
+                <li><strong>Worker (Pekerja / Mitra Mandiri):</strong> Pengguna sektor informal terverifikasi yang melamar pekerjaan mikro (micro-tasks) atau menyediakan jasa keahlian mandiri.</li>
                 <li><strong>Sistem Escrow:</strong> Sistem rekening bersama perantara terenkripsi yang berfungsi menampung dana dari Employer secara aman sebelum dilepaskan kepada Worker demi kenyamanan kedua belah pihak.</li>
               </ul>
             </div>
@@ -157,8 +155,8 @@ const TermsAndConditions: React.FC = () => {
                 Demi memastikan inklusi ekonomi yang adil dan transparan bagi sektor informal, skema finansial diatur sebagai berikut:
               </p>
               <ul className="list-disc pl-5 space-y-2">
-                <li>Employer diwajibkan melakukan penyetoran dana penuh (*100% upfront payment*) ke dalam sistem Escrow KaryaMandiri saat menerbitkan atau menyetujui kontrak kerja crowdsourcing.</li>
-                <li>Pencairan dana kepada Worker baru akan dilakukan oleh sistem setelah Employer memberikan konfirmasi peninjauan (*approval*) dalam waktu maksimal 3x24 jam setelah pekerjaan dikirimkan.</li>
+                <li>Employer diwajibkan melakukan penyetoran dana penuh (100% upfront payment) ke dalam sistem Escrow KaryaMandiri saat menerbitkan atau menyetujui kontrak kerja crowdsourcing.</li>
+                <li>Pencairan dana kepada Worker baru akan dilakukan oleh sistem setelah Employer memberikan konfirmasi peninjauan (approval) dalam waktu maksimal 3x24 jam setelah pekerjaan dikirimkan.</li>
                 <li>Jika batas waktu peninjauan habis dan tidak ada respons dari Employer, sistem berhak melepaskan dana otomatis ke akun Worker demi asas keadilan.</li>
               </ul>
             </div>

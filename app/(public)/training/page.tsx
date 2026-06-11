@@ -134,10 +134,10 @@ const TrainingCenter: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen pb-20">
       
       {/* HERO BANNER SECTION */}
-      <section className="bg-white border-b border-slate-200 py-16 px-6 relative overflow-hidden">
+      <section className="bg-white border-b border-slate-200 py-8 px-6 relative overflow-hidden">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           <div className="lg:col-span-7 space-y-5 text-left">
@@ -148,7 +148,7 @@ const TrainingCenter: React.FC = () => {
               Tingkatkan Keahlian Anda, <br />Dapatkan Proyek Berupah Tinggi!
             </h1>
             <p className="text-slate-500 text-sm md:text-base leading-relaxed max-w-xl">
-              Akses modul pelatihan gratis yang dirancang khusus untuk sektor informal. Selesaikan kelas, dapatkan lencana sertifikasi, dan jadilah prioritas utama saat melamar kerja *crowd*.
+              Akses modul pelatihan gratis yang dirancang khusus untuk sektor informal. Selesaikan kelas, dapatkan lencana sertifikasi, dan jadilah prioritas utama saat melamar kerja crowd.
             </p>
             
             {/* Search Input Bar */}
@@ -187,7 +187,7 @@ const TrainingCenter: React.FC = () => {
       </section>
 
       {/* FILTER CATEGORIES */}
-      <main className="max-w-5xl mx-auto px-4 md:px-6 mt-12 space-y-8">
+      <main className="max-w-5xl mx-auto mt-8 space-y-8">
         
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {categories.map((cat) => (

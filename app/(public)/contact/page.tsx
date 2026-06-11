@@ -47,12 +47,39 @@ const ContactUs: React.FC = () => {
     try {
       setIsSubmitting(true);
       
-      // Simulasi pengiriman data ke server/API/Supabase Edge Function
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Mmapping value role ke teks yang mudah dibaca manusia
+      const roleLabels: Record<string, string> = {
+        worker: "Worker / Mitra Mandiri (Sektor Informal)",
+        employer: "Employer / Pemberi Kerja (Penyedia Proyek)",
+        partner: "Instansi / Calon Partner Strategis",
+        other: "Lainnya"
+      };
+
+      const readableRole = roleLabels[formData.role] || formData.role;
+
+      // Menyusun format text WhatsApp (menggunakan bintang * untuk bold)
+      const waMessage = `Halo Tim Operations KaryaMandiri,
+
+Saya ingin mengirimkan pesan melalui Formulir Kontak Website:
+
+*👤 Nama Lengkap:* ${formData.name}
+*📧 Alamat Email:* ${formData.email}
+*💼 Status Peran:* ${readableRole}
+*📌 Subjek / Topik:* ${formData.subject}
+
+*💬 Isi Detail Pesan:*
+${formData.message}`;
+
+      // Encode string pesan agar aman dibaca oleh URL browser
+      const encodedText = encodeURIComponent(waMessage);
+      const phoneNumber = "6282114487163";
+
+      // Buka tautan WhatsApp langsung ke tab baru
+      window.open(`https://wa.me/${phoneNumber}?text=${encodedText}`, "_blank");
       
-      toast.success("Pesan berhasil dikirim! Tim Support kami akan menghubungi Anda melalui email dalam 1x24 jam.");
+      toast.success("Mengarahkan pesan Anda ke Live Chat WhatsApp Support...");
       
-      // Reset Formulir setelah berhasil
+      // Reset Formulir setelah berhasil diarahkan
       setFormData({
         name: '',
         email: '',
@@ -62,7 +89,7 @@ const ContactUs: React.FC = () => {
       });
     } catch (error) {
       console.error("Error submitting contact form:", error);
-      toast.error("Gagal mengirim pesan. Silakan coba beberapa saat lagi.");
+      toast.error("Gagal mengarahkan ke WhatsApp. Silakan coba lagi.");
     } finally {
       setIsSubmitting(false);
     }
@@ -74,10 +101,10 @@ const ContactUs: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen pb-20">
       
       {/* HERO HEADER */}
-      <section className="bg-white border-b border-slate-200 py-16 px-6 text-center">
+      <section className="bg-white border-b border-slate-200 py-8 px-6 text-center">
         <div className="max-w-3xl mx-auto space-y-4">
           <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
             Hubungi Kami
@@ -92,7 +119,7 @@ const ContactUs: React.FC = () => {
       </section>
 
       {/* TWO COLUMN CONTENT LAYOUT */}
-      <main className="max-w-5xl mx-auto px-4 md:px-6 mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* KOLOM KIRI: FORMULIR KONTAK (SPAN 7) */}
         <section className="lg:col-span-7">
@@ -209,7 +236,7 @@ const ContactUs: React.FC = () => {
                 <div>
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Kantor Operasional</p>
                   <p className="text-sm font-semibold text-slate-700 mt-0.5 leading-snug">
-                    Jakarta Selatan, DKI Jakarta, Indonesia
+                    Bekasi, Jawa Barat, Indonesia
                   </p>
                 </div>
               </div>
@@ -221,8 +248,8 @@ const ContactUs: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Korespondensi Email</p>
-                  <a href="mailto:halo@karyamandiri.id" className="text-sm font-bold text-blue-500 hover:text-blue-600 transition block mt-0.5">
-                    halo@karyamandiri.id
+                  <a href="mailto:syahrizaalsistani@gmail.com" className="text-sm font-bold text-blue-500 hover:text-blue-600 transition block mt-0.5">
+                    syahrizaalsistani@gmail.com
                   </a>
                 </div>
               </div>

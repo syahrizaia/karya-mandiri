@@ -82,10 +82,10 @@ const CaraKerjaCrowd: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen pb-20">
       
       {/* HERO SECTION */}
-      <section className="bg-white border-b border-slate-200 py-16 px-6 text-center">
+      <section className="bg-white border-b border-slate-200 py-12 px-6 text-center">
         <div className="max-w-3xl mx-auto space-y-6">
           <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
             <FiCpu /> Model Bisnis Crowdsourcing
@@ -124,7 +124,7 @@ const CaraKerjaCrowd: React.FC = () => {
       </section>
 
       {/* TIMELINE / STEP BY STEP PROCESS SECTION */}
-      <main className="max-w-5xl mx-auto px-4 md:px-6 mt-16">
+      <main className="max-w-5xl mx-auto mt-8">
         
         <AnimatePresence mode="wait">
           <motion.div
@@ -189,7 +189,7 @@ const CaraKerjaCrowd: React.FC = () => {
               </div>
               <h4 className="font-bold text-slate-800 text-sm md:text-base">Distribusi Massal Instan</h4>
               <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
-                Didukung ribuan *crowd workers* bersertifikasi KYC di seluruh nusantara. Tugas bervolume raksasa dapat dipecah secara merata dan selesai hanya dalam hitungan jam.
+                Didukung ribuan crowd workers bersertifikasi KYC di seluruh nusantara. Tugas bervolume raksasa dapat dipecah secara merata dan selesai hanya dalam hitungan jam.
               </p>
             </div>
 

@@ -100,10 +100,10 @@ const HelpCenter: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen pb-20">
       
       {/* HERO SECTION WITH SEARCH */}
-      <section className="bg-white border-b border-slate-200 py-16 px-6 text-center">
+      <section className="bg-white border-b border-slate-200 py-8 px-6 text-center">
         <div className="max-w-3xl mx-auto space-y-6">
           <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
             Customer Support
@@ -129,7 +129,7 @@ const HelpCenter: React.FC = () => {
         </div>
       </section>
 
-      <main className="max-w-5xl mx-auto px-4 md:px-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* SIDEBAR NAVIGATION: CATEGORIES */}
         <aside className="lg:col-span-1 space-y-3">
@@ -232,7 +232,7 @@ const HelpCenter: React.FC = () => {
                 Tim Operations & Support KaryaMandiri siap membantu Anda secara personal selama jam kerja (08:00 - 17:00 WIB).
               </p>
               <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-slate-300 pt-2">
-                <span className="flex items-center gap-1.5"><FiMail className="text-blue-400" /> halo@karyamandiri.id</span>
+                <span className="flex items-center gap-1.5"><FiMail className="text-blue-400" /> syahrizaalsistani@gmail.com</span>
                 <span className="flex items-center gap-1.5"><FiPhone className="text-blue-400" /> +62 821-1448-7163</span>
               </div>
             </div>

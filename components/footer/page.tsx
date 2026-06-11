@@ -84,7 +84,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-4 text-sm text-slate-500">
               <li className="flex items-start gap-3">
                 <FiMapPin className="mt-1 text-blue-600 shrink-0" />
-                <span>Jakarta Selatan, DKI Jakarta, Indonesia</span>
+                <span>Bekasi, Jawa Barat, Indonesia</span>
               </li>
               <li className="flex items-center gap-3">
                 <FiPhone className="text-blue-600 shrink-0" />
@@ -92,7 +92,7 @@ const Footer: React.FC = () => {
               </li>
               <li className="flex items-center gap-3">
                 <FiMail className="text-blue-600 shrink-0" />
-                <span>halo@karyamandiri.id</span>
+                <span>syahrizaalsistani@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -101,7 +101,7 @@ const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+          <p className="text-xs text-center font-semibold text-slate-400 uppercase tracking-widest">
             © {currentYear} <span className='text-blue-600'>KaryaMandiri Syahriza</span>. All Rights Reserved.
           </p>
           <div className="flex items-center gap-6 text-xs font-bold text-slate-400">
