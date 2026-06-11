@@ -4,6 +4,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import ClientDashboardWrapper from "@/components/layout/page";
+import KamaAssistant from "@/components/ai/KamaAssistant";
+import { createClient } from "@/lib/supabase-browser";
 
 const playfairDisplayHeading = Playfair_Display({
   subsets: ["latin"],
@@ -131,11 +133,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const currentUserID = user?.id || undefined;
+  
   return (
     <html
       lang="id"
@@ -153,6 +159,8 @@ export default function RootLayout({
         <ClientDashboardWrapper>{children}</ClientDashboardWrapper>
 
         <Toaster style={{ zIndex: 99999 }} position="top-center" richColors />
+
+        <KamaAssistant userId={currentUserID} />
 
         {/* Structured Data (JSON-LD) untuk organisasi / situs web */}
         <script

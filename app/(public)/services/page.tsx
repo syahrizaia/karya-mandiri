@@ -17,6 +17,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase-browser";
+import { useSearchParams } from "next/navigation";
 
 interface IServiceFeed {
   id: string;
@@ -36,9 +37,12 @@ interface IServiceFeed {
 export default function Services() {
   const [services, setServices] = useState<IServiceFeed[]>([]);
   const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+
+  const initialSearch = searchParams?.get("search") || "";
   
   // State Filter & Search
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState("Semua Kategori");
 
   // State Utama untuk Keperluan Navigasi Halaman Pagination
@@ -103,6 +107,19 @@ export default function Services() {
     
     return matchesSearch && matchesCategory;
   });
+
+  useEffect(() => {
+    const handleKamaSearch = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const voiceKeyword = customEvent.detail;
+      
+      setSearchQuery(voiceKeyword); // Mengisi kolom input secara otomatis
+      setSelectedCategory("Semua Kategori"); // Reset kategori ke semua agar jangkauan pencarian suara luas
+    };
+
+    window.addEventListener("kama-trigger-search", handleKamaSearch);
+    return () => window.removeEventListener("kama-trigger-search", handleKamaSearch);
+  }, []);
 
   // LOGIKA UTAMA SPLICING DATA PAGINATION
   const indexOfLastItem = currentPage * itemsPerPage;

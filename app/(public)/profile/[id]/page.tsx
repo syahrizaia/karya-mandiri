@@ -191,7 +191,6 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
     }
   }, [profileId]);
 
-  // 🌟 TAMPILAN LOADING SKELETON YANG DISESUAIKAN (PREVENT LAYOUT SHIFT)
   if (loading) {
     return (
       <div className="w-full max-w-4xl mx-auto space-y-6 px-4 py-4 md:py-12 lg:pt-4 animate-pulse">
