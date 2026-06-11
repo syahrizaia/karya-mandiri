@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
 import { 
@@ -34,7 +34,7 @@ interface IServiceFeed {
   } | null;
 }
 
-export default function Services() {
+function ServicesContent() {
   const [services, setServices] = useState<IServiceFeed[]>([]);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
@@ -377,5 +377,17 @@ export default function Services() {
         </>
       )}
     </div>
+  );
+}
+
+export default function ServicesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
+        <p className="animate-pulse">Memuat Katalog Jasa KaryaMandiri...</p>
+      </div>
+    }>
+      <ServicesContent />
+    </Suspense>
   );
 }
