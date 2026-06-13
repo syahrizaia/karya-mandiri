@@ -18,7 +18,8 @@ interface ApplyJobDialogProps {
 export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: ApplyJobDialogProps) {
   const [loading, setLoading] = useState(false);
   const [notes, setNotes] = useState("");
-  const [, setIsAppliedByUser] = useState<boolean>(false);
+
+  const employerName = (job as any).profiles?.full_name || job.employer_name || "Pengguna KaryaMandiri";
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,23 +32,9 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
         return;
       }
 
-      const newApplication = {
-        applied_at: new Date().toISOString(),
-        status: job.type === "Crowdsourcing" ? "approved" : "pending",
-        worker_notes: notes || "Tanpa catatan tambahan",
-      };
-
-      const existingApplications = (job as any).applications || [];
-      const updatedApplications = [...existingApplications, newApplication];
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error("Anda harus login terlebih dahulu.");
-        return;
-      }
-
-      if (!user) {
-        toast.error("User belum login. Silakan login terlebih dahulu.");
-        setLoading(false);
         return;
       }
 
@@ -57,7 +44,7 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
           {
             job_id: job.id,
             user_id: user.id,
-            status: 'pending',    // Status awal pelamar
+            status: job.type === "Crowdsourcing" ? "approved" : "pending", // Otomatis approved jika crowdsourcing
             notes: notes || "Tanpa catatan tambahan",
           }
         ])
@@ -65,25 +52,23 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
         .single();
 
       if (updateError) {
-        // Jika eror karena duplicate (constraint unique_worker_job), tangani di sini
         if (updateError.code === '23505') {
           throw new Error("Anda sudah melamar pekerjaan ini sebelumnya.");
         }
         throw updateError;
       }
 
-      const currentTaken = Number(job.taken) || 0;
-    
-      const { error: jobError } = await supabase
-        .from('jobs')
-        .update({ 
-          taken: currentTaken + 0
-        })
-        .eq('id', job.id);
+      if (job.type === "Crowdsourcing") {
+        const currentTaken = Number(job.taken) || 0;
+        const { error: jobError } = await supabase
+          .from('jobs')
+          .update({ 
+            taken: currentTaken + 1
+          })
+          .eq('id', job.id);
 
-      if (jobError) throw jobError;
-
-      if (updateError) throw updateError;
+        if (jobError) throw jobError;
+      }
 
       toast.success(
         job.type === "Crowdsourcing"
@@ -91,12 +76,12 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
           : "Lamaran berhasil dikirim! Menunggu tinjauan."
       );
 
-      // Pemicu reaktivitas halaman agar jumlah kuota (taken) langsung berubah di UI dashboard utama
-      if (onSuccess && updatedJob) onSuccess();
+      if (onSuccess && updatedJob) {
+        onSuccess();
+      }
+      
       onOpenChange(false);
       setNotes(""); // Reset form input
-      window.location.reload()
-      setIsAppliedByUser(true);
 
     } catch (err: any) {
       console.error("DETAIL ERROR 1 TABEL:", JSON.stringify(err, null, 2));
@@ -125,7 +110,7 @@ export default function ApplyJobDialog({ job, open, onOpenChange, onSuccess }: A
         {/* Ringkasan Singkat Pekerjaan */}
         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 my-2 space-y-2 text-sm text-slate-700">
           <div className="font-bold text-base text-slate-800 line-clamp-1">{job.title}</div>
-          <div className="flex items-center gap-1 text-slate-500 font-medium">{job.employer_name || "KaryaMandiri Partner"}</div>
+          <div className="flex items-center gap-1 text-slate-500 font-medium">{employerName}</div>
           <div className="flex justify-between pt-2 border-t border-slate-200/60 font-semibold">
             <span className="text-slate-500">Estimasi Upah:</span>
             <span className="text-green-600">Rp{(job.reward ?? 0).toLocaleString("id-ID")}</span>

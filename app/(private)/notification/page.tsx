@@ -154,12 +154,36 @@ const Notification: React.FC = () => {
   };
 
   const renderMessageContent = (notif: NotificationItem) => {
-    // Jika tidak ada ID pengirim, langsung kembalikan teks biasa
+    if (!notif.message) return "";
+
+    // JALAN BARU: Deteksi format [Nama](UserID) dari trigger Supabase baru
+    if (notif.message.includes('[') && notif.message.includes('](')) {
+      const parts = notif.message.split(/(\[.*?\]\(.*?\))/g);
+
+      return parts.map((part, index) => {
+        const match = part.match(/\[(.*?)\]\((.*?)\)/);
+        
+        if (match) {
+          const [_, name, userId] = match;
+          return (
+            <Link 
+              key={index} 
+              href={`/profile/${userId}`}
+              className="font-bold text-blue-600 hover:underline inline-block mx-0.5"
+              onClick={(e) => e.stopPropagation()} // Mencegah card ikut ter-klik jadi 'read'
+            >
+              {name}
+            </Link>
+          );
+        }
+        return part;
+      });
+    }
+
+    // JALAN LAMA: Cadangan untuk notifikasi teks polos lama agar tidak eror
     if (!notif.sender_id) return notif.message;
 
-    // Menangani Notifikasi Kontak Jasa Baru (Type: lead)
     if (notif.type === 'lead' && notif.message.includes(' tertarik dengan keahlian Anda')) {
-      // Memisahkan nama berdasarkan teks konstan dari trigger postgres
       const parameterPemisah = ' tertarik dengan keahlian Anda';
       const parts = notif.message.split(parameterPemisah);
       const namaPencari = parts[0];
@@ -168,9 +192,9 @@ const Notification: React.FC = () => {
       return (
         <>
           <Link 
-            href={`/profile/${notif.sender_id}`} // <--- Mengarah ke profil pengirim klik
+            href={`/profile/${notif.sender_id}`}
             className="font-bold text-blue-600 hover:underline inline-block mr-1"
-            onClick={(e) => e.stopPropagation()} // Mencegah bentrok dengan markAsRead bawaan card
+            onClick={(e) => e.stopPropagation()}
           >
             {namaPencari}
           </Link>
@@ -179,7 +203,6 @@ const Notification: React.FC = () => {
       );
     }
 
-    // Menangani Notifikasi Lamaran Baru (Type: applicant) jika ada
     if (notif.type === 'applicant' && notif.message.includes(' telah melamar')) {
       const parts = notif.message.split(' telah melamar');
       const namaPelamar = parts[0];
@@ -222,7 +245,6 @@ const Notification: React.FC = () => {
       {/* List Notifikasi */}
       <div className="space-y-3">
         {loading ? (
-          // Skeleton Loader saat mengambil data
           [1, 2, 3].map((i) => (
             <div key={i} className="p-5 bg-white rounded-3xl border border-slate-100 flex gap-4 animate-pulse">
               <div className="w-12 h-12 bg-slate-100 rounded-2xl shrink-0" />
@@ -282,7 +304,6 @@ const Notification: React.FC = () => {
             </div>
           ))
         ) : (
-          // Empty State
           <div className="text-center py-16 md:py-20 bg-white rounded-3xl border border-dashed border-slate-200 px-4">
             <FiBell className="mx-auto text-slate-300 mb-3 md:mb-4" size={40} />
             <p className="text-sm text-slate-500 font-medium">Belum ada notifikasi baru.</p>

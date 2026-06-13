@@ -1,20 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { IJobs } from "@/app/types/jobs";
 import supabase from "@/lib/db";
-import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
-import { id } from "date-fns/locale/id";
-import { motion } from "framer-motion";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FiAlertCircle, FiCalendar, FiChevronLeft, FiClock, FiMail, FiMapPin, FiShield } from "react-icons/fi";
+import { FiAlertCircle, FiCalendar, FiChevronLeft, FiMail } from "react-icons/fi";
 import SubscriptionDialog from "../../../../components/subscription/page";
-import SaveJobButton from "@/components/ui/save-job-button/page";
 import ApplyJobDialog from "@/components/apply-job/page";
 import ShareJobButton from "@/components/ui/share-job-button/page";
 import Image from "next/image";
 import Link from "next/link";
+import DetailJobContentGrid from "@/components/detail-job-content-grid/page";
 
 interface IApplicant {
   id: string;
@@ -50,12 +46,10 @@ const DetailJob: React.FC = () => {
       const fetchJobAndUser = async () => {
         try {
           setLoading(true);
-
           const { data: { user } } = await supabase.auth.getUser();
           
           if (user) {
             setUserId(user.id);
-            
             const { data: profile } = await supabase
               .from('profiles')
               .select('role')
@@ -77,15 +71,15 @@ const DetailJob: React.FC = () => {
               setIsSavedByUser(true);
             }
 
-            const { data: application, error } = await supabase
+            const { data: application } = await supabase
               .from('applications')
               .select('id')
-              .eq('job_id', jobId)      // Ambil dari params id pekerjaan saat ini
-              .eq('user_id', user.id) // Filter berdasarkan ID user aktif
+              .eq('job_id', jobId)
+              .eq('user_id', user.id)
               .maybeSingle();
 
             if (application) {
-              setIsAppliedByUser(true); // User terbukti sudah melamar proyek ini
+              setIsAppliedByUser(true);
             }
           }
 
@@ -94,6 +88,7 @@ const DetailJob: React.FC = () => {
             .select(`
               *,
               profiles:user_id (
+                full_name,
                 avatar_url
               )
             `)
@@ -107,7 +102,6 @@ const DetailJob: React.FC = () => {
             { item_id: jobId, item_type: 'job', interaction_type: 'view' }
           ]);
 
-          // Fallback sekunder jika skema simpan Anda langsung menggunakan kolom 'user_id' di tabel 'jobs'
           if (user && data && data.is_saved && data.user_id === user.id) {
             setIsSavedByUser(true);
           }
@@ -121,7 +115,7 @@ const DetailJob: React.FC = () => {
 
       fetchJobAndUser();
     }
-  }, [params?.id]);
+  }, [params?.id, jobId]);
 
   useEffect(() => {
     if (!jobId) return;
@@ -130,16 +124,14 @@ const DetailJob: React.FC = () => {
       setLoading(true);
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          // router.push('/login');
-          return;
-        }
+        if (!user) return;
 
         const { data: jobData, error: jobError } = await supabase
           .from('jobs')
           .select(`
             *,
             profiles:user_id (
+              full_name,
               avatar_url
             )
           `)
@@ -147,13 +139,11 @@ const DetailJob: React.FC = () => {
           .single();
 
         if (jobError || !jobData) {
-          console.error('Error fetching job details:', jobError);
-          router.push('/dashboard'); // Kembalikan ke dashboard jika lowongan tidak ketemu
+          router.push('/dashboard');
           return;
         }
         setJob(jobData);
 
-        // Menggunakan teknik Inner Join Supabase untuk menarik profile pelamar secara instan
         const { data: applicantsData, error: applicantsError } = await supabase
           .from('applications')
           .select(`
@@ -176,14 +166,7 @@ const DetailJob: React.FC = () => {
         if (profile) { setUserRole(profile.role); }
         setRoleLoading(false);
 
-        if (applicantsError) {
-          console.error('Detail Error Supabase:', {
-            Pesan: applicantsError.message,
-            Detail: applicantsError.details,
-            Petunjuk: applicantsError.hint,
-            Kode: applicantsError.code
-          });
-        } else {
+        if (!applicantsError) {
           setApplicants(applicantsData as unknown as IApplicant[]);
         }
       } catch (err) {
@@ -196,7 +179,6 @@ const DetailJob: React.FC = () => {
     fetchJobAndApplicants();
   }, [jobId, router]);
 
-  // Fungsi untuk memperbarui status lamaran worker (Terima / Tolak)
   const handleUpdateStatus = async (applicationId: string, newStatus: 'accepted' | 'rejected') => {
     try {
       const targetApplicant = applicants.find(app => app.id === applicationId);
@@ -229,69 +211,20 @@ const DetailJob: React.FC = () => {
         if (jobUpdateError) throw jobUpdateError;
       }
 
-      // Update state lokal agar UI langsung sinkron tanpa reload
       setApplicants((prev) =>
         prev.map((app) => (app.id === applicationId ? { ...app, status: newStatus } : app))
       );
 
       setJob((prevJob) => {
         if (!prevJob) return null;
-        return {
-          ...prevJob,
-          taken: newTaken
-        };
+        return { ...prevJob, taken: newTaken };
       });
 
-      // Sinkronisasi komponen Next.js server jika diperlukan
       router.refresh();
     } catch (err) {
       alert('Gagal memperbarui status pelamar');
       console.error(err);
     }
-  };
-
-  const formatDescription = (text: string) => {
-    if (!text) return null;
-
-    return text.split('\n').map((line, index) => {
-      const trimmedLine = line.trim();
-
-      // Deteksi Judul Utama / Sub-heading (Teks berhuruf kapital semua)
-      if (/^[A-Z\s()\-–]{5,}$/.test(trimmedLine)) {
-        return (
-          <h4 key={index} className="text-md font-black text-slate-900 uppercase tracking-wide mt-6 mb-2 first:mt-0">
-            {trimmedLine}
-          </h4>
-        );
-      }
-
-      // Deteksi Poin List Numerik (Contoh: 1. Perencanaan)
-      if (/^\d+\.\s/.test(trimmedLine)) {
-        return (
-          <p key={index} className="font-bold text-slate-800 mt-3 mb-1 pl-1">
-            {trimmedLine}
-          </p>
-        );
-      }
-
-      // Deteksi Poin List Strip (Contoh: - Melakukan riset)
-      if (trimmedLine.startsWith('-')) {
-        return (
-          <span key={index} className="block text-slate-600 pl-4 py-0.5 relative before:content-['•'] before:absolute before:left-0 before:text-blue-500">
-            {trimmedLine.substring(1).trim()}
-          </span>
-        );
-      }
-
-      // Paragraf Teks Biasa atau baris kosong
-      return trimmedLine === "" ? (
-        <span key={index} className="block h-2" />
-      ) : (
-        <p key={index} className="text-slate-600 leading-relaxed mb-2">
-          {trimmedLine}
-        </p>
-      );
-    });
   };
 
   if (loading) return (
@@ -302,13 +235,7 @@ const DetailJob: React.FC = () => {
 
   if (!job) return <div className="text-center py-20">Pekerjaan tidak ditemukan.</div>;
 
-  const progressPercentage = (job.taken / job.total) * 100;
-
-  const jobDetail = {
-    id: job.id,
-    title: job.title,
-    company: job.employer,
-  };
+  const jobDetail = { id: job.id, title: job.title };
 
   return (
     <div className="min-h-screen pb-10">
@@ -326,182 +253,18 @@ const DetailJob: React.FC = () => {
       </div>
 
       <main className="max-w-5xl mx-auto mt-4 flex flex-col gap-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Kolom Kiri: Detail Utama */}
-          <div className="lg:col-span-2 space-y-6">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm"
-            >
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                  job.type === 'Crowdsourcing' ? 'bg-purple-100 text-purple-700' : 'bg-orange-100 text-orange-700'
-                }`}>
-                  {job.type}
-                </span>
-                <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                  {job.category}
-                </span>
-              </div>
+        
+        <DetailJobContentGrid
+          job={job}
+          userId={userId}
+          userRole={userRole}
+          isSavedByUser={isSavedByUser}
+          isAppliedByUser={isAppliedByUser}
+          setSelectedApplyJob={setSelectedApplyJob}
+        />
 
-              <h1 className="text-3xl font-bold text-slate-900 mb-4">{job.title}</h1>
-              
-              <div className="flex flex-wrap gap-6 text-slate-500 mb-8">
-                <Link href={`/profile/${job.user_id}`} className="flex items-center gap-2 text-blue-400 hover:text-blue-600 transition">
-                  {(job as any).profiles?.avatar_url ? (
-                    <Image
-                      src={(job as any).profiles.avatar_url} 
-                      alt={job.employer || 'Avatar'} 
-                      className="w-6 h-6 rounded-xl object-cover border border-slate-200 shrink-0"
-                      onError={(e) => {
-                        // Fallback jika url gambar bermasalah atau rusak
-                        (e.target as HTMLElement).style.display = 'none';
-                      }}
-                      width={50}
-                      height={50}
-                    />
-                  ) : (
-                    // Lingkaran inisial jika employer tidak mengunggah foto profil
-                    <div className="w-6 h-6 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0 uppercase">
-                      {job.employer ? job.employer.charAt(0) : 'E'}
-                    </div>
-                  )}
-                  <span>{job.employer}</span>
-                </Link>
-                <div className="flex items-center gap-2"><FiMapPin className="text-red-400"/> {job.location}</div>
-                <div className="flex items-center gap-2">
-                  <FiClock /> {formatDistanceToNow(new Date(job.posted_at), { addSuffix: true, locale: id })}
-                </div>
-              </div>
-
-              <div className="prose prose-slate max-w-none">
-                <h3 className="text-lg font-bold text-slate-900">Deskripsi Tugas</h3>
-                <div className="text-slate-600 leading-relaxed whitespace-pre-wrap">{formatDescription(job.description)}</div>
-                
-                <h3 className="text-lg font-bold text-slate-900 mt-6">Persyaratan & Kualifikasi</h3>
-                <ul className="list-disc pl-5 text-slate-600 space-y-2">
-                  {(typeof job.requirements === 'string' 
-                    ? (job.requirements as string).split('\n') 
-                    : job.requirements
-                  ).map((req, index) => (
-                    <li key={index}>{req}</li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Kolom Kanan: Widget Aksi */}
-          <aside className="space-y-6">
-            <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-lg sticky top-24">
-              <div className="mb-6">
-                <p className="text-sm text-slate-400 font-bold uppercase mb-1">Upah Tugas</p>
-                <div className="flex items-baseline gap-1">
-                  {job && typeof job.reward === 'number' ? (
-                    <span className="text-3xl font-black text-green-600">
-                      Rp{job.reward.toLocaleString('id-ID')}
-                    </span>
-                    ) : (
-                    <span className="text-3xl font-black text-slate-400">Rp0</span>
-                  )}
-                </div>
-              </div>
-
-              {job.type === 'Crowdsourcing' && (
-                <div className="mb-6 p-4 bg-slate-50 rounded-2xl">
-                  <div className="flex justify-between text-xs font-bold mb-2 uppercase tracking-tight">
-                    <span className="text-slate-500">Kuota Terisi</span>
-                    <span className="text-blue-600">{job.taken} / {job.total} Pekerja</span>
-                  </div>
-                  <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-blue-500 h-full transition-all duration-1000" 
-                      style={{ width: `${progressPercentage}%` }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-slate-400 mt-2 italic">
-                    *Tugas akan dimulai setelah kuota terpenuhi.
-                  </p>
-                </div>
-              )}
-
-              {/* CONTAINER TOMBOL AKSI */}
-              <div className="flex flex-row lg:flex-col gap-4">
-                {/* PROSES VALIDASI ROLE: Hanya Worker yang Bisa Melamar & Menyimpan */}
-                {userRole === 'worker' ? (
-                  <>
-                    <button
-                      disabled={isAppliedByUser || job.status === 'pending' || job.status === 'completed'}
-                      className={`w-full p-4 text-sm md:text-lg font-bold rounded-2xl transition flex items-center justify-center gap-2 ${
-                        isAppliedByUser 
-                          ? 'bg-slate-400 text-white cursor-not-allowed shadow-none'
-                          : job.status === 'pending'
-                            ? 'bg-orange-100 text-orange-600 cursor-not-allowed shadow-none'
-                            : job.status === 'completed'
-                              ? 'bg-slate-600 text-white cursor-not-allowed shadow-none'
-                              : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-200 shadow-lg'
-                      }`}
-                      onClick={() => setSelectedApplyJob(job)}
-                    >
-                      <FiShield className="lg:text-4xl" />
-                      {isAppliedByUser 
-                        ? 'Pekerjaan Sudah Dilamar' 
-                        : job.status === 'pending' 
-                          ? 'Pekerjaan Sedang Ditunda' 
-                          : job.status === 'completed'
-                            ? 'Pekerjaan Telah Selesai'
-                            : 'Ambil Pekerjaan Sekarang'
-                      }
-                    </button>
-                    <SaveJobButton
-                      is_saved={isSavedByUser} // Sinkronisasi dinamis sesuai user login
-                      id={job.id}
-                      status={job.status}
-                      title={job.title}
-                      employer={job.employer}
-                      employer_name={job.employer_name}
-                      category={job.category}
-                      location={job.location}
-                      reward={job.reward}
-                      type={job.type}
-                      description={job.description}
-                      requirements={job.requirements}
-                      taken={job.taken}
-                      total={job.total}
-                      posted_at={job.posted_at}
-                      deadline={job.deadline}
-                      applied_at={job.applied_at}
-                      worker_notes={job.worker_notes}
-                      applications={job.applications}
-                    />
-                  </>
-                ) : (
-                  /* Tampilan Fallback jika dibuka oleh Employer atau User tanpa Sesi Login */
-                  <div className="w-full p-4 bg-slate-50 border border-slate-200 text-slate-500 text-center font-semibold text-xs rounded-2xl">
-                    {userId 
-                      ? "Aksi lamar & simpan lowongan hanya tersedia untuk akun Pekerja (Worker)." 
-                      : "Silakan login terlebih dahulu untuk melamar pekerjaan."
-                    }
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-slate-200 flex items-center gap-3 text-slate-400">
-                <FiShield className="text-blue-500 shrink-0" />
-                <p className="text-[10px] leading-tight">
-                  Pembayaran Anda diamankan oleh sistem <strong>Escrow KaryaMandiri</strong>. Dana akan cair otomatis setelah tugas diverifikasi.
-                </p>
-              </div>
-            </div>
-          </aside>
-        </div>
-
-        {userRole !== 'employer' || job.user_id !== userId ? (
-          <></>
-        ) : (
-          /* TAMPILAN KHUSUS EMPLOYER */
+        {/* TAMPILAN KHUSUS MANAGEMENT PANEL UNTUK EMPLOYER */}
+        {userRole === 'employer' && job.user_id === userId && (
           <div className="flex flex-col lg:flex-row gap-4">
             {/* Ringkasan Informasi Job */}
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 h-fit">
@@ -510,7 +273,6 @@ const DetailJob: React.FC = () => {
                   <span className="text-xs font-semibold tracking-wider text-blue-600 uppercase bg-blue-50 px-2.5 py-1 rounded-md">
                     Detail Proyek
                   </span>
-                  {/* <h1 className="text-2xl font-bold text-gray-800 mt-2">{job.title}</h1> */}
                   <p className="text-gray-500 text-sm mt-1 pt-2">
                     Anggaran: <span className="font-semibold text-gray-700">Rp{job.reward.toLocaleString()} / orang</span>
                   </p>
@@ -541,12 +303,9 @@ const DetailJob: React.FC = () => {
                 <div className="divide-y divide-gray-100">
                   {applicants.map((applicant) => (
                     <div key={applicant.id} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition">
-                      
-                      {/* Profil Worker */}
                       <div className="flex flex-col items-start gap-2">
                         <div className="flex gap-2">
                           <Link href={`/profile/${applicant.user_id}`} className="bg-blue-100 text-blue-600 p-1 rounded-2xl w-fit h-fit">
-                            {/* <FiUser size={20} /> */}
                             <Image
                               src={applicant.profiles?.avatar_url || 'https://api.dicebear.com/7.x/initials/svg?seed=Worker'}
                               alt="Avatar"
@@ -577,7 +336,6 @@ const DetailJob: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Status & Tombol Aksi */}
                       <div className="flex items-center gap-3 self-end sm:self-center">
                         {applicant.status === 'pending' ? (
                           <div className="flex items-center gap-2">
@@ -601,8 +359,6 @@ const DetailJob: React.FC = () => {
                             }`}>
                               {applicant.status === 'accepted' ? 'Diterima' : 'Ditolak'}
                             </span>
-                            
-                            {/* Tombol ganti pikiran jika statusnya sudah 'accepted' agar bisa mengurangi kuota taken */}
                             {applicant.status === 'accepted' && (
                               <button
                                 onClick={() => handleUpdateStatus(applicant.id, 'rejected')}
@@ -631,16 +387,13 @@ const DetailJob: React.FC = () => {
             if (!open) setSelectedApplyJob(null);
           }}
           onSuccess={() => {
-            // Opsi A: Jika Anda menggunakan state lokal untuk array lowongan:
             setJobs((prevJobs) =>
               prevJobs.map((item) =>
                 item.id === selectedApplyJob.id
-                  ? { ...item, taken: (item.taken ?? 0) + 1 } // Langsung manipulasi UI lokal (+1)
+                  ? { ...item, taken: (item.taken ?? 0) + 1 }
                   : item
               )
             );
-
-            // Opsi B: Paksa Next.js Router untuk menyinkronkan ulang komponen server
             router.refresh(); 
           }}
         />
