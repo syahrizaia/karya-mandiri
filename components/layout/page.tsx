@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { FiBriefcase, FiHome, FiSettings, FiBell, FiMenu, FiX, FiLogOut, FiMoon, FiSun } from "react-icons/fi";
+import { FiBriefcase, FiHome, FiSettings, FiBell, FiMenu, FiX, FiLogOut, FiMoon, FiSun, FiDownload } from "react-icons/fi";
 import { usePathname, useRouter } from "next/navigation";
 import Footer from "@/components/footer/page";
 import { MdHistory, MdWorkspacesOutline } from "react-icons/md";
@@ -215,6 +215,14 @@ export default function ClientDashboardWrapper({
           })}
 
           <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+            <Link
+              href="/download"
+              className="flex items-center gap-3 p-3 mb-2 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            >
+              <FiDownload />
+              <span>Unduh Aplikasi</span>
+            </Link>
+
             <button 
               onClick={() => setTheme(isDarkMode ? "light" : "dark")}
               className="flex w-full items-center justify-between p-3 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
