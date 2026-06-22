@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { IJobs } from '@/app/types/jobs';
 import supabase from '@/lib/db';
 import SubscriptionDialog from '../../../components/subscription/page';
-import JobList from '@/components/job-list/page';
+import JobList from '@/components/jobs/job-list/page';
 import { FiFilter, FiSearch, FiUsers } from 'react-icons/fi';
 import { JobFilters } from '@/components/jobs/JobFilters';
 

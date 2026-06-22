@@ -14,10 +14,10 @@ import {
   FiChevronDown,
 } from 'react-icons/fi';
 import Link from 'next/link';
-import TopTalent from '@/components/top-talent/page';
-import ProjectAndServiceTrends from '@/components/project-and-service-trends/page';
-import TaskExploration from '@/components/task-exploration/page';
-import LiveImpactStatistics from '@/components/live-impact-statistics/page';
+import TopTalent from '@/components/landing-page/top-talent/page';
+import ProjectAndServiceTrends from '@/components/landing-page/project-and-service-trends/page';
+import TaskExploration from '@/components/landing-page/task-exploration/page';
+import LiveImpactStatistics from '@/components/landing-page/live-impact-statistics/page';
 import MobilePWAInstaller from '@/components/pwa/MobilePWAInstaller';
 
 // Varian Animasi untuk Efek Fade-up sekuensial (Staggered)

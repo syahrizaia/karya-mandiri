@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/static-components */
 "use client";
 
 import React, { useEffect, useState } from 'react';

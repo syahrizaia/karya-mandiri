@@ -1,6 +1,6 @@
 import React from "react";
 import { FiChevronLeft } from "react-icons/fi";
-import ShareServiceButton from "@/components/ui/share-service-button/page";
+import ShareServiceButton from "@/components/services/share-service-button/page";
 
 interface ServiceDetailHeaderProps {
   serviceId: string;

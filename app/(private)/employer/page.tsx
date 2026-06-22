@@ -1,9 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable react-hooks/static-components */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from 'react';
 import { 
   FiUsers, 

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/static-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -96,17 +95,17 @@ const GeneralDashboard: React.FC = () => {
           }))
         );
 
-        const { count: projectCount, error: projectError } = await supabase
+        const { count: projectCount } = await supabase
           .from('jobs')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'active'); 
 
-        const { data: transactionData, error: transError } = await supabase
+        const { data: transactionData } = await supabase
           .from('transactions')
           .select('amount')
           .eq('status', 'success');
 
-        const { count: completedCount, error: completedError } = await supabase
+        const { count: completedCount } = await supabase
           .from('jobs')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'completed');
@@ -162,7 +161,7 @@ const GeneralDashboard: React.FC = () => {
           }
         }
 
-        const { data: allProfiles, error: errTotalUsers } = await supabase
+        const { data: allProfiles } = await supabase
           .from('profiles')
           .select('id, is_verified, role, full_name, email, phone');
 
@@ -176,7 +175,7 @@ const GeneralDashboard: React.FC = () => {
           ? Math.round((verifiedUsersCount / totalUsersCount) * 100) 
           : 0;
 
-        const { data: allJobs, error: errTotalJobs } = await supabase
+        const { data: allJobs } = await supabase
           .from('jobs')
           .select('id, user_id');
 

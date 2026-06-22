@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Link from "next/link";
-import { FiBriefcase, FiUser, FiHome, FiSettings, FiBell, FiMenu, FiX, FiLogOut, FiMoon, FiSun } from "react-icons/fi";
+import { FiBriefcase, FiHome, FiSettings, FiBell, FiMenu, FiX, FiLogOut, FiMoon, FiSun } from "react-icons/fi";
 import { usePathname, useRouter } from "next/navigation";
 import Footer from "@/components/footer/page";
 import { MdHistory, MdWorkspacesOutline } from "react-icons/md";
@@ -11,6 +12,7 @@ import supabase from "@/lib/db";
 import { toast } from "sonner";
 import { TbNews } from "react-icons/tb";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 
 export default function ClientDashboardWrapper({
   children,
@@ -244,7 +246,7 @@ export default function ClientDashboardWrapper({
             >
               <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold overflow-hidden border border-blue-100 dark:border-blue-800">
                 {userProfile.avatar_url ? (
-                  <img src={userProfile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  <Image src={userProfile.avatar_url} alt="Profile" className="w-full h-full object-cover" width={40} height={40} />
                 ) : (
                   userProfile.full_name.charAt(0).toUpperCase()
                 )}

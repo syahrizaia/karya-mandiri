@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { FiChevronLeft } from "react-icons/fi";
 import SubscriptionDialog from "../../../../components/subscription/page";
 import ApplyJobDialog from "@/components/apply-job/page";
-import ShareJobButton from "@/components/ui/share-job-button/page";
+import ShareJobButton from "@/components/jobs/share-job-button/page";
 import DetailJobContentGrid from "@/components/jobs/detail-job-content-grid/page";
 import EmployerManagementPanel, { IApplicant } from "@/components/jobs/EmployerManagementPanel";
 

@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { supabaseAdmin } from "@/lib/admin";
 import { NextResponse } from "next/server";
 import webpush from "web-push";
-import { createClient } from "@supabase/supabase-js";
-
-// Menggunakan Service Role Supabase agar bypass RLS saat mencari token user
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Pastikan taruh Service Role Key di env demi keamanan backend
-);
 
 webpush.setVapidDetails(
   "mailto:syahriza@karyamandiri.com",
@@ -18,48 +12,49 @@ webpush.setVapidDetails(
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
-    
-    // Membaca record data baru hasil kiriman Webhook Supabase
-    const { record } = payload; 
-    if (!record || !record.user_id) {
+    const { record } = payload;
+
+    if (!record?.user_id) {
       return NextResponse.json({ error: "Data payload tidak valid" }, { status: 400 });
     }
 
-    // 1. Ambil semua token HP terdaftar milik user tersebut (bisa lebih dari 1 perangkat)
+    // 1. Ambil token user, pastikan mengambil ID untuk mempermudah delete nanti
     const { data: tokens, error } = await supabaseAdmin
       .from("user_push_tokens")
-      .select("subscription")
+      .select("id, subscription") 
       .eq("user_id", record.user_id);
 
-    if (error || !tokens || tokens.length === 0) {
-      return NextResponse.json({ message: "User tidak memiliki perangkat PWA aktif" });
+    if (error) throw error;
+    if (!tokens || tokens.length === 0) {
+      return NextResponse.json({ message: "Tidak ada perangkat aktif" });
     }
 
-    // 2. Bungkus payload push notification yang akan tampil di HP
     const pushPayload = JSON.stringify({
       title: record.title || "KaryaMandiri",
       body: record.message || "Ada pemberitahuan baru.",
-      url: "/notifications", // Mengarah langsung ke halaman notifikasi pas di-klik
+      url: "/notifications",
     });
 
-    // 3. Tembak push secara parallel ke seluruh HP user yang terdaftar
-    const pushPromises = tokens.map((t: any) => 
-      webpush.sendNotification(t.subscription, pushPayload).catch((err) => {
-        // Jika token kedaluwarsa (app diuninstall), hapus otomatis dari database
+    // 2. Kirim notifikasi secara paralel
+    const pushPromises = tokens.map(async (t) => {
+      try {
+        await webpush.sendNotification(t.subscription, pushPayload);
+      } catch (err: any) {
+        // Error 410 (Gone) atau 404 (Not Found) artinya subscription sudah tidak valid
         if (err.statusCode === 410 || err.statusCode === 404) {
-          return supabaseAdmin
-            .from("user_push_tokens")
-            .delete()
-            .eq("subscription", JSON.stringify(t.subscription));
+          console.warn(`Menghapus token kedaluwarsa: ${t.id}`);
+          await supabaseAdmin.from("user_push_tokens").delete().eq("id", t.id);
+        } else {
+          console.error("Gagal mengirim ke satu perangkat:", err.message);
         }
-      })
-    );
+      }
+    });
 
     await Promise.all(pushPromises);
 
-    return NextResponse.json({ success: true, fired_to: tokens.length });
+    return NextResponse.json({ success: true, count: tokens.length });
   } catch (error: any) {
-    console.error("Gagal memproses webhook push:", error);
+    console.error("Gagal memproses webhook:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
