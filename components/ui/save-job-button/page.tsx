@@ -97,10 +97,10 @@ export default function SaveJobButton({ id }: IJobs) {
     <button
       onClick={handleSaveToggle}
       disabled={loading}
-      className={`p-3 rounded-xl border transition-all flex items-center justify-center ${
+      className={`p-3 rounded-xl border transition-all flex items-center justify-center cursor-pointer disabled:cursor-not-allowed ${
         isSaved
-          ? "bg-blue-50 border-blue-200 text-blue-600"
-          : "bg-white border-slate-200 text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+          ? "bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-950/40 dark:border-blue-800 dark:text-blue-400"
+          : "bg-white border-slate-200 text-slate-400 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
       }`}
       title={isSaved ? "Hapus dari simpanan" : "Simpan pekerjaan"}
     >

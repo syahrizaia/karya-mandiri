@@ -19,9 +19,12 @@ import SubscriptionDialog from '../../../components/subscription/page';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Link from 'next/link';
 import Image from 'next/image';
+import SummaryCard from '@/components/dashboard/SummaryCard';
+import EcosystemLoading from '@/components/dashboard/EcosystemLoading';
+import ProgressItem from '@/components/dashboard/ProgressItem';
 
 export interface IEcosystemActivities {
-  id: any; // atau number / string tergantung tipe di DB Anda
+  id: any;
   time: string;
   action: string;
   target: string;
@@ -32,57 +35,8 @@ export interface IEcosystemActivities {
     avatar_url: string;
     role: string;
   };
-  // Jika kolom "user" di database sudah dihapus, Anda bisa menghapus atau menjadikannya opsional:
   user?: string; 
 }
-
-// --- Sub Komponen ---
-const SummaryCard = ({ title, value, icon, trend, color, isLoading }: any) => {
-  const colorClasses: any = {
-    blue: "text-blue-600 bg-blue-50",
-    emerald: "text-emerald-600 bg-emerald-50",
-    purple: "text-purple-600 bg-purple-50",
-    amber: "text-amber-600 bg-amber-50",
-  };
-
-  if (isLoading) {
-    return (
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm animate-pulse">
-        <div className="flex justify-between items-start mb-4 gap-4">
-          <div className="w-11 h-11 bg-slate-100 rounded-2xl" />
-          <div className="h-4 w-12 bg-slate-100 rounded-md" />
-        </div>
-        <div className="h-4 w-24 bg-slate-100 rounded-md mb-2" />
-        <div className="h-7 w-16 bg-slate-200 rounded-lg" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-      <div className="flex justify-between items-start mb-4 gap-4">
-        <div className={`p-3 rounded-2xl ${colorClasses[color]}`}>
-          {icon}
-        </div>
-        <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter">{trend}</span>
-      </div>
-      <p className="text-sm font-medium text-slate-500">{title}</p>
-      <h2 className="text-2xl font-bold text-slate-900">{value}</h2>
-    </div>
-  );
-};
-
-const ProgressItem = ({ label, progress, color }: { label: string, progress: number, color: string }) => (
-  <div className="space-y-1.5">
-    <div className="flex justify-between text-[10px] font-bold uppercase text-slate-500">
-      <span>{label}</span>
-      <span>{progress}%</span>
-    </div>
-    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-      <div className={`${color} h-full transition-all duration-1000`} style={{ width: `${progress}%` }} />
-    </div>
-  </div>
-);
 
 const GeneralDashboard: React.FC = () => {
   const [ecosystemActivities, setEcosystemActivities] = useState<IEcosystemActivities[]>([]);
@@ -90,7 +44,7 @@ const GeneralDashboard: React.FC = () => {
   const [showSubModal, setShowSubModal] = useState(false);
   const [showAllActivities, setShowAllActivities] = useState(false);
 
-  // State untuk statistik dinamis dari Supabase
+  // State statistik dinamis
   const [dynamicStats, setDynamicStats] = useState({
     economicImpact: 0,
     totalWorkers: 0,
@@ -131,7 +85,7 @@ const GeneralDashboard: React.FC = () => {
               role
             )
           `)
-          .order('time', { ascending: false })
+          .order('time', { ascending: false });
 
         if (activitiesError) throw activitiesError;
 
@@ -157,47 +111,37 @@ const GeneralDashboard: React.FC = () => {
           .select('*', { count: 'exact', head: true })
           .eq('status', 'completed');
 
-        // Kalkulasi total nominal perputaran uang upah
         const totalImpact = transactionData?.reduce((sum, item) => sum + (item.amount || 0), 0) || 0;
 
-        //  KALKULASI GROWTH RATE DINAMIS
+        // Kalkulasi growth rate dinamis
         const sekarang = new Date();
-
-        // Batas waktu awal bulan ini (30 hari terakhir)
         const awalBulanIni = new Date();
         awalBulanIni.setDate(sekarang.getDate() - 30);
 
-        // Batas waktu awal bulan lalu (30 s.d 60 hari yang lalu)
         const awalBulanLaju = new Date();
         awalBulanLaju.setDate(sekarang.getDate() - 60);
 
-        // Hitung total aktivitas Bulan Ini (30 hari terakhir)
         const { count: countBulanIni } = await supabase
           .from('ecosystem_activities')
           .select('*', { count: 'exact', head: true })
           .gte('time', awalBulanIni.toISOString());
 
-        // Hitung total aktivitas Bulan Lalu (rentang hari ke 30 hingga 60 ke belakang)
         const { count: countBulanLaju } = await supabase
           .from('ecosystem_activities')
           .select('*', { count: 'exact', head: true })
           .gte('time', awalBulanLaju.toISOString())
           .lt('time', awalBulanIni.toISOString());
 
-        // Terapkan Rumus Laju Pertumbuhan
         let kalkulasiGrowth = 0;
         const ini = countBulanIni || 0;
         const lalu = countBulanLaju || 0;
 
         if (lalu > 0) {
-          // Jika bulan lalu ada aktivitas, gunakan rumus standar
           kalkulasiGrowth = ((ini - lalu) / lalu) * 100;
         } else if (lalu === 0 && ini > 0) {
-          // Jika bulan lalu kosong (misal pengguna baru daftar), pertumbuhan dianggap 100%
           kalkulasiGrowth = 100;
         }
 
-        // Kueri hitung total pekerjaan per kategori untuk Alokasi Jasa
         const { data: categoryData, error: categoryError } = await supabase
           .from('jobs')
           .select('category');
@@ -218,41 +162,34 @@ const GeneralDashboard: React.FC = () => {
           }
         }
 
-        // Ambil total user (Gunakan select standar tanpa opsi head jika memicu eror)
         const { data: allProfiles, error: errTotalUsers } = await supabase
           .from('profiles')
           .select('id, is_verified, role, full_name, email, phone');
 
         const totalUsersCount = allProfiles ? allProfiles.length : 0;
 
-        // Hitung user terverifikasi langsung dari array lokal untuk menghindari filter URL yang sensitif
         const verifiedUsersCount = allProfiles 
           ? allProfiles.filter(p => (p as any).is_verified === true).length
           : 0;
 
-        // Hitung rasio KYC untuk akurasi persentase Target Capaian (menggunakan definisi baru Anda)
         const verifikasiKYCProgress = totalUsersCount 
           ? Math.round((verifiedUsersCount / totalUsersCount) * 100) 
           : 0;
 
-        // Ambil total tugas keseluruhan dari tabel jobs
         const { data: allJobs, error: errTotalJobs } = await supabase
           .from('jobs')
           .select('id, user_id');
 
         const totalTasksCount = allJobs ? allJobs.length : 0;
 
-        // Hitung total semua profile dengan role 'employer'
         const totalEmployers = allProfiles 
           ? allProfiles.filter(p => p.role === 'employer').length 
           : 0;
 
-        // Ambil ID employer unik yang sudah pernah memposting proyek dari data jobs yang sudah ditarik
         const uniqueActiveEmployers = allJobs
           ? new Set(allJobs.map(j => j.user_id).filter(Boolean)).size
           : 0;
 
-        // Rumus Persentase Retensi Kemitraan
         const kalkulasiRetensi = totalEmployers > 0
           ? Math.round((uniqueActiveEmployers / totalEmployers) * 100)
           : 0;
@@ -263,13 +200,12 @@ const GeneralDashboard: React.FC = () => {
           retensiEmployer: kalkulasiRetensi,
         });
 
-        // Setel seluruh state gabungan
         setDynamicStats({
-          economicImpact: totalImpact || 0, // Fallback ke mock jika tabel baru kosong
+          economicImpact: totalImpact || 0,
           totalWorkers: verifiedUsersCount,
           activeProjects: projectCount || 0,
           completedTasks: completedCount || 0,
-          growthRate: parseFloat(kalkulasiGrowth.toFixed(1)), // Dapat dikalkulasi dinamis berdasarkan komparasi bulan lalu jika diperlukan
+          growthRate: parseFloat(kalkulasiGrowth.toFixed(1)),
         });
 
       } catch (err) {
@@ -282,43 +218,38 @@ const GeneralDashboard: React.FC = () => {
     fetchDashboardData();
 
     const activityChannel = supabase
-    .channel('realtime_ecosystem_changes')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'ecosystem_activities'
-      },
-      async (payload) => {
-        const newActivity = payload.new as any;
+      .channel('realtime_ecosystem_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'ecosystem_activities'
+        },
+        async (payload) => {
+          const newActivity = payload.new as any;
 
-        // Ambil data profil dari user_id secara instan untuk melengkapi relasi
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('full_name, avatar_url, role')
-          .eq('id', newActivity.user_id)
-          .single();
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name, avatar_url, role')
+            .eq('id', newActivity.user_id)
+            .single();
 
-        // Gabungkan data aktivitas baru dengan objek profilnya
-        const completeActivity: IEcosystemActivities = {
-          ...newActivity,
-          profiles: profileData || { full_name: 'Pengguna Baru', avatar_url: '', role: 'Pekerja Mandiri' }
-        };
+          const completeActivity: IEcosystemActivities = {
+            ...newActivity,
+            profiles: profileData || { full_name: 'Pengguna Baru', avatar_url: '', role: 'Pekerja Mandiri' }
+          };
 
-        // Selipkan ke urutan paling atas state
-        setEcosystemActivities((prevActivities) => [completeActivity, ...prevActivities]);
-      }
-    )
-    .subscribe();
+          setEcosystemActivities((prevActivities) => [completeActivity, ...prevActivities]);
+        }
+      )
+      .subscribe();
 
-    // Bersihkan pemancaran sinyal (cleanup subscription) jika komponen di-unmount/ditutup
     return () => {
       supabase.removeChannel(activityChannel);
     };
   }, []);
 
-  // Format Helper Rupiah Triliun/Miliar agar scannable
   const formatImpactValue = (value: number) => {
     if (value >= 1000000000000) {
       return `Rp${(value / 1000000000000).toFixed(1)}T`;
@@ -328,44 +259,21 @@ const GeneralDashboard: React.FC = () => {
     return `Rp${value.toLocaleString('id-ID')}`;
   };
 
-  const EcosystemLoading = () => (
-    <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-pulse">
-      <div className="p-6 border-b border-slate-50 flex justify-between items-center">
-        <div className="h-5 w-40 bg-slate-200 rounded-lg"></div>
-        <div className="h-4 w-16 bg-slate-100 rounded-lg"></div>
-      </div>
-      <div className="divide-y divide-slate-50">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="p-5 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-11 h-11 bg-slate-100 rounded-xl" />
-              <div className="space-y-2">
-                <div className="h-4 w-64 bg-slate-200 rounded-md" />
-                <div className="h-3 w-24 bg-slate-100 rounded-md" />
-              </div>
-            </div>
-            <div className="w-4 h-4 bg-slate-100 rounded-full" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
-    <div className="space-y-4 animate-in fade-in duration-500 md:pt-12 lg:pt-4 lg:p-4">
+    <div className="space-y-4 animate-in fade-in duration-500 md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100">
       {/* Welcome Section */}
       <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Ringkasan Platform</h1>
-          <p className="text-slate-500">Pantau ekosistem inklusi ekonomi KaryaMandiri hari ini.</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">Ringkasan Platform</h1>
+          <p className="text-slate-500 dark:text-slate-400">Pantau ekosistem inklusi ekonomi KaryaMandiri hari ini.</p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-2xl border border-slate-200 flex items-center gap-3 shadow-sm text-green-500 text-sm font-medium">
+        <div className="bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-3 shadow-sm text-green-500 dark:text-green-400 text-sm font-medium">
           <span className="flex h-3 w-3 rounded-full bg-green-500 animate-caret-blink" />
           Sistem Online: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
         </div>
       </section>
 
-      {/* Stats Grid - Sekarang Dinamis Terintegrasi Loading Skeleton */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <SummaryCard 
           title="Total Inklusi Upah" 
@@ -405,124 +313,50 @@ const GeneralDashboard: React.FC = () => {
         {loading ? (
           <EcosystemLoading />
         ) : (
-          /* Aktivitas Utama */
+          /* Aktivitas Utama Ekosistem */
           <>
-          <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            <div className="p-6 border-b border-slate-200 flex justify-between items-center">
-              <h3 className="font-bold text-slate-800 flex items-center gap-2">
-                <FiActivity className="text-blue-600" /> Aktivitas Ekosistem Realtime
-              </h3>
-              <button
-                className="text-xs font-bold text-blue-600 hover:underline"
-                onClick={() => setShowAllActivities(true)}
-              >
-                Lihat Semua
-              </button>
-            </div>
-            <div className="divide-y divide-slate-100">
-              {ecosystemActivities.length === 0 ? (
-                <div className="p-8 text-center text-sm text-slate-400">Belum ada aktivitas baru hari ini.</div>
-              ) : (
-                ecosystemActivities.slice(0, 5).map((ecosystemActivity: IEcosystemActivities) => ( 
-                  <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-slate-50 transition">
-                    <div className="flex items-center gap-4">
-                      {ecosystemActivity.type === 'project' ? (
-                        <div className="p-3 rounded-xl bg-blue-50 text-blue-600 shrink-0">
-                          <FiLayers />
-                        </div>
-                      ) : ecosystemActivity.type === 'payment' ? (
-                        <div className="p-3 rounded-xl bg-green-50 text-green-600 shrink-0">
-                          <FiTrendingUp />
-                        </div>
-                      ) : (
-                        /* Jika type adalah 'user' / registrasi baru, tampilkan foto profil */
-                        <div className="shrink-0 relative w-10 h-10">
-                          {(ecosystemActivity.profiles as any)?.avatar_url ? (
-                            <Image
-                              src={(ecosystemActivity.profiles as any).avatar_url} 
-                              alt={ecosystemActivity.profiles?.full_name || 'Avatar'} 
-                              className="w-10 h-10 rounded-xl object-cover border border-slate-100"
-                              onError={(e) => {
-                                // Fallback jika URL gambar rusak
-                                (e.target as HTMLElement).style.display = 'none';
-                              }}
-                              width={50}
-                              height={50}
-                            />
-                          ) : (
-                            /* Lingkaran inisial jika belum mengunggah foto profil */
-                            <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-100">
-                              {ecosystemActivity.profiles?.full_name 
-                                ? ecosystemActivity.profiles.full_name.charAt(0) 
-                                : ecosystemActivity.user 
-                                  ? ecosystemActivity.user.charAt(0) 
-                                  : 'U'}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-sm text-slate-600">
-                          <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900">
-                            {ecosystemActivity.profiles?.full_name}
-                          </Link> {ecosystemActivity.action} 
-                          <span className="font-semibold text-slate-800"> {ecosystemActivity.target}</span>
-                        </p>
-                        <p className="text-xs text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
-                      </div>
-                    </div>
-                    <FiArrowUpRight className="text-slate-300" />
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          <Dialog open={showAllActivities} onOpenChange={setShowAllActivities}>
-            <DialogContent className="sm:max-w-xl rounded-3xl p-8 border-none shadow-2xl">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-2">
-                  <FiActivity className="text-blue-600" /> Semua Aktivitas Ekosistem
-                </DialogTitle>
-                <DialogDescription className="text-slate-500">
-                  Daftar lengkap seluruh rekam jejak aktivitas realtime yang terjadi di platform KaryaMandiri.
-                </DialogDescription>
-              </DialogHeader>
-
-              {/* Container list yang bisa di-scroll secara independen */}
-              <div className="max-h-[60vh] overflow-y-auto pr-2 mt-4 divide-y divide-slate-100 min-h-[200px]">
+            <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+                  <FiActivity className="text-blue-600 dark:text-blue-400" /> Aktivitas Ekosistem Realtime
+                </h3>
+                <button
+                  className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                  onClick={() => setShowAllActivities(true)}
+                >
+                  Lihat Semua
+                </button>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
                 {ecosystemActivities.length === 0 ? (
-                  <div className="py-12 text-center text-sm text-slate-400">Tidak ada data aktivitas yang tercatat.</div>
+                  <div className="p-8 text-center text-sm text-slate-400 dark:text-slate-500">Belum ada aktivitas baru hari ini.</div>
                 ) : (
-                  ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => (
-                    <div key={`modal-${ecosystemActivity.id}`} className="py-4 flex items-center justify-between hover:bg-slate-50/50 transition px-2 rounded-xl">
+                  ecosystemActivities.slice(0, 5).map((ecosystemActivity: IEcosystemActivities) => ( 
+                    <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
                       <div className="flex items-center gap-4">
                         {ecosystemActivity.type === 'project' ? (
-                          <div className="p-3 rounded-xl bg-blue-50 text-blue-600 shrink-0">
+                          <div className="p-3 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 shrink-0">
                             <FiLayers />
                           </div>
                         ) : ecosystemActivity.type === 'payment' ? (
-                          <div className="p-3 rounded-xl bg-green-50 text-green-600 shrink-0">
+                          <div className="p-3 rounded-xl bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400 shrink-0">
                             <FiTrendingUp />
                           </div>
                         ) : (
-                          /* Jika type adalah 'user' / registrasi baru, tampilkan foto profil */
                           <div className="shrink-0 relative w-10 h-10">
                             {(ecosystemActivity.profiles as any)?.avatar_url ? (
                               <Image
                                 src={(ecosystemActivity.profiles as any).avatar_url} 
                                 alt={ecosystemActivity.profiles?.full_name || 'Avatar'} 
-                                className="w-10 h-10 rounded-xl object-cover border border-slate-100"
+                                className="w-10 h-10 rounded-xl object-cover border border-slate-100 dark:border-slate-800"
                                 onError={(e) => {
-                                  // Fallback jika URL gambar rusak
                                   (e.target as HTMLElement).style.display = 'none';
                                 }}
                                 width={50}
                                 height={50}
                               />
                             ) : (
-                              /* Lingkaran inisial jika belum mengunggah foto profil */
-                              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-100">
+                              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-100 dark:border-purple-900">
                                 {ecosystemActivity.profiles?.full_name 
                                   ? ecosystemActivity.profiles.full_name.charAt(0) 
                                   : ecosystemActivity.user 
@@ -533,47 +367,115 @@ const GeneralDashboard: React.FC = () => {
                           </div>
                         )}
                         <div>
-                          <p className="text-sm text-slate-600">
-                            <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900">
-                              {ecosystemActivity.profiles?.full_name || ecosystemActivity.user || "Pengguna"}
+                          <p className="text-sm text-slate-600 dark:text-slate-300">
+                            <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900 dark:text-slate-50">
+                              {ecosystemActivity.profiles?.full_name}
                             </Link> {ecosystemActivity.action} 
-                            <span className="font-semibold text-slate-800"> {ecosystemActivity.target}</span>
+                            <span className="font-semibold text-slate-800 dark:text-slate-200"> {ecosystemActivity.target}</span>
                           </p>
-                          <p className="text-xs text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
+                          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
                         </div>
                       </div>
+                      <FiArrowUpRight className="text-slate-300 dark:text-slate-600" />
                     </div>
                   ))
                 )}
               </div>
+            </div>
 
-              <DialogFooter className="pt-4 border-t border-slate-100 mt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAllActivities(false)}
-                  className="w-full sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 hover:bg-slate-100 rounded-2xl transition-colors text-center"
-                >
-                  Tutup Halaman
-                </button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+            {/* Modal Dialog: Semua Aktivitas */}
+            <Dialog open={showAllActivities} onOpenChange={setShowAllActivities}>
+              <DialogContent className="sm:max-w-xl rounded-3xl p-8 border-none bg-white dark:bg-slate-900 shadow-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-black text-slate-900 dark:text-slate-50 flex items-center gap-2">
+                    <FiActivity className="text-blue-600 dark:text-blue-400" /> Semua Aktivitas Ekosistem
+                  </DialogTitle>
+                  <DialogDescription className="text-slate-500 dark:text-slate-400">
+                    Daftar lengkap seluruh rekam jejak aktivitas realtime yang terjadi di platform KaryaMandiri.
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="max-h-[60vh] overflow-y-auto pr-2 mt-4 divide-y divide-slate-100 dark:divide-slate-800 min-h-[200px]">
+                  {ecosystemActivities.length === 0 ? (
+                    <div className="py-12 text-center text-sm text-slate-400 dark:text-slate-500">Tidak ada data aktivitas yang tercatat.</div>
+                  ) : (
+                    ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => (
+                      <div key={`modal-${ecosystemActivity.id}`} className="py-4 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 px-2 rounded-xl">
+                        <div className="flex items-center gap-4">
+                          {ecosystemActivity.type === 'project' ? (
+                            <div className="p-3 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 shrink-0">
+                              <FiLayers />
+                            </div>
+                          ) : ecosystemActivity.type === 'payment' ? (
+                            <div className="p-3 rounded-xl bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400 shrink-0">
+                              <FiTrendingUp />
+                            </div>
+                          ) : (
+                            <div className="shrink-0 relative w-10 h-10">
+                              {(ecosystemActivity.profiles as any)?.avatar_url ? (
+                                <Image
+                                  src={(ecosystemActivity.profiles as any).avatar_url} 
+                                  alt={ecosystemActivity.profiles?.full_name || 'Avatar'} 
+                                  className="w-10 h-10 rounded-xl object-cover border border-slate-100 dark:border-slate-800"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = 'none';
+                                  }}
+                                  width={50}
+                                  height={50}
+                                />
+                              ) : (
+                                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-100 dark:border-purple-900">
+                                  {ecosystemActivity.profiles?.full_name 
+                                    ? ecosystemActivity.profiles.full_name.charAt(0) 
+                                    : ecosystemActivity.user 
+                                      ? ecosystemActivity.user.charAt(0) 
+                                      : 'U'}
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-sm text-slate-600 dark:text-slate-300">
+                              <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900 dark:text-slate-50">
+                                {ecosystemActivity.profiles?.full_name || ecosystemActivity.user || "Pengguna"}
+                              </Link> {ecosystemActivity.action} 
+                              <span className="font-semibold text-slate-800 dark:text-slate-200"> {ecosystemActivity.target}</span>
+                            </p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                <DialogFooter className="pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAllActivities(false)}
+                    className="w-full sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-colors text-center"
+                  >
+                    Tutup Halaman
+                  </button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </>
         )}
 
-        {/* Panel Info Tambahan & Statistik Baru */}
+        {/* Panel Info Tambahan & Statistik */}
         <div className="space-y-4">
-          {/* Target Capaian Tahun Berjalan */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-            <h3 className="font-bold text-slate-800 mb-4 text-sm flex items-center gap-2">
+          {/* Target Capaian Strategis */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-4 text-sm flex items-center gap-2">
               <FiZap className="text-amber-500" /> Target Capaian Strategis
             </h3>
             {loading ? (
               <div className="space-y-4 animate-pulse">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="space-y-2">
-                    <div className="h-3 w-32 bg-slate-100 rounded" />
-                    <div className="h-2 w-full bg-slate-100 rounded-full" />
+                    <div className="h-3 w-32 bg-slate-100 dark:bg-slate-800 rounded" />
+                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full" />
                   </div>
                 ))}
               </div>
@@ -586,43 +488,43 @@ const GeneralDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Distribusi Pembagian Tugas Ekosistem */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
-            <h3 className="font-bold text-slate-800 mb-3 text-sm flex items-center gap-2">
-              <FiPieChart className="text-purple-600" /> Alokasi Sektor Jasa Live
+          {/* Alokasi Sektor Jasa Live */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+            <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-3 text-sm flex items-center gap-2">
+              <FiPieChart className="text-purple-600 dark:text-purple-400" /> Alokasi Sektor Jasa Live
             </h3>
             {loading ? (
               <div className="space-y-3 animate-pulse">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex justify-between items-center">
-                    <div className="h-3 w-28 bg-slate-100 rounded" />
-                    <div className="h-3 w-8 bg-slate-100 rounded" />
+                    <div className="h-3 w-28 bg-slate-100 dark:bg-slate-800 rounded" />
+                    <div className="h-3 w-8 bg-slate-100 dark:bg-slate-800 rounded" />
                   </div>
                 ))}
               </div>
             ) : (
               <div className="space-y-2.5">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="flex items-center gap-2 text-slate-600">
+                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> Pengembangan Web & IT
                   </span>
-                  <span className="font-bold text-slate-800">
+                  <span className="font-bold text-slate-800 dark:text-slate-200">
                     {jasaAllocation.webIT}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="flex items-center gap-2 text-slate-600">
+                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                     <span className="w-2.5 h-2.5 rounded-full bg-purple-500" /> Fotografi & Kreatif
                   </span>
-                  <span className="font-bold text-slate-800">
+                  <span className="font-bold text-slate-800 dark:text-slate-200">
                     {jasaAllocation.fotografi}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="flex items-center gap-2 text-slate-600">
+                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Produksi Video & Film
                   </span>
-                  <span className="font-bold text-slate-800">
+                  <span className="font-bold text-slate-800 dark:text-slate-200">
                     {jasaAllocation.videoFilm}%
                   </span>
                 </div>
@@ -630,11 +532,11 @@ const GeneralDashboard: React.FC = () => {
             )}
           </div>
 
-          {/* Informasi Edukasi Inklusi */}
-          <div className="bg-slate-900 rounded-3xl p-6 text-white relative overflow-hidden group">
+          {/* Card Informasi Edukasi Inklusi */}
+          <div className="bg-slate-900 dark:bg-slate-950 rounded-3xl p-6 text-white border border-transparent dark:border-slate-800 relative overflow-hidden group">
             <div className="relative z-10">
               <h3 className="font-bold text-lg mb-2">Model Crowdsourcing</h3>
-              <p className="text-slate-400 text-xs leading-relaxed mb-4">
+              <p className="text-slate-400 dark:text-slate-400 text-xs leading-relaxed mb-4">
                 Membantu sektor informal mendapatkan upah layak melalui pembagian tugas kolektif yang efisien, transparan, dan terlindungi regulasi data.
               </p>
               <button

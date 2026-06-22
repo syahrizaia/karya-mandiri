@@ -3,16 +3,12 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { 
-  FiSearch, 
-  FiFilter, 
-  FiUsers, 
-  FiX
-} from 'react-icons/fi';
 import { IJobs } from '@/app/types/jobs';
 import supabase from '@/lib/db';
 import SubscriptionDialog from '../../../components/subscription/page';
 import JobList from '@/components/job-list/page';
+import { FiFilter, FiSearch, FiUsers } from 'react-icons/fi';
+import { JobFilters } from '@/components/jobs/JobFilters';
 
 const Jobs: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -144,33 +140,33 @@ const Jobs: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 md:pt-12 lg:pt-4 lg:p-4">
+    <div className="space-y-8 md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Search & Hero Section */}
-      <section className="bg-blue-600 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+      <section className="bg-blue-600 dark:bg-blue-700 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden transition-colors">
         <div className="relative z-10 max-w-2xl">
           <h1 className="text-3xl font-bold mb-2">Temukan Peluang Kerja</h1>
-          <p className="text-blue-100 mb-6">Pilih tugas yang sesuai dengan keahlian dan lokasi Anda.</p>
+          <p className="text-blue-100 dark:text-blue-200 mb-6 transition-colors">Pilih tugas yang sesuai dengan keahlian dan lokasi Anda.</p>
           
           <div className="flex flex-row gap-3">
-            <div className="flex-1 relative text-slate-800">
-              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+            <div className="flex-1 relative text-slate-800 dark:text-slate-100">
+              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
               <input 
                 type="text" 
                 placeholder="Cari posisi atau perusahaan..."
-                className="w-full pl-10 pr-4 py-4 rounded-2xl focus:ring-4 focus:ring-blue-300 text-white border outline-none transition"
+                className="w-full pl-10 pr-4 py-4 rounded-2xl focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900/50 text-slate-900 dark:text-white bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800 outline-none transition"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <button
               onClick={() => setShowFilterDrawer(true)}
-              className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 rounded-2xl font-bold transition flex items-center justify-center gap-2"
+              className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 rounded-2xl font-bold transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <FiFilter /> Filter
             </button>
           </div>
         </div>
-        <div className="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4">
+        <div className="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4 select-none pointer-events-none">
            <FiUsers size={300} />
         </div>
       </section>
@@ -178,120 +174,20 @@ const Jobs: React.FC = () => {
       {/* Main Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
-        {/* Sidebar Filter (Desktop) */}
-        <aside className="hidden lg:block space-y-6">
-          <div>
-            <h3 className="font-bold text-slate-800 mb-4">Kategori Sektor</h3>
-            <div className="space-y-2">
-              {['Produksi', 'Logistik', 'Jasa', 'Konstruksi'].map((cat) => (
-                <label key={cat} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white cursor-pointer transition">
-                  <input 
-                    type="checkbox" 
-                    className="w-5 h-5 rounded text-blue-600 accent-blue-600 cursor-pointer"
-                    checked={selectedCategories.includes(cat)}
-                    onChange={() => handleCategoryChange(cat)}
-                  />
-                  <span className="text-slate-600 font-medium">{cat}</span>
-                </label>
-              ))}
-            </div>
-          </div>
+        {/* Render extracted Sidebar & Drawer Filter */}
+        <JobFilters 
+          selectedCategories={selectedCategories}
+          handleCategoryChange={handleCategoryChange}
+          minReward={minReward}
+          setMinReward={setMinReward}
+          maxPriceLimit={maxPriceLimit}
+          showFilterDrawer={showFilterDrawer}
+          setShowFilterDrawer={setShowFilterDrawer}
+          filteredJobsCount={filteredJobs.length}
+          handleResetAllFilters={handleResetAllFilters}
+        />
 
-          <div className="p-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
-            <h3 className="font-bold text-slate-800 mb-2">Upah Minimum</h3>
-            <p className="text-xl font-bold text-green-600 mb-4">Rp{minReward.toLocaleString('id-ID')}</p>
-            <input 
-              type="range" 
-              min="0"
-              max={maxPriceLimit}
-              step="10000"
-              value={minReward}
-              onChange={(e) => setMinReward(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" 
-            />
-            <div className="flex justify-between text-[10px] text-slate-400 font-semibold mt-2">
-              <span>Rp0</span>
-              <span>Max: Rp{maxPriceLimit.toLocaleString('id-ID')}</span>
-            </div>
-          </div>
-        </aside>
-
-        {/* DRAWER MODAL FILTER UNTUK DEVICE MOBILE & TABLET */}
-        {showFilterDrawer && (
-          <div className="fixed inset-0 z-50 lg:hidden flex justify-end animate-fade-in">
-            <div 
-              className="absolute inset-0 bg-black/40 backdrop-blur-xs" 
-              onClick={() => setShowFilterDrawer(false)}
-            />
-            
-            <div className="relative w-80 max-w-full bg-white h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto animate-slide-left z-10">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                  <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                    <FiFilter className="text-blue-600"/> Filter Lowongan
-                  </h2>
-                  <button 
-                    onClick={() => setShowFilterDrawer(false)}
-                    className="p-2 hover:bg-slate-100 rounded-xl text-slate-500 transition"
-                  >
-                    <FiX size={20} />
-                  </button>
-                </div>
-
-                <div>
-                  <h3 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Kategori Sektor</h3>
-                  <div className="space-y-1">
-                    {['Produksi', 'Logistik', 'Jasa', 'Konstruksi'].map((cat) => (
-                      <label key={cat} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 cursor-pointer transition">
-                        <input 
-                          type="checkbox" 
-                          className="w-5 h-5 rounded text-blue-600 accent-blue-600 cursor-pointer"
-                          checked={selectedCategories.includes(cat)}
-                          onChange={() => handleCategoryChange(cat)}
-                        />
-                        <span className="text-slate-600 text-sm font-semibold">{cat}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200/60">
-                  <h3 className="font-bold text-slate-800 mb-1 text-sm uppercase tracking-wide">Upah Minimum</h3>
-                  <p className="text-lg font-black text-green-600 mb-3">Rp{minReward.toLocaleString('id-ID')}</p>
-                  <input 
-                    type="range" 
-                    min="0"
-                    max={maxPriceLimit}
-                    step="10000"
-                    value={minReward}
-                    onChange={(e) => setMinReward(Number(e.target.value))}
-                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600" 
-                  />
-                  <div className="flex justify-between text-[9px] text-slate-400 font-bold mt-2">
-                    <span>Rp0</span>
-                    <span>Max: Rp{maxPriceLimit.toLocaleString('id-ID')}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-slate-100 space-y-2">
-                <button
-                  onClick={() => setShowFilterDrawer(false)}
-                  className="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition shadow-sm"
-                >
-                  Terapkan Filter ({filteredJobs.length})
-                </button>
-                <button
-                  onClick={handleResetAllFilters}
-                  className="w-full py-2.5 text-slate-500 font-bold text-xs hover:text-red-500 transition"
-                >
-                  Reset Pilihan
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
+        {/* List Lowongan Kerja */}
         <JobList
           filteredJobs={filteredJobs}
           currentJobs={currentJobs}

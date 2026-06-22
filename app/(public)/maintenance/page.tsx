@@ -12,16 +12,15 @@ export default function MaintenancePage() {
     // Simulasi pengecekan status ke server/API selama 1.5 detik
     setTimeout(() => {
       setIsRefreshing(false);
-      // Anda bisa menyisipkan fungsi fetchNews() atau window.location.reload() di sini
       window.location.reload();
     }, 1500);
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center selection:bg-amber-500 selection:text-slate-900">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-amber-500 selection:text-slate-900 transition-colors">
       
       {/* Kontainer Utama */}
-      <div className="max-w-md w-full space-y-8 bg-slate-800/50 border border-slate-700/50 p-8 rounded-3xl backdrop-blur-md shadow-2xl relative overflow-hidden">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/50 p-8 rounded-3xl backdrop-blur-md shadow-2xl relative overflow-hidden transition-colors">
         
         {/* Efek Cahaya Latar Belakang Mendatar */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent shadow-[0_0_20px_rgba(245,158,11,0.5)]" />
@@ -38,37 +37,37 @@ export default function MaintenancePage() {
 
         {/* Teks Informasi */}
         <div className="space-y-3">
-          <span className="px-3 py-1 text-xs font-semibold tracking-wider text-amber-500 uppercase bg-amber-500/20 border border-amber-500/40 rounded-full">
+          <span className="px-3 py-1 text-xs font-semibold tracking-wider text-amber-600 dark:text-amber-500 uppercase bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 dark:border-amber-500/40 rounded-full">
             Sistem Maintenance
           </span>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
             Laman Sedang <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-500">Perbaikan</span>
           </h1>
-          <p className="text-base text-slate-800 leading-relaxed">
+          <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
             Kami sedang memperbarui sistem dan meningkatkan performa API server agar aplikasi menjadi lebih stabil dan cepat. Kami akan segera kembali!
           </p>
         </div>
 
         {/* Garis Pembatas */}
-        <hr className="border-slate-700/60" />
+        <hr className="border-slate-200 dark:border-slate-800/60" />
 
         {/* Baris Tombol Aksi */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           
-          {/* Tombol Cek Status Baru */}
+          {/* Tombol Cek Status / Muat Ulang */}
           <button
             onClick={handleCheckStatus}
             disabled={isRefreshing}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-slate-950 font-semibold rounded-xl shadow-lg shadow-amber-500/20 transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-slate-950 font-semibold rounded-xl shadow-lg shadow-amber-500/10 dark:shadow-amber-500/20 transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
             {isRefreshing ? "Memeriksa..." : "Coba Muat Ulang"}
           </button>
 
-          {/* Tombol Kembali (Opsional) */}
+          {/* Tombol Kembali */}
           <button 
             onClick={() => window.history.back()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl border border-slate-700 transition-all duration-200 active:scale-95"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 active:scale-95 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             Kembali
@@ -78,7 +77,7 @@ export default function MaintenancePage() {
       </div>
 
       {/* Catatan Kaki Kecil */}
-      <p className="mt-8 text-xs text-slate-500 tracking-wide uppercase">
+      <p className="mt-8 text-xs text-slate-400 dark:text-slate-500 tracking-wide uppercase">
         © {new Date().getFullYear()} • Tim Pengembang Aplikasi
       </p>
     </div>

@@ -18,6 +18,7 @@ import TopTalent from '@/components/top-talent/page';
 import ProjectAndServiceTrends from '@/components/project-and-service-trends/page';
 import TaskExploration from '@/components/task-exploration/page';
 import LiveImpactStatistics from '@/components/live-impact-statistics/page';
+import MobilePWAInstaller from '@/components/pwa/MobilePWAInstaller';
 
 // Varian Animasi untuk Efek Fade-up sekuensial (Staggered)
 const fadeInUp: Variants = {
@@ -344,6 +345,8 @@ export default function LandingPage() {
           <Link href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600"> Supabase Server Architecture</Link>.
         </p>
       </footer>
+
+      <MobilePWAInstaller />
     </div>
   );
 }

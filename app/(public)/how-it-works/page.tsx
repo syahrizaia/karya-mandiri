@@ -25,7 +25,6 @@ interface IStep {
 const CaraKerjaCrowd: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'worker' | 'employer'>('worker');
 
-  // Alur Kerja untuk Sisi Worker (Mitra Mandiri)
   const workerSteps: IStep[] = [
     {
       number: "01",
@@ -53,7 +52,6 @@ const CaraKerjaCrowd: React.FC = () => {
     }
   ];
 
-  // Alur Kerja untuk Sisi Employer (Pemberi Kerja)
   const employerSteps: IStep[] = [
     {
       number: "01",
@@ -82,29 +80,29 @@ const CaraKerjaCrowd: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 bg-slate-50 dark:bg-slate-950 transition-colors">
       
       {/* HERO SECTION */}
-      <section className="bg-white border-b border-slate-200 py-12 px-6 text-center">
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-12 px-6 text-center transition-colors">
         <div className="max-w-3xl mx-auto space-y-6">
-          <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+          <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 dark:bg-blue-950/30 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
             <FiCpu /> Model Bisnis Crowdsourcing
           </span>
-          <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+          <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
             Bagaimana Cara Kerja <br className="hidden md:block"/> Skema Crowdsourcing?
           </h1>
-          <p className="text-slate-500 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
+          <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
             KaryaMandiri membagi proyek besar menjadi ribuan tugas mikro digital. Pendekatan ini memberikan fleksibilitas kerja bagi sektor informal sekaligus efisiensi biaya yang luar biasa bagi pemberi kerja.
           </p>
 
           {/* INTERACTIVE TAB SWITCHER TOGGLE */}
-          <div className="p-1.5 bg-slate-100 border border-slate-200 rounded-2xl w-full max-w-md mx-auto flex gap-1 mt-6">
+          <div className="p-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-md mx-auto flex gap-1 mt-6">
             <button
               onClick={() => setActiveTab('worker')}
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${
                 activeTab === 'worker'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               <FiUser /> Sebagai Pekerja (Crowd)
@@ -113,8 +111,8 @@ const CaraKerjaCrowd: React.FC = () => {
               onClick={() => setActiveTab('employer')}
               className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${
                 activeTab === 'employer'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
               }`}
             >
               <FiBriefcase /> Sebagai Employer
@@ -124,7 +122,7 @@ const CaraKerjaCrowd: React.FC = () => {
       </section>
 
       {/* TIMELINE / STEP BY STEP PROCESS SECTION */}
-      <main className="max-w-5xl mx-auto mt-8">
+      <main className="max-w-5xl mx-auto mt-8 px-4">
         
         <AnimatePresence mode="wait">
           <motion.div
@@ -138,24 +136,22 @@ const CaraKerjaCrowd: React.FC = () => {
             {(activeTab === 'worker' ? workerSteps : employerSteps).map((step, index) => (
               <div 
                 key={index} 
-                className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs relative overflow-hidden flex flex-col justify-between h-[280px] hover:border-blue-500 hover:shadow-md transition duration-300 group"
+                className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs relative overflow-hidden flex flex-col justify-between h-[280px] hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition duration-300 group"
               >
                 <div>
-                  {/* Step Badge Number & Icon */}
                   <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-blue-600 text-lg group-hover:bg-blue-600 group-hover:text-white transition duration-300">
+                    <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-lg group-hover:bg-blue-600 dark:group-hover:bg-blue-600 group-hover:text-white transition duration-300">
                       {step.icon}
                     </div>
-                    <span className="text-3xl font-black text-slate-100 tracking-wider group-hover:text-blue-50/60 transition duration-300">
+                    <span className="text-3xl font-black text-slate-100 dark:text-slate-800 tracking-wider group-hover:text-blue-50/60 dark:group-hover:text-blue-900/40 transition duration-300">
                       {step.number}
                     </span>
                   </div>
 
-                  {/* Title & Description */}
-                  <h3 className="font-black text-slate-900 text-base mb-2 group-hover:text-blue-600 transition duration-200">
+                  <h3 className="font-black text-slate-900 dark:text-slate-100 text-base mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition duration-200">
                     {step.title}
                   </h3>
-                  <p className="text-slate-500 text-xs md:text-sm leading-relaxed line-clamp-4">
+                  <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed line-clamp-4">
                     {step.description}
                   </p>
                 </div>
@@ -165,41 +161,38 @@ const CaraKerjaCrowd: React.FC = () => {
         </AnimatePresence>
 
         {/* CORE FEATURES INFOGRAPHIC CARD */}
-        <section className="bg-white border border-slate-200/80 rounded-3xl p-6 md:p-10 mt-12 shadow-xs">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight mb-8 text-center md:text-left">
+        <section className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 md:p-10 mt-12 shadow-xs transition-colors">
+          <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-8 text-center md:text-left">
             Tiga Pilar Utama Ekosistem KaryaMandiri
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Pilar 1 */}
             <div className="space-y-3">
-              <div className="w-10 h-10 bg-emerald-50 text-emerald-600 font-bold text-sm rounded-xl flex items-center justify-center border border-emerald-100">
+              <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 font-bold text-sm rounded-xl flex items-center justify-center border border-emerald-100 dark:border-emerald-900/50">
                 01
               </div>
-              <h4 className="font-bold text-slate-800 text-sm md:text-base">Sistem Escrow Terjamin</h4>
-              <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
+              <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm md:text-base">Sistem Escrow Terjamin</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed">
                 Uang jaminan dari Employer dikunci aman sebelum tugas didistribusikan. Tidak ada lagi risiko kerjaan fiktif bagi pekerja informal maupun risiko hilangnya dana bagi pemberi kerja.
               </p>
             </div>
 
-            {/* Pilar 2 */}
             <div className="space-y-3">
-              <div className="w-10 h-10 bg-blue-50 text-blue-600 font-bold text-sm rounded-xl flex items-center justify-center border border-blue-100">
+              <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-bold text-sm rounded-xl flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
                 02
               </div>
-              <h4 className="font-bold text-slate-800 text-sm md:text-base">Distribusi Massal Instan</h4>
-              <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
+              <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm md:text-base">Distribusi Massal Instan</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed">
                 Didukung ribuan crowd workers bersertifikasi KYC di seluruh nusantara. Tugas bervolume raksasa dapat dipecah secara merata dan selesai hanya dalam hitungan jam.
               </p>
             </div>
 
-            {/* Pilar 3 */}
             <div className="space-y-3">
-              <div className="w-10 h-10 bg-purple-50 text-purple-600 font-bold text-sm rounded-xl flex items-center justify-center border border-purple-100">
+              <div className="w-10 h-10 bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 font-bold text-sm rounded-xl flex items-center justify-center border border-purple-100 dark:border-purple-900/50">
                 03
               </div>
-              <h4 className="font-bold text-slate-800 text-sm md:text-base">Inklusi Finansial Adil</h4>
-              <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
+              <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm md:text-base">Inklusi Finansial Adil</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed">
                 Kami berkomitmen memberdayakan pekerja lepas sektor informal dengan model bagi hasil yang transparan, bebas komisi eksploitatif, serta mendukung penarikan e-wallet lokal.
               </p>
             </div>
@@ -207,7 +200,7 @@ const CaraKerjaCrowd: React.FC = () => {
         </section>
 
         {/* DYNAMIC CALL TO ACTION (CTA) */}
-        <section className="bg-slate-900 text-white rounded-3xl p-8 md:p-12 mt-12 flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden">
+        <section className="bg-slate-900 dark:bg-blue-900 text-white rounded-3xl p-8 md:p-12 mt-12 flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden transition-colors">
           <div className="space-y-3 max-w-xl text-center md:text-left">
             <h3 className="text-xl md:text-2xl font-black tracking-tight">
               {activeTab === 'worker' 
@@ -225,23 +218,19 @@ const CaraKerjaCrowd: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
             {activeTab === 'worker' ? (
-              <>
-                <Link
-                  href="/jobs"
-                  className="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl text-center flex items-center justify-center gap-2 transition"
-                >
-                  Jelajahi Lowongan Kerja <FiArrowRight />
-                </Link>
-              </>
+              <Link
+                href="/jobs"
+                className="px-6 py-4 bg-white dark:bg-blue-600 text-slate-900 dark:text-white font-bold text-sm rounded-xl text-center flex items-center justify-center gap-2 transition"
+              >
+                Jelajahi Lowongan Kerja <FiArrowRight />
+              </Link>
             ) : (
-              <>
-                <Link
-                  href="/employer"
-                  className="px-6 py-4 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm rounded-xl text-center flex items-center justify-center gap-2 transition"
-                >
-                  Mulai Pasang Lowongan <FiArrowRight />
-                </Link>
-              </>
+              <Link
+                href="/employer"
+                className="px-6 py-4 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm rounded-xl text-center flex items-center justify-center gap-2 transition"
+              >
+                Mulai Pasang Lowongan <FiArrowRight />
+              </Link>
             )}
           </div>
         </section>

@@ -20,31 +20,24 @@ import { EmployerData } from '../types';
 import supabase from '@/lib/db';
 import { IJobs } from '@/app/types/jobs';
 import { useRouter } from 'next/navigation';
-import CreateProjectDialog from '../../../components/create-job/page';
-import EditProjectDialog from '@/components/edit-job/page';
-import DeleteProjectDialog from '@/components/delete-job/page';
+import CreateProjectDialog from '../../../components/employer/create-job/page';
+import EditProjectDialog from '@/components/employer/edit-job/page';
+import DeleteProjectDialog from '@/components/employer/delete-job/page';
 import Link from 'next/link';
+import StatCard from '@/components/employer/StatCard';
+import TableLoading from '@/components/employer/TableLoading';
 
-// Sub-komponen StatCard
-const StatCard = ({ icon, title, value, color }: { icon: any, title: string, value: any, color: string }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4">
-    <div className={`${color} p-4 rounded-lg text-white text-2xl`}>
-      {icon}
-    </div>
-    <div>
-      <p className="text-sm text-gray-500 uppercase tracking-wider">{title}</p>
-      <p className="text-2xl font-bold text-gray-800">{value}</p>
-    </div>
-  </div>
-);
-
-// Helper function untuk style status
+// Helper function untuk style status dengan dukungan Dark Mode
 const getStatusStyle = (status: string) => {
   switch (status) {
-    case 'active': return 'bg-green-100 text-green-700';
-    case 'pending': return 'bg-yellow-100 text-yellow-700';
-    case 'completed': return 'bg-gray-100 text-gray-700';
-    default: return 'bg-gray-100 text-gray-700';
+    case 'active': 
+      return 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400';
+    case 'pending': 
+      return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-400';
+    case 'completed': 
+      return 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-400';
+    default: 
+      return 'bg-gray-100 text-gray-700 dark:bg-slate-800 dark:text-slate-400';
   }
 };
 
@@ -70,11 +63,11 @@ const EmployerDashboard: React.FC = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  // State Utama untuk Keperluan Navigasi Halaman Pagination
+  // State pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Batas maksimal baris data per halaman di sini
+  const itemsPerPage = 5;
 
-  // Perhitungan State Statis dari Database Secara Dinamis
+  // State statistik dinamis dari DB
   const [stats, setStats] = useState<EmployerData>({
     name: "User",
     company: "KaryaMandiri Corp",
@@ -138,17 +131,14 @@ const EmployerDashboard: React.FC = () => {
     fetchEmployerDashboardData();
   }, [router]);
 
-  // 🌟 Reset halaman aktif ke 1 setiap kali query pencarian berubah
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // 🌟 FILTER DATA BERDASARKAN INPUT PENCARIAN (Judul Proyek)
   const filteredJobs = jobs.filter((job) =>
     job.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // LOGIKA HITUNGAN SLICE DATA PAGINATION
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentJobs = jobs.slice(indexOfFirstItem, indexOfLastItem);
@@ -158,7 +148,6 @@ const EmployerDashboard: React.FC = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Callback penanganan pasca-hapus agar halaman tidak bug jika kosong
   const handleDeleteSuccess = (deletedId: string) => {
     const updatedJobs = jobs.filter((item) => item.id !== deletedId);
     setJobs(updatedJobs);
@@ -169,52 +158,13 @@ const EmployerDashboard: React.FC = () => {
     }
   };
 
-  const TableLoading = () => {
-    return (
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-          <div className="h-5 w-48 bg-gray-200 rounded-md"></div>
-        </div>
-        
-        <table className="w-full text-left border-collapse">
-          <thead className="bg-gray-50 uppercase text-xs">
-            <tr>
-              <th className="px-6 py-4"><div className="h-3 w-20 bg-gray-200 rounded"></div></th>
-              <th className="px-6 py-4"><div className="h-3 w-16 bg-gray-200 rounded"></div></th>
-              <th className="px-6 py-4"><div className="h-3 w-24 bg-gray-200 rounded"></div></th>
-              <th className="px-6 py-4"><div className="h-3 w-16 bg-gray-200 rounded"></div></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <tr key={i}>
-                <td className="px-6 py-4">
-                  <div className="h-4 w-40 bg-gray-100 rounded"></div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="h-6 w-20 bg-gray-100 rounded-full"></div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="h-4 w-28 bg-gray-100 rounded"></div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="h-4 w-24 bg-gray-100 rounded"></div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
   return (
-    <div className="min-h-fit p-0 md:pt-12 lg:p-4">
+    <div className="min-h-fit p-0 md:pt-12 lg:p-4 text-slate-900 dark:text-slate-100">
       {/* Header */}
       <header className="flex justify-between items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Dashboard Employer</h1>
-          <p className="text-gray-600">Selamat datang kembali, {stats.name}</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-slate-50">Dashboard Employer</h1>
+          <p className="text-gray-600 dark:text-slate-400">Selamat datang kembali, {stats.name}</p>
         </div>
 
         <CreateProjectDialog />
@@ -227,24 +177,24 @@ const EmployerDashboard: React.FC = () => {
         <StatCard icon={<FiTrendingUp />} title="Investasi Sosial" value={formatDynamicRupiah(stats.totalInvestment)} color="bg-purple-500" />
       </div>
 
-      {/* Project Table */}
+      {/* Project Table Container */}
       {loading ? (
         <TableLoading />
       ) : (
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-transparent dark:border-slate-800 overflow-hidden">
           {/* Header Tabel & Input Fitur Cari */}
-          <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-lg font-semibold text-gray-800">Status Proyek Crowdsourcing</h2>
+          <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-slate-100">Status Proyek Crowdsourcing</h2>
 
             {jobs.length > 0 && (
               <div className="relative w-full sm:w-64">
-                <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
+                <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 text-base" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Cari judul proyek..."
-                  className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition bg-gray-50/50"
+                  className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition bg-gray-50/50 dark:bg-slate-800 text-gray-800 dark:text-slate-100"
                 />
               </div>
             )}
@@ -253,21 +203,20 @@ const EmployerDashboard: React.FC = () => {
           <div className="overflow-x-auto">
             {jobs.length === 0 ? (
               <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
-                <div className="p-4 bg-slate-50 text-slate-400 rounded-full">
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 rounded-full">
                   <FiAlertCircle size={32} />
                 </div>
-                <h3 className="text-md font-bold text-slate-700">Belum Ada Proyek</h3>
-                <p className="text-sm text-slate-400 max-w-xs">Anda belum mempublikasikan lowongan proyek crowdsourcing apa pun saat ini.</p>
+                <h3 className="text-md font-bold text-slate-700 dark:text-slate-300">Belum Ada Proyek</h3>
+                <p className="text-sm text-slate-400 dark:text-slate-500 max-w-xs">Anda belum mempublikasikan lowongan proyek crowdsourcing apa pun saat ini.</p>
               </div>
             ) : filteredJobs.length === 0 ? (
-              /* Kondisi jika ada proyek tapi hasil ketikan search tidak cocok */
-              <div className="p-12 text-center text-gray-400 font-medium text-sm">
+              <div className="p-12 text-center text-gray-400 dark:text-slate-500 font-medium text-sm">
                 Tidak ada proyek yang cocok dengan kata kunci &quot;{searchQuery}&quot;.
               </div>
             ) : (
               <>
                 <table className="w-full text-left border-collapse min-w-175"> 
-                  <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
+                  <thead className="bg-gray-50 dark:bg-slate-800/60 text-gray-600 dark:text-slate-400 uppercase text-xs">
                     <tr>
                       <th className="px-6 py-4 font-medium">Judul Proyek</th>
                       <th className="px-6 py-4 font-medium">Status</th>
@@ -276,14 +225,13 @@ const EmployerDashboard: React.FC = () => {
                       <th className="px-6 py-4 font-medium text-center">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {/* Loop menggunakan currentJobs hasil filter dan slice */}
+                  <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
                     {currentJobs.map((job) => (
-                      <tr key={job.id} className="hover:bg-gray-50 transition">
-                        <td className="px-6 py-4 font-medium text-gray-800 whitespace-nowrap">
+                      <tr key={job.id} className="hover:bg-gray-50 dark:hover:bg-slate-800/40 transition">
+                        <td className="px-6 py-4 font-medium text-gray-800 dark:text-slate-200 whitespace-nowrap">
                           <Link 
                             href={`/jobs/${job.id}`} 
-                            className="text-blue-600 hover:text-blue-800 hover:underline transition"
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline transition"
                           >
                             {job.title}
                           </Link>
@@ -293,10 +241,10 @@ const EmployerDashboard: React.FC = () => {
                             { (job.status?.toUpperCase()) ?? "PENDING" }
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-gray-600 whitespace-nowrap">
+                        <td className="px-6 py-4 text-gray-600 dark:text-slate-400 whitespace-nowrap">
                           {job.taken} dari {job.total} Orang
                         </td>
-                        <td className="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap">
+                        <td className="px-6 py-4 font-semibold text-gray-700 dark:text-slate-300 whitespace-nowrap">
                           Rp{job.reward.toLocaleString()}
                         </td>
                         <td className='px-4 py-2 whitespace-nowrap'>
@@ -304,14 +252,14 @@ const EmployerDashboard: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => setSelectedJob({ job, action: "edit" })}
-                              className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition"
+                              className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-950/50 rounded-lg transition"
                             >
                               <FiEdit2 size={18} />
                             </button>
                             <button
                               type="button"
                               onClick={() => setSelectedJob({ job, action: "delete" })}
-                              className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition"
+                              className="p-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/50 rounded-lg transition"
                             >
                               <FiTrash2 size={18} />
                             </button>
@@ -324,13 +272,13 @@ const EmployerDashboard: React.FC = () => {
 
                 {/* BILAH NAVIGASI BAR FOOTER PAGINATION */}
                 {totalPages > 1 && (
-                  <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex flex-col sm:flex-row gap-4 justify-between items-center text-sm">
-                    <p className="text-xs text-gray-400 font-semibold">
-                      Menampilkan <span className="text-gray-700">{indexOfFirstItem + 1}</span> -{" "}
-                      <span className="text-gray-700">
+                  <div className="p-4 border-t border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row gap-4 justify-between items-center text-sm">
+                    <p className="text-xs text-gray-400 dark:text-slate-500 font-semibold">
+                      Menampilkan <span className="text-gray-700 dark:text-slate-300">{indexOfFirstItem + 1}</span> -{" "}
+                      <span className="text-gray-700 dark:text-slate-300">
                         {Math.min(indexOfLastItem, jobs.length)}
                       </span>{" "}
-                      dari <span className="text-gray-700">{jobs.length}</span> proyek
+                      dari <span className="text-gray-700 dark:text-slate-300">{jobs.length}</span> proyek
                     </p>
 
                     <div className="flex items-center gap-1">
@@ -338,20 +286,20 @@ const EmployerDashboard: React.FC = () => {
                       <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="p-2 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 disabled:opacity-40 transition cursor-pointer disabled:cursor-not-allowed"
+                        className="p-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 transition cursor-pointer disabled:cursor-not-allowed"
                       >
                         <FiChevronLeft size={16} />
                       </button>
 
-                      {/* Baris Iterasi Angka Halaman */}
+                      {/* Angka Halaman */}
                       {Array.from({ length: totalPages }, (_, idx) => (
                         <button
                           key={idx + 1}
                           onClick={() => handlePageChange(idx + 1)}
                           className={`w-8 h-8 text-xs font-bold rounded-xl transition cursor-pointer ${
                             currentPage === idx + 1
-                              ? "bg-blue-600 text-white shadow-xs"
-                              : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                              ? "bg-blue-600 dark:bg-blue-500 text-white shadow-xs"
+                              : "bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-700"
                           }`}
                         >
                           {idx + 1}
@@ -362,7 +310,7 @@ const EmployerDashboard: React.FC = () => {
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="p-2 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 disabled:opacity-40 transition cursor-pointer disabled:cursor-not-allowed"
+                        className="p-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-slate-300 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-40 transition cursor-pointer disabled:cursor-not-allowed"
                       >
                         <FiChevronRight size={16} />
                       </button>
@@ -375,6 +323,7 @@ const EmployerDashboard: React.FC = () => {
         </div>
       )}
 
+      {/* Dialog penanganan Aksi */}
       {selectedJob?.action === "edit" && (
         <EditProjectDialog
           job={selectedJob.job}

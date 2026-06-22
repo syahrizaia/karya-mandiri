@@ -16,7 +16,6 @@ interface ISection {
 const TermsAndConditions: React.FC = () => {
   const [activeSection, setActiveSection] = useState('definisi');
 
-  // Daftar Pasal/Navigasi di Sidebar
   const sections: ISection[] = [
     { id: 'definisi', title: '1. Ketentuan Umum & Definisi' },
     { id: 'akun', title: '2. Pendaftaran Akun & Verifikasi' },
@@ -30,7 +29,7 @@ const TermsAndConditions: React.FC = () => {
     setActiveSection(id);
     const element = document.getElementById(id);
     if (element) {
-      const offset = 100; // Jarak aman agar tidak tertutup header/navbar
+      const offset = 100;
       const bodyRect = document.body.getBoundingClientRect().top;
       const elementRect = element.getBoundingClientRect().top;
       const elementPosition = elementRect - bodyRect;
@@ -44,40 +43,40 @@ const TermsAndConditions: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 bg-slate-50 dark:bg-slate-950 transition-colors">
       
       {/* HERO HEADER */}
-      <section className="bg-white border-b border-slate-200 py-8 px-6">
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-8 px-6 transition-colors">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-blue-600 font-bold text-sm bg-blue-50 w-fit px-3 py-1 rounded-full">
-              <Scale /> Legal & Regulasi
+            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold text-sm bg-blue-50 dark:bg-blue-950/40 w-fit px-3 py-1 rounded-full">
+              <Scale size={16} /> Legal & Regulasi
             </div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight md:text-4xl">
+            <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight md:text-4xl">
               Syarat & Ketentuan Layanan
             </h1>
-            <p className="text-slate-500 text-sm max-w-xl leading-relaxed">
+            <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xl leading-relaxed">
               Selamat datang di KaryaMandiri. Mohon luangkan waktu Anda untuk membaca kontrak kesepakatan penggunaan platform ini secara cermat.
             </p>
           </div>
           
-          <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 p-4 rounded-2xl w-fit shrink-0">
-            <FiClock className="text-slate-400 text-lg" />
+          <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl w-fit shrink-0">
+            <FiClock className="text-slate-400 dark:text-slate-500 text-lg" />
             <div>
-              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pembaruan Terakhir</p>
-              <p className="text-xs font-bold text-slate-700">10 Juni 2026</p>
+              <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Pembaruan Terakhir</p>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-200">10 Juni 2026</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* TWO COLUMN CONTENT LAYOUT */}
-      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-4 gap-10">
+      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-4 gap-10 px-4">
         
         {/* STICKY SIDEBAR NAVIGATION */}
         <aside className="lg:col-span-1 hidden lg:block">
-          <div className="sticky top-24 space-y-2 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest px-2 mb-3">
+          <div className="sticky top-24 space-y-2 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs">
+            <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest px-2 mb-3">
               Daftar Isi Pasal
             </h3>
             <nav className="space-y-1">
@@ -87,8 +86,8 @@ const TermsAndConditions: React.FC = () => {
                   onClick={() => scrollToSection(sec.id)}
                   className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${
                     activeSection === sec.id
-                      ? 'bg-blue-50 text-blue-600'
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                      ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'
+                      : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-800 dark:hover:text-slate-200'
                   }`}
                 >
                   {sec.title}
@@ -99,23 +98,23 @@ const TermsAndConditions: React.FC = () => {
         </aside>
 
         {/* ARTICLES & LEGAL TEXT CONTENT */}
-        <section className="lg:col-span-3 space-y-12 bg-white border border-slate-200/80 rounded-3xl p-6 md:p-10 shadow-xs">
+        <section className="lg:col-span-3 space-y-12 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 md:p-10 shadow-xs">
           
           {/* INTRODUCTORY NOTE */}
-          <div className="bg-amber-50 border border-amber-200/60 rounded-2xl p-5 flex gap-4 text-amber-900 text-sm leading-relaxed">
-            <FiAlertCircle className="shrink-0 text-amber-600 text-xl mt-0.5" />
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-900/50 rounded-2xl p-5 flex gap-4 text-amber-900 dark:text-amber-200 text-sm leading-relaxed">
+            <FiAlertCircle className="shrink-0 text-amber-600 dark:text-amber-500 text-xl mt-0.5" />
             <div>
               <span className="font-bold">Pemberitahuan Penting:</span> Dengan mendaftar, mengakses, atau menggunakan platform KaryaMandiri, Anda secara otomatis menyatakan setuju untuk terikat oleh seluruh aturan yang tercantum di bawah ini. Jika Anda tidak menyetujui salah satu poin di dalamnya, Anda tidak diperkenankan menggunakan layanan kami.
             </div>
           </div>
 
           {/* PASAL 1 */}
-          <article id="definisi" className="space-y-4 border-b border-slate-100 pb-8">
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+          <article id="definisi" className="space-y-4 border-b border-slate-100 dark:border-slate-800 pb-8">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
               1. Ketentuan Umum & Definisi
             </h2>
-            <div className="text-slate-600 text-sm md:text-base leading-relaxed space-y-3">
+            <div className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed space-y-3">
               <p>Dalam Syarat dan Ketentuan ini, istilah-istilah berikut memiliki arti sebagai berikut:</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li><strong>KaryaMandiri:</strong> Platform crowdsourcing dan manajemen jasa sektor informal yang dikelola di bawah yurisdiksi Republik Indonesia.</li>
@@ -127,12 +126,12 @@ const TermsAndConditions: React.FC = () => {
           </article>
 
           {/* PASAL 2 */}
-          <article id="akun" className="space-y-4 border-b border-slate-100 pb-8">
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+          <article id="akun" className="space-y-4 border-b border-slate-100 dark:border-slate-800 pb-8">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
               2. Pendaftaran Akun & Perlindungan Data Pribadi
             </h2>
-            <div className="text-slate-600 text-sm md:text-base leading-relaxed space-y-3">
+            <div className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed space-y-3">
               <p>
                 Guna mengakses fungsionalitas penuh transaksi digital di platform, seluruh pengguna wajib mematuhi aturan akun berikut:
               </p>
@@ -145,12 +144,12 @@ const TermsAndConditions: React.FC = () => {
           </article>
 
           {/* PASAL 3 */}
-          <article id="escrow" className="space-y-4 border-b border-slate-100 pb-8">
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+          <article id="escrow" className="space-y-4 border-b border-slate-100 dark:border-slate-800 pb-8">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
               3. Sistem Keamanan Rekening Bersama (Escrow)
             </h2>
-            <div className="text-slate-600 text-sm md:text-base leading-relaxed space-y-3">
+            <div className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed space-y-3">
               <p>
                 Demi memastikan inklusi ekonomi yang adil dan transparan bagi sektor informal, skema finansial diatur sebagai berikut:
               </p>
@@ -163,12 +162,12 @@ const TermsAndConditions: React.FC = () => {
           </article>
 
           {/* PASAL 4 */}
-          <article id="crowdsourcing" className="space-y-4 border-b border-slate-100 pb-8">
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+          <article id="crowdsourcing" className="space-y-4 border-b border-slate-100 dark:border-slate-800 pb-8">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
               4. Mekanisme Kerja & Kebijakan Pembatalan Proyek
             </h2>
-            <div className="text-slate-600 text-sm md:text-base leading-relaxed space-y-3">
+            <div className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed space-y-3">
               <p>
                 Aturan pengerjaan proyek crowdsourcing demi meminimalisir perselisihan di lapangan:
               </p>
@@ -181,12 +180,12 @@ const TermsAndConditions: React.FC = () => {
           </article>
 
           {/* PASAL 5 */}
-          <article id="hki" className="space-y-4 border-b border-slate-100 pb-8">
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+          <article id="hki" className="space-y-4 border-b border-slate-100 dark:border-slate-800 pb-8">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
               5. Hak Kekayaan Intelektual (HKI)
             </h2>
-            <div className="text-slate-600 text-sm md:text-base leading-relaxed space-y-3">
+            <div className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed space-y-3">
               <p>
                 Kepemilikan aset digital atau fisik hasil pengerjaan platform diatur secara tegas:
               </p>
@@ -198,11 +197,11 @@ const TermsAndConditions: React.FC = () => {
 
           {/* PASAL 6 */}
           <article id="sengketa" className="space-y-4">
-            <h2 className="text-lg font-black text-slate-900 flex items-center gap-2">
+            <h2 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
               <span className="w-1.5 h-6 bg-blue-600 rounded-full inline-block"></span>
               6. Batasan Tanggung Jawab & Hukum yang Berlaku
             </h2>
-            <div className="text-slate-600 text-sm md:text-base leading-relaxed space-y-3">
+            <div className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed space-y-3">
               <p>
                 Platform tunduk penuh terhadap hukum digital Indonesia:
               </p>
@@ -214,16 +213,16 @@ const TermsAndConditions: React.FC = () => {
           </article>
 
           {/* ESCALATION BACK TO HELP CENTER */}
-          <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50 -mx-6 md:-mx-10 -mb-6 md:-mb-10 p-6 md:p-8 rounded-b-3xl">
+          <div className="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-50 dark:bg-slate-800/50 -mx-6 md:-mx-10 -mb-6 md:-mb-10 p-6 md:p-8 rounded-b-3xl">
             <div className="space-y-1">
-              <h4 className="font-bold text-slate-900 text-sm">Ada poin pasal yang kurang jelas?</h4>
-              <p className="text-slate-500 text-xs">
+              <h4 className="font-bold text-slate-900 dark:text-white text-sm">Ada poin pasal yang kurang jelas?</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-xs">
                 Kunjungi Pusat Bantuan kami untuk membaca skenario tanya jawab praktis seputar implementasi syarat di atas.
               </p>
             </div>
             <a 
               href="/help-center" 
-              className="px-4 py-2.5 bg-white border border-slate-200 hover:border-blue-600 hover:text-blue-600 font-bold text-xs rounded-xl text-slate-700 flex items-center gap-1.5 transition transition-all shrink-0 shadow-xs"
+              className="px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-blue-600 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 font-bold text-xs rounded-xl text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition transition-all shrink-0 shadow-xs"
             >
               Ke Pusat Bantuan <FiArrowRight />
             </a>

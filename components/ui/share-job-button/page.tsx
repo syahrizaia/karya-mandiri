@@ -47,7 +47,7 @@ export default function ShareJobButton({ jobId, jobTitle }: ShareJobButtonProps)
       {/* Tombol Pemicu Popover */}
       <PopoverTrigger asChild>
         <button 
-          className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl transition shadow-sm cursor-pointer"
           title="Bagikan lowongan"
         >
           <FiShare2 className="text-base" /> Bagikan
@@ -55,18 +55,24 @@ export default function ShareJobButton({ jobId, jobTitle }: ShareJobButtonProps)
       </PopoverTrigger>
 
       {/* Menu Dropdown Popover */}
-      <PopoverContent className="w-56 rounded-2xl p-2 bg-white border border-slate-200 shadow-xl z-50" side="top" align="end">
+      <PopoverContent 
+        className="w-56 rounded-2xl p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl z-50 transition-colors" 
+        side="top" 
+        align="end"
+      >
         <div className="flex flex-col space-y-1">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 py-1.5">Bagikan ke</p>
+          <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider px-3 py-1.5">
+            Bagikan ke
+          </p>
           
           {/* Opsi 1: WhatsApp */}
           <Link
             href={`https://wa.me/?text=${shareText}${encodeURIComponent(shareUrl)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-green-50 hover:text-green-700 rounded-xl transition-colors"
+            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-green-50 dark:hover:bg-green-950/30 hover:text-green-700 dark:hover:text-green-400 rounded-xl transition-colors"
           >
-            <FaWhatsapp className="text-lg text-green-500" />
+            <FaWhatsapp className="text-lg text-green-500 shrink-0" />
             WhatsApp
           </Link>
 
@@ -75,9 +81,9 @@ export default function ShareJobButton({ jobId, jobTitle }: ShareJobButtonProps)
             href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${shareText}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors"
+            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-950/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl transition-colors"
           >
-            <FaTelegram className="text-lg text-blue-400" />
+            <FaTelegram className="text-lg text-blue-400 shrink-0" />
             Telegram
           </Link>
 
@@ -86,23 +92,23 @@ export default function ShareJobButton({ jobId, jobTitle }: ShareJobButtonProps)
             href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 rounded-xl transition-colors"
+            className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 hover:text-indigo-700 dark:hover:text-indigo-400 rounded-xl transition-colors"
           >
-            <FiLinkedin className="text-lg text-indigo-500" />
+            <FiLinkedin className="text-lg text-indigo-500 shrink-0" />
             LinkedIn
           </Link>
 
-          <div className="h-px bg-slate-100 my-1" />
+          <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
 
           {/* Opsi 4: Salin Tautan */}
           <button
             onClick={handleCopyLink}
-            className="flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 rounded-xl transition-colors text-left"
+            className="flex items-center gap-3 w-full px-3 py-2 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-left cursor-pointer"
           >
             {copied ? (
-              <FiCheck className="text-lg text-green-600" />
+              <FiCheck className="text-lg text-green-600 dark:text-green-400 shrink-0" />
             ) : (
-              <FiCopy className="text-lg text-slate-500" />
+              <FiCopy className="text-lg text-slate-500 dark:text-slate-400 shrink-0" />
             )}
             {copied ? "Tersalin!" : "Salin Tautan"}
           </button>

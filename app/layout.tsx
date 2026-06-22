@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import ClientDashboardWrapper from "@/components/layout/page";
 import KamaAssistant from "@/components/ai/KamaAssistant";
 import { createClient } from "@/lib/supabase-browser";
+import PWALoader from "@/components/pwa/PWALoader";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const playfairDisplayHeading = Playfair_Display({
   subsets: ["latin"],
@@ -42,6 +44,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  manifest: "/manifest.json",
   // Informasi aplikasi
   applicationName: siteConfig.name,
   authors: [{ name: siteConfig.authorName, url: siteConfig.authorUrl }],
@@ -126,10 +129,10 @@ export const metadata: Metadata = {
     yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION ?? "",
     yahoo: process.env.NEXT_PUBLIC_YAHOO_VERIFICATION ?? "",
     other: {
-    'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION ?? "",
-    'baidu-site-verification': process.env.NEXT_PUBLIC_BAIDU_VERIFICATION ?? "",
-    'naver-site-verification': process.env.NEXT_PUBLIC_NAVER_VERIFICATION ?? "",
-  },
+      'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION ?? "",
+      'baidu-site-verification': process.env.NEXT_PUBLIC_BAIDU_VERIFICATION ?? "",
+      'naver-site-verification': process.env.NEXT_PUBLIC_NAVER_VERIFICATION ?? "",
+    },
   },
 };
 
@@ -145,6 +148,7 @@ export default async function RootLayout({
   return (
     <html
       lang="id"
+      suppressHydrationWarning
       className={cn(
         "h-full",
         "antialiased",
@@ -155,36 +159,44 @@ export default async function RootLayout({
         playfairDisplayHeading.variable
       )}
     >
-      <body className="min-h-full flex flex-col">
-        <ClientDashboardWrapper>{children}</ClientDashboardWrapper>
+      <body className="min-h-full flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <PWALoader />
 
-        <Toaster style={{ zIndex: 99999 }} position="top-center" richColors />
+          <ClientDashboardWrapper>{children}</ClientDashboardWrapper>
 
-        <KamaAssistant userId={currentUserID} />
+          <Toaster style={{ zIndex: 99999 }} position="top-center" richColors />
 
-        {/* Structured Data (JSON-LD) untuk organisasi / situs web */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "WebSite",
-              name: siteConfig.name,
-              url: siteConfig.url,
-              description: siteConfig.description,
-              author: {
-                "@type": "Person",
-                name: siteConfig.authorName,
-                url: siteConfig.authorUrl,
-              },
-              potentialAction: {
-                "@type": "SearchAction",
-                target: `${siteConfig.url}/search?q={search_term_string}`,
-                "query-input": "required name=search_term_string",
-              },
-            }),
-          }}
-        />
+          <KamaAssistant userId={currentUserID} />
+
+          {/* Structured Data (JSON-LD) untuk organisasi / situs web */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: siteConfig.name,
+                url: siteConfig.url,
+                description: siteConfig.description,
+                author: {
+                  "@type": "Person",
+                  name: siteConfig.authorName,
+                  url: siteConfig.authorUrl,
+                },
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: `${siteConfig.url}/search?q={search_term_string}`,
+                  "query-input": "required name=search_term_string",
+                },
+              }),
+            }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

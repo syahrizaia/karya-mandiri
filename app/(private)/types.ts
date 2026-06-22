@@ -73,7 +73,9 @@ export interface NotificationItem {
   id: string;
   title: string;
   message: string;
-  timestamp: string;
-  type: 'job' | 'payment' | 'system' | 'announcement';
-  isRead: boolean;
+  created_at: string;
+  type: 'payment' | 'job' | 'system' | 'applicant' | 'lead';
+  is_read: boolean;
+  user_id?: string;
+  sender_id?: string;
 }

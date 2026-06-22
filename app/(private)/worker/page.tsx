@@ -18,9 +18,10 @@ import { IJobs } from '@/app/types/jobs';
 import SaveJobButton from '@/components/ui/save-job-button/page';
 import formatRelativeTime from '@/components/ui/format-relative-time/page';
 import Link from 'next/link';
-import Services from '../../../components/manage-services/page';
-import PostServiceDialog from '@/components/create-service/page';
+import Services from '../../../components/worker/manage-services/page';
+import PostServiceDialog from '@/components/services/create-service/page';
 import { useRouter } from 'next/navigation';
+import SavedJobSkeleton from '@/components/worker/SavedJobSkeleton';
 
 interface IProfile {
   id: string | null;
@@ -46,7 +47,6 @@ const WorkerDashboard: React.FC = () => {
     completedTasks: 0,
   });
 
-  // Fetch data profil sekaligus mengunci ID user yang sedang login
   useEffect(() => {
     const initDashboardData = async () => {
       try {
@@ -110,61 +110,23 @@ const WorkerDashboard: React.FC = () => {
     console.log("Postingan berhasil dikirim, me-refresh feed data...");
   };
 
-  function SavedJobSkeleton() {
-    return (
-      <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 animate-pulse">
-        {/* Sisi Kiri: Ikon dan Teks */}
-        <div className="flex gap-4 items-center w-full md:w-auto">
-          {/* Mock Ikon Search */}
-          <div className="bg-slate-100 p-6 rounded-lg hidden sm:block w-12 h-12" />
-          
-          {/* Mock Judul dan Sub-info */}
-          <div className="space-y-2 flex-1 sm:flex-none min-w-50">
-            <div className="h-5 bg-slate-200 rounded-md w-3/4 md:w-48" />
-            <div className="flex items-center gap-3 mt-1">
-              <div className="h-5 bg-slate-100 rounded w-16" />
-              <div className="h-4 bg-slate-100 rounded w-24" />
-            </div>
-          </div>
-        </div>
-        
-        {/* Sisi Kanan: Upah dan Tombol Aksi */}
-        <div className="flex flex-col md:flex-row items-start justify-between w-full md:w-auto gap-6">
-          {/* Mock Info Upah */}
-          <div className="text-left md:text-right space-y-1 min-w-20">
-            <div className="h-3 bg-slate-100 rounded w-8 md:ml-auto" />
-            <div className="h-5 bg-slate-200 rounded w-20 md:ml-auto" />
-          </div>
-          
-          {/* Mock Tombol Aksi & Bookmark */}
-          <div className="grid grid-cols-4 items-center gap-3 w-full md:w-auto">
-            {/* Mock Tombol Ambil Tugas */}
-            <div className="h-10 bg-slate-200 rounded-lg col-span-3 min-w-30 md:w-32" />
-            {/* Mock SaveJobButton */}
-            <div className="h-10 bg-slate-200 rounded-lg w-10" />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen md:pt-12 lg:pt-4 lg:p-4">
+    <div className="min-h-screen md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Profil Singkat & Level */}
       <header className="flex flex-col md:flex-row justify-between items-end md:items-end mb-8 gap-4">
         <div className="flex flex-row justify-between gap-4 w-full">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Halo, {profile.name}!</h1>
-            <p className="text-slate-500 font-medium italic">Level: {profile.level}</p>
+            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-50">Halo, {profile.name}!</h1>
+            <p className="text-slate-500 dark:text-slate-400 font-medium italic">Level: {profile.level}</p>
           </div>
-          <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 h-fit px-4 py-2 rounded-full shadow-sm">
+          <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-400 h-fit px-4 py-2 rounded-full shadow-sm">
             <FiStar className="fill-current" />
             <span className="font-bold">{profile.rating.toFixed(1)} Rating Kerja</span>
           </div>
         </div>
         <button
           onClick={() => setDialogOpen(true)}
-          className="px-6 py-3.5 bg-white hover:bg-blue-100 text-blue-600 font-bold rounded-2xl shadow-md transition flex items-center gap-2 shrink-0"
+          className="px-6 py-3.5 bg-white dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 border border-transparent dark:border-slate-700 font-bold rounded-2xl shadow-md transition flex items-center gap-2 shrink-0"
         >
           <FiPlus className="stroke-3" /> Tawarkan Jasaku
         </button>
@@ -172,7 +134,7 @@ const WorkerDashboard: React.FC = () => {
 
       {/* Ringkasan Pendapatan & Capaian */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-linear-to-br from-green-500 to-green-600 p-6 rounded-2xl text-white shadow-lg">
+        <div className="bg-linear-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 p-6 rounded-2xl text-white shadow-lg">
           <div className="flex justify-between items-center opacity-80 mb-2">
             <p className="text-sm uppercase tracking-wider">Total Pendapatan</p>
             <FiDollarSign />
@@ -180,12 +142,12 @@ const WorkerDashboard: React.FC = () => {
           <h2 className="text-3xl font-bold">Rp{(profile?.totalEarnings ?? 0).toLocaleString("id-ID")}</h2>
         </div>
         
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex justify-between items-center transition-colors">
           <div>
-            <p className="text-sm text-slate-500 uppercase">Tugas Selesai</p>
-            <h2 className="text-3xl font-bold text-slate-800">{profile.completedTasks}</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 uppercase">Tugas Selesai</p>
+            <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-50">{profile.completedTasks}</h2>
           </div>
-          <FiCheckCircle className="text-blue-500 text-4xl" />
+          <FiCheckCircle className="text-blue-500 dark:text-blue-400 text-4xl" />
         </div>
       </div>
 
@@ -194,9 +156,9 @@ const WorkerDashboard: React.FC = () => {
       {/* Cari Tugas Baru */}
       <section className="mb-8">
         <div className="flex justify-between items-center mb-4 gap-4">
-          <h3 className="text-lg font-bold text-slate-800">Tugas Disimpan (Crowdsourcing)</h3>
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Tugas Disimpan (Crowdsourcing)</h3>
           <button
-            className="text-blue-600 text-sm font-semibold flex items-center gap-1"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold flex items-center gap-1"
             onClick={() => setShowSubModal(true)}
           >
             Lihat Semua <FiArrowRight />
@@ -205,29 +167,26 @@ const WorkerDashboard: React.FC = () => {
 
         <div className="space-y-4">
           {loading ? (
-            /* Menampilkan 3 kartu loading tiruan saat fetching data */
             <>
               <SavedJobSkeleton />
               <SavedJobSkeleton />
               <SavedJobSkeleton />
             </>
           ) : savedJobs.length === 0 ? (
-            /* Antisipasi jika tidak ada pekerjaan yang disimpan */
-            <div className="text-center py-10 text-slate-400 italic bg-slate-50 rounded-xl border border-dashed">
+            <div className="text-center py-10 text-slate-400 dark:text-slate-500 italic bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
               Belum ada proyek yang disimpan.
             </div>
           ) : (
-            /* Render data asli jika sudah selesai loading */
             savedJobs.map((job) => (
-              <div key={job.id} className="bg-white p-5 rounded-xl border border-slate-200 hover:border-blue-400 transition-all shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div key={job.id} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 transition-all shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex gap-4 items-center">
-                  <div className="bg-blue-100 p-3 rounded-lg text-blue-600 hidden sm:block">
+                  <div className="bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 p-3 rounded-lg hidden sm:block">
                     <FiSearch />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-800">{job.title}</h4>
-                    <div className="flex items-center gap-3 text-sm text-slate-500 mt-1">
-                      <span className="bg-slate-100 px-2 py-0.5 rounded">{job.category}</span>
+                    <h4 className="font-bold text-slate-800 dark:text-slate-100">{job.title}</h4>
+                    <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400 mt-1">
+                      <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{job.category}</span>
                       <span className="flex items-center gap-1"><FiClock /> {formatRelativeTime(job.deadline)}</span>
                     </div>
                   </div>
@@ -235,18 +194,18 @@ const WorkerDashboard: React.FC = () => {
                 
                 <div className="flex flex-col md:flex-row items-start justify-between w-full md:w-auto gap-6">
                   <div className="text-left md:text-right">
-                    <p className="text-xs text-slate-400">Upah</p>
-                    <p className="font-bold text-green-600 italic">Rp{job.reward.toLocaleString()}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">Upah</p>
+                    <p className="font-bold text-green-600 dark:text-green-400 italic">Rp{job.reward.toLocaleString()}</p>
                   </div>
                   <div className="grid grid-cols-4 items-center gap-3 w-full md:w-auto">
                     <Link
                       href={`/jobs/${job.id}`}
                       className={`px-5 py-2 rounded-lg text-center font-bold transition col-span-3 ${
-                      job.status === 'pending' 
-                        ? 'bg-orange-100 text-orange-600 cursor-not-allowed' 
-                        : job.status === 'completed'
-                          ? 'bg-slate-600 text-white cursor-not-allowed'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                        job.status === 'pending' 
+                          ? 'bg-orange-100 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400 cursor-not-allowed' 
+                          : job.status === 'completed'
+                            ? 'bg-slate-600 text-white dark:bg-slate-800 dark:text-slate-400 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
                       }`}
                       onClick={(e) => (job.status === 'pending' || job.status === 'completed') && e.preventDefault()}
                     >
@@ -287,18 +246,18 @@ const WorkerDashboard: React.FC = () => {
       </section>
 
       {/* Edukasi Mandiri (Micro-learning) */}
-      <div className="bg-indigo-900 rounded-2xl p-6 text-white overflow-hidden relative">
+      <div className="bg-indigo-900 dark:bg-indigo-950 rounded-2xl p-6 text-white overflow-hidden relative transition-colors">
         <div className="relative z-10">
           <h3 className="text-lg font-bold mb-2">Tingkatkan Skill-mu! 🚀</h3>
-          <p className="text-indigo-200 text-sm mb-4">Ikuti pelatihan singkat gratis untuk mendapatkan akses ke tugas dengan upah lebih tinggi.</p>
+          <p className="text-indigo-200 dark:text-indigo-300 text-sm mb-4">Ikuti pelatihan singkat gratis untuk mendapatkan akses ke tugas dengan upah lebih tinggi.</p>
           <Link
             href="/training"
-            className="bg-white text-indigo-900 px-4 py-2 rounded-lg font-bold text-sm"
+            className="bg-white dark:bg-slate-100 text-indigo-900 dark:text-indigo-950 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-100/90 transition-colors"
           >
             Mulai Belajar
           </Link>
         </div>
-        <FiStar className="absolute -right-4 -bottom-4 text-indigo-800 text-9xl opacity-50" />
+        <FiStar className="absolute -right-4 -bottom-4 text-indigo-800 dark:text-indigo-900 text-9xl opacity-50" />
       </div>
       
       <PostServiceDialog 

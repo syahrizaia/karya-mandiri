@@ -67,18 +67,18 @@ const DataSecurity: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 bg-slate-50 dark:bg-slate-950 transition-colors">
       
       {/* HERO SECTION */}
-      <section className="bg-white border-b border-slate-200 py-8 px-6 text-center relative overflow-hidden">
+      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-8 px-6 text-center relative overflow-hidden transition-colors">
         <div className="max-w-3xl mx-auto space-y-4 relative z-10">
-          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
             <FiShield /> Infrastruktur Aman
           </span>
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight leading-tight">
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
             Komitmen Keamanan & <br />Perlindungan Siber KaryaMandiri
           </h1>
-          <p className="text-slate-500 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
+          <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
             Kami membangun sistem dengan standar arsitektur bank-grade untuk memastikan seluruh data pribadi, dokumen KYC, dan dana transaksi di platform Anda terlindungi secara menyeluruh.
           </p>
         </div>
@@ -91,7 +91,7 @@ const DataSecurity: React.FC = () => {
       </section>
 
       {/* CORE INFRASTRUCTURE PILLARS */}
-      <main className="max-w-5xl mx-auto mt-8 space-y-16">
+      <main className="max-w-5xl mx-auto mt-8 space-y-16 px-4">
         
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {securityPillars.map((pillar, idx) => (
@@ -101,31 +101,31 @@ const DataSecurity: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="bg-white border border-slate-200/80 rounded-3xl p-6 md:p-8 shadow-xs flex flex-col justify-between hover:border-indigo-500/50 transition duration-300"
+              className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-xs flex flex-col justify-between hover:border-indigo-500/50 transition duration-300"
             >
               <div className="space-y-4">
                 {/* Icon Header */}
-                <div className="w-12 h-12 bg-indigo-50 border border-indigo-100 rounded-2xl text-indigo-600 flex items-center justify-center text-xl">
+                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 rounded-2xl text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl">
                   {pillar.icon}
                 </div>
                 
                 {/* Title & Desc */}
                 <div className="space-y-1">
-                  <h3 className="font-black text-slate-900 text-base md:text-lg">
+                  <h3 className="font-black text-slate-900 dark:text-white text-base md:text-lg">
                     {pillar.title}
                   </h3>
-                  <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
+                  <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed">
                     {pillar.description}
                   </p>
                 </div>
 
-                <hr className="border-slate-100" />
+                <hr className="border-slate-100 dark:border-slate-800" />
 
                 {/* Technical Bullet Points */}
                 <ul className="space-y-2.5 pt-1">
                   {pillar.details.map((detail, dIdx) => (
-                    <li key={dIdx} className="flex items-start gap-2.5 text-xs text-slate-600 leading-normal">
-                      <FiCheckCircle className="text-emerald-500 text-base shrink-0 mt-0.5" />
+                    <li key={dIdx} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400 leading-normal">
+                      <FiCheckCircle className="text-emerald-500 dark:text-emerald-400 text-base shrink-0 mt-0.5" />
                       <span>{detail}</span>
                     </li>
                   ))}
@@ -136,18 +136,18 @@ const DataSecurity: React.FC = () => {
         </section>
 
         {/* SECURITY RESPONSIBILITY ADVISORY CARD */}
-        <section className="bg-amber-50 border border-amber-200/70 rounded-3xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <section className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50 rounded-3xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           <div className="md:col-span-2 flex justify-center md:justify-start">
-            <div className="w-14 h-14 bg-amber-100 border border-amber-200 text-amber-700 rounded-2xl flex items-center justify-center text-2xl shadow-xs">
+            <div className="w-14 h-14 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-2xl flex items-center justify-center text-2xl shadow-xs">
               <FiAlertTriangle />
             </div>
           </div>
           
           <div className="md:col-span-10 text-center md:text-left space-y-2">
-            <h4 className="font-black text-amber-900 text-base">
+            <h4 className="font-black text-amber-900 dark:text-amber-100 text-base">
               Bagian Penting: Tanggung Jawab Keamanan Akun Anda
             </h4>
-            <p className="text-amber-800 text-xs md:text-sm leading-relaxed">
+            <p className="text-amber-800 dark:text-amber-200 text-xs md:text-sm leading-relaxed">
               Meskipun platform KaryaMandiri memproteksi server secara maksimal, keamanan akun juga sangat bergantung pada kedisiplinan Anda. Jangan pernah membagikan password, kode OTP, atau token akses kepada pihak lain yang mengaku sebagai tim internal kami. Kami tidak pernah meminta kredensial rahasia Anda demi alasan apa pun.
             </p>
           </div>
@@ -160,7 +160,7 @@ const DataSecurity: React.FC = () => {
               Menemukan Celah Keamanan (Bug Vulnerability)?
             </h3>
             <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
-              Kami sangat mengapresiasi kontribusi para peneliti keamanan siber secara etis (*ethical hacking*). Jika Anda mendeteksi adanya celah keamanan pada sistem API, otentikasi, atau basis data kami, segera laporkan ke tim tanggap insiden digital.
+              Kami sangat mengapresiasi kontribusi para peneliti keamanan siber secara etis (ethical hacking). Jika Anda mendeteksi adanya celah keamanan pada sistem API, otentikasi, atau basis data kami, segera laporkan ke tim tanggap insiden digital.
             </p>
           </div>
 
