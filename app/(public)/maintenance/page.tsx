@@ -17,7 +17,7 @@ export default function MaintenancePage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-amber-500 selection:text-slate-900 transition-colors">
+    <div className="flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-amber-500 selection:text-slate-900 transition-colors">
       
       {/* Kontainer Utama */}
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/50 p-8 rounded-3xl backdrop-blur-md shadow-2xl relative overflow-hidden transition-colors">

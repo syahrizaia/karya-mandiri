@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -5,12 +6,16 @@ import React, { useState, useEffect } from "react";
 import { FiDownload, FiMonitor, FiCheckCircle, FiArrowLeft, FiSmartphone } from "react-icons/fi";
 import { SiGoogleplay, SiApple } from "react-icons/si";
 import { useRouter } from "next/navigation";
+import QRCode from "react-qr-code";
 
 export default function DownloadPage() {
   const router = useRouter();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [currentUrl, setCurrentUrl] = useState("");
 
   useEffect(() => {
+    setCurrentUrl(window.location.href);
+    
     // Menangkap event install prompt
     const handler = (e: any) => {
       e.preventDefault();
@@ -38,7 +43,7 @@ export default function DownloadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8 flex flex-col items-center">
+    <div className="bg-slate-50 dark:bg-slate-950 p-4 md:p-8 flex flex-col items-center">
       
       <button 
         onClick={() => router.back()}
@@ -84,11 +89,18 @@ export default function DownloadPage() {
           <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-semibold text-sm">
             <FiMonitor /> Scan via Ponsel
           </div>
-          <div className="w-32 h-32 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-400 text-xs">
-            [QR Code]
+          <div className="p-3 bg-white rounded-xl">
+             <QRCode
+                size={120}
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                value={currentUrl} // URL yang akan dituju saat di-scan
+                viewBox={`0 0 256 256`}
+                fgColor="#000000" // Warna QR hitam
+             />
           </div>
+          
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Pindai untuk instalasi cepat.
+            Arahkan kamera ponsel Anda ke kode ini.
           </p>
         </div>
 
