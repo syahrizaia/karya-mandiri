@@ -125,7 +125,7 @@ const HelpCenter: React.FC = () => {
         </div>
       </section>
 
-      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 px-4">
+      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* SIDEBAR NAVIGATION */}
         <aside className="lg:col-span-1 space-y-3">

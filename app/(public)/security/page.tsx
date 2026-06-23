@@ -91,7 +91,7 @@ const DataSecurity: React.FC = () => {
       </section>
 
       {/* CORE INFRASTRUCTURE PILLARS */}
-      <main className="max-w-5xl mx-auto mt-8 space-y-16 px-4">
+      <main className="max-w-5xl mx-auto mt-8 space-y-16">
         
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {securityPillars.map((pillar, idx) => (

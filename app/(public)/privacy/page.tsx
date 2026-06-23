@@ -71,7 +71,7 @@ const PrivacyPolicy: React.FC = () => {
       </section>
 
       {/* TWO COLUMN LAYOUT */}
-      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-4 gap-10 px-4">
+      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-4 gap-10">
         
         {/* STICKY SIDEBAR NAVIGATION */}
         <aside className="lg:col-span-1 hidden lg:block">

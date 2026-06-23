@@ -238,7 +238,7 @@ const DetailJob: React.FC = () => {
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto mt-4 px-4 sm:px-6 flex flex-col gap-4">
+      <main className="max-w-5xl mx-auto mt-4 flex flex-col gap-4">
         <DetailJobContentGrid
           job={job}
           userId={userId}

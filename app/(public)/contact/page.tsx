@@ -114,7 +114,7 @@ ${formData.message}`;
       </section>
 
       {/* TWO COLUMN CONTENT LAYOUT */}
-      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 px-4">
+      <main className="max-w-5xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* KOLOM KIRI: FORMULIR KONTAK */}
         <section className="lg:col-span-7">

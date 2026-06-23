@@ -184,7 +184,7 @@ const TrainingCenter: React.FC = () => {
       </section>
 
       {/* FILTER CATEGORIES */}
-      <main className="max-w-5xl mx-auto mt-8 space-y-8 px-4">
+      <main className="max-w-5xl mx-auto mt-8 space-y-8">
         
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {categories.map((cat) => (

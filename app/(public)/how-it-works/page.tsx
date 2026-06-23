@@ -122,7 +122,7 @@ const CaraKerjaCrowd: React.FC = () => {
       </section>
 
       {/* TIMELINE / STEP BY STEP PROCESS SECTION */}
-      <main className="max-w-5xl mx-auto mt-8 px-4">
+      <main className="max-w-5xl mx-auto mt-8">
         
         <AnimatePresence mode="wait">
           <motion.div

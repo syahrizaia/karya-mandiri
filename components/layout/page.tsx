@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { FiBriefcase, FiHome, FiSettings, FiBell, FiMenu, FiX, FiLogOut, FiMoon, FiSun, FiDownload } from "react-icons/fi";
+import { FiBriefcase, FiHome, FiSettings, FiBell, FiMenu, FiX, FiLogOut, FiMoon, FiSun, FiDownload, FiLogIn } from "react-icons/fi";
 import { usePathname, useRouter } from "next/navigation";
 import Footer from "@/components/footer/page";
 import { MdHistory, MdWorkspacesOutline } from "react-icons/md";
@@ -228,8 +228,8 @@ export default function ClientDashboardWrapper({
               className="flex w-full items-center justify-between p-3 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             >
               <div className="flex items-center gap-3">
-                {isDarkMode ? <FiSun /> : <FiMoon />} 
-                <span>{isDarkMode ? "Mode Terang" : "Mode Gelap"}</span>
+                {mounted && isDarkMode ? <FiSun /> : <FiMoon />} 
+                <span>{mounted && isDarkMode ? "Mode Terang" : "Mode Gelap"}</span>
               </div>
               <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors ${mounted && isDarkMode ? 'bg-blue-600' : 'bg-slate-300'}`}>
                 <div className={`bg-white w-3 h-3 rounded-full transition-transform ${mounted && isDarkMode ? 'translate-x-5' : 'translate-x-0'}`} />
@@ -237,13 +237,24 @@ export default function ClientDashboardWrapper({
             </button>
           </div>
 
+          {/* SISI USER BELUM LOGIN (GUEST) */}
           {!loading && (!userRole || userRole === "guest") && (
-            <Link
-              href="/"
-              className="flex items-center gap-3 p-3 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors mt-2 border border-dashed border-blue-200 dark:border-blue-900/50 font-semibold text-sm"
-            >
-              <FiHome /> Beranda Utama
-            </Link>
+            <>
+              <Link
+                href="/"
+                className="flex items-center gap-3 p-3 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors mt-2 border border-dashed border-blue-200 dark:border-blue-900/50 font-semibold text-sm"
+              >
+                <FiHome /> Beranda Utama
+              </Link>
+              
+              {/* TOMBOL LOGIN BARU */}
+              <Link
+                href="/login"
+                className="flex items-center gap-3 p-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all mt-2 font-bold text-sm shadow-md shadow-blue-500/10"
+              >
+                <FiLogIn /> Login / Masuk
+              </Link>
+            </>
           )}
 
           {/* Profil User Section */}
