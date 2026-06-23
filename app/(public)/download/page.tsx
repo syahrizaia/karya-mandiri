@@ -100,6 +100,7 @@ export default function DownloadPage() {
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') {
+      localStorage.setItem("pwa_installed", "true");
       await trackDownload("pwa"); // Catat jika PWA berhasil dipasang
       setDeferredPrompt(null);
     }

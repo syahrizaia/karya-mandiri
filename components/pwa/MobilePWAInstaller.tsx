@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
@@ -9,11 +10,27 @@ export default function MobilePWAInstaller() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Tampilkan hanya jika di perangkat mobile
     const isMobile = window.innerWidth < 768;
-    if (isMobile) {
+    
+    const isStandalone = 
+      window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as any).standalone === true; // Fallback untuk iOS Safari
+
+    const isAlreadyInstalled = localStorage.getItem("pwa_installed") === "true";
+
+    // Tampilkan banner hanya jika di mobile DAN belum terinstal sama sekali
+    if (isMobile && !isStandalone && !isAlreadyInstalled) {
       setIsVisible(true);
     }
+
+    // Listener otomatis: Jika user menginstal aplikasi, langsung hilangkan banner saat itu juga
+    const handleAppInstalled = () => {
+      localStorage.setItem("pwa_installed", "true");
+      setIsVisible(false);
+    };
+
+    window.addEventListener('appinstalled', handleAppInstalled);
+    return () => window.removeEventListener('appinstalled', handleAppInstalled);
   }, []);
 
   if (!isVisible) return null;
@@ -33,7 +50,7 @@ export default function MobilePWAInstaller() {
           </div>
         </div>
         
-        {/* Sisi Kanan: Tombol Aksi */}
+        {/* Sisi Rencana Tindakan */}
         <div className="flex items-center gap-2 shrink-0 ml-2">
           <Link
             href="/download"
