@@ -1,74 +1,100 @@
-# KaryaMandiri ![Version](https://img.shields.io/badge/version-1.0.0-blue)
+# KaryaMandiri
+
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
+![React](https://img.shields.io/badge/React-19-61dafb)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)
+
 ![Logo KaryaMandiri](public/screenshot-landing-page.png)
 
 **"Memberdayakan Tangan-Tangan Terampil, Membangun Kemandirian Bangsa."**
 
-KaryaMandiri adalah platform inklusi ekonomi sektor informal berbasis model bisnis *crowdsourcing*. Platform ini dirancang untuk menjembatani kesenjangan akses bagi pekerja sektor informal (seperti kurir, tenaga sortir, pekerja harian, dan UMKM rumahan) ke dalam ekosistem digital yang terstruktur, transparan, dan berdaya saing.
+KaryaMandiri adalah platform inklusi ekonomi sektor informal berbasis model bisnis *crowdsourcing*. Platform ini menjembatani pekerja sektor informal (kurir, tenaga sortir, pekerja harian, UMKM rumahan) ke dalam ekosistem digital yang terstruktur, transparan, dan berdaya saing.
 
 ## 🌐 Live Demo
-Kunjungi platform kami di: [https://karya-mandiri.vercel.app](https://karya-mandiri.vercel.app)
+
+[https://karya-mandiri.vercel.app](https://karya-mandiri.vercel.app)
 
 ---
 
 ## 🚀 Fitur Utama
-*   **Crowdsourcing Engine:** Memecah proyek skala besar menjadi tugas mikro yang dapat dikerjakan secara kolaboratif oleh komunitas.
-*   **Visual Trust System:** Portofolio berbasis multimedia yang memvalidasi keahlian pekerja melalui testimoni dan *community vouching*.
-*   **Collective Procurement:** Fitur belanja kolektif untuk menekan biaya operasional mitra.
-*   **Decision Support System (DSS):** Dasbor analitik untuk memonitor tren ekonomi sektor informal secara *real-time*.
-*   **Smart-Contract Lite:** Kesepakatan kerja digital dengan bahasa sederhana untuk melindungi hak pekerja.
+
+- **Crowdsourcing Engine** — memecah proyek skala besar menjadi tugas mikro yang dikerjakan kolaboratif.
+- **Visual Trust System** — portofolio multimedia dengan testimoni dan *community vouching*.
+- **Collective Procurement** — belanja kolektif untuk menekan biaya operasional mitra.
+- **Decision Support System (DSS)** — dasbor analitik tren ekonomi sektor informal *real-time*.
+- **Smart-Contract Lite** — kesepakatan kerja digital berbahasa sederhana.
+- **Asisten Suara Kama** — navigasi, pencarian, dan aksi sistem via perintah suara (Gemini AI).
+- **PWA + Push Notification** — installable, offline-ready, notifikasi web push real-time.
+- **AI Brief Enhancer** — peningkatan deskripsi proyek/layanan berbasis AI.
 
 ## 🛠 Tech Stack
-Platform ini dibangun dengan teknologi modern untuk performa tinggi dan skalabilitas:
-*   **Framework:** [Next.js 15+](https://nextjs.org/) (App Router)
-*   **Styling:** [Tailwind CSS](https://tailwindcss.com/)
-*   **Language:** TypeScript
-*   **Database:** PostgreSQL (via Supabase)
-*   **State Management:** Zustand / React Query
-*   **Deployment:** [Vercel](https://vercel.com/)
-*   **Tooling:** Postman (API Documentation), Zod (Validation)
+
+| Layer | Teknologi |
+|---|---|
+| Framework | [Next.js 16](https://nextjs.org/) (App Router, React Compiler, Turbopack) |
+| UI | [React 19](https://react.dev/) |
+| Styling | [Tailwind CSS v4](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) + Radix UI |
+| Language | TypeScript 5 |
+| Database & Auth | [Supabase](https://supabase.com/) (PostgreSQL, `@supabase/ssr`) |
+| Animasi | Framer Motion |
+| AI | Google Gemini (`@google/generative-ai`) |
+| PWA & Push | Service Worker + Web Push API |
+| Deployment | [Vercel](https://vercel.com/) |
 
 ## 📋 Struktur Proyek
+
 ```text
-/app             # Next.js App Router (Pages & Layouts)
-/components      # Reusable UI Components
-/lib             # Konfigurasi Database & Server Actions
-/types           # TypeScript Interfaces
-/public          # Aset Statis
+app/            # Next.js App Router (route groups: auth, private, public, api)
+components/     # Reusable UI & feature components
+lib/            # Supabase client, utils
+types/          # TypeScript interfaces
+public/         # Static assets (PWA manifest, service worker)
+middleware.ts   # Proteksi rute + refresh sesi Supabase
 ```
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 🚦 Prasyarat
 
-## Getting Started
+- Node.js 20+
+- Akun [Supabase](https://supabase.com/) (PostgreSQL + Auth)
+- (Opsional) API key Google Gemini untuk fitur AI
 
-First, run the development server:
+## ⚙️ Environment Variables
+
+Buat `.env.local` di root proyek:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SITE_URL=https://karya-mandiri.vercel.app
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=
+GEMINI_API_KEY=
+```
+
+## 🚀 Menjalankan Proyek
 
 ```bash
+# Install dependensi
+npm install
+
+# Mode development
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Production build
+npm run build
+
+# Jalankan hasil build
+npm start
+
+# Lint
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Buka [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📚 Dokumentasi
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js](https://nextjs.org/docs)
+- [Supabase SSR](https://supabase.com/docs/guides/auth/server-side/nextjs)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+- [Web Push API](https://web.dev/push-notifications-web-push-protocol/)
