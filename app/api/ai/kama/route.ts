@@ -3,11 +3,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  console.log("\n=== KAMA API ROUTE DIPANGGIL ===");
-
   try {
     const { command } = await req.json();
-    console.log("Kalimat dari User:", command);
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -60,16 +57,12 @@ export async function POST(req: Request) {
       Aturan Ketat: Hanya kembalikan output berupa valid JSON objek tunggal tanpa markdown, tanpa teks tambahan apa pun.
     `;
 
-    console.log("Sedang mengirim perintah ke Gemini AI...");
     const result = await model.generateContent(systemPrompt);
     const aiResponse = result.response.text();
-    
-    console.log("Respon Mentah Gemini:", aiResponse);
 
     const cleanText = aiResponse.replace(/```json|```/g, "").trim();
     const jsonAction = JSON.parse(cleanText);
 
-    console.log("Sukses memproses aksi:", jsonAction);
     return NextResponse.json(jsonAction);
 
   } catch (error: any) {

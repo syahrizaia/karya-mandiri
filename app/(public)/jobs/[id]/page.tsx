@@ -3,13 +3,15 @@
 import { IJobs } from "@/app/types/jobs";
 import supabase from "@/lib/db";
 import { useParams, useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { FiChevronLeft } from "react-icons/fi";
-import SubscriptionDialog from "../../../../components/subscription/page";
-import ApplyJobDialog from "@/components/apply-job/page";
 import ShareJobButton from "@/components/jobs/share-job-button/page";
 import DetailJobContentGrid from "@/components/jobs/detail-job-content-grid/page";
 import EmployerManagementPanel, { IApplicant } from "@/components/jobs/EmployerManagementPanel";
+
+const SubscriptionDialog = dynamic(() => import("../../../../components/subscription/page"), { ssr: false });
+const ApplyJobDialog = dynamic(() => import("@/components/apply-job/page"), { ssr: false });
 
 const DetailJob: React.FC = () => {
   const params = useParams();
@@ -48,7 +50,7 @@ const DetailJob: React.FC = () => {
 
             const { data: savedData } = await supabase
               .from("saved_jobs")
-              .select("*")
+              .select("id")
               .eq("user_id", user.id)
               .eq("job_id", params.id)
               .maybeSingle();

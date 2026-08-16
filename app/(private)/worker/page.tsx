@@ -37,6 +37,7 @@ const WorkerDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [savedJobs, setSavedJobs] = useState<IJobs[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const [profile, setProfile] = useState<IProfile>({
     id: null,
     name: "Pengguna",
@@ -103,10 +104,10 @@ const WorkerDashboard: React.FC = () => {
     };
 
     initDashboardData();
-  }, [router]);
+  }, [router, refreshKey]);
 
   const handleRefreshData = () => {
-    console.log("Postingan berhasil dikirim, me-refresh feed data...");
+    setRefreshKey((k) => k + 1);
   };
 
   return (

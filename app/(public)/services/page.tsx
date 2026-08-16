@@ -164,8 +164,7 @@ function ServicesContent() {
       window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
 
     } catch (error: any) {
-      console.error("Ditemukan Error Supabase:", error); 
-      console.log("Stringified Error:", JSON.stringify(error, null, 2));
+      console.error("Ditemukan Error Supabase:", error);
       toast.error(`Gagal mencatat lead: ${error?.message || "Kesalahan sistem"}`);
     }
   };

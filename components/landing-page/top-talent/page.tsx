@@ -2,6 +2,7 @@
 
 import supabase from "@/lib/db";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FiStar } from "react-icons/fi";
 import { MdVerified } from "react-icons/md";
@@ -87,11 +88,12 @@ export default function TopTalent() {
                   {/* Perbaikan: Menambahkan slash '/' di awal path agar routing absolut tidak menumpuk */}
                   <Link href={`/profile/${talent.id}`} className="flex items-center gap-4">
                     <div className="relative w-14 h-14 shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
-                        src={talent.avatar_url} 
-                        alt={talent.full_name} 
-                        className="w-full h-full object-cover rounded-2xl border border-slate-700" 
+                      <Image
+                        src={talent.avatar_url}
+                        alt={talent.full_name}
+                        width={56}
+                        height={56}
+                        className="w-full h-full object-cover rounded-2xl border border-slate-700"
                       />
                       <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-0.5 rounded-full border border-slate-900">
                         <MdVerified size={14} />

@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import ClientDashboardWrapper from "@/components/layout/page";
 import KamaAssistant from "@/components/ai/KamaAssistant";
-import { createClient } from "@/lib/supabase-browser";
+import { createClient } from "@/lib/supabase-server";
 import PWALoader from "@/components/pwa/PWALoader";
 import { ThemeProvider } from "@/components/theme-provider";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://karya-mandiri.vercel.app";
 
 const playfairDisplayHeading = Playfair_Display({
   subsets: ["latin"],
@@ -29,7 +31,7 @@ const geistMono = Geist_Mono({
 // Metadata SEO yang lebih lengkap
 const siteConfig = {
   name: "KaryaMandiri",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://karya-mandiri.vercel.app",
+  url: SITE_URL,
   ogImage: "/og-image.jpg", // ukuran 1200x630, taruh di folder public
   description: "Platform crowdsourcing freelance terpercaya di Indonesia. Temukan proyek, lowongan pekerjaan, dan penyedia jasa profesional yang siap membantu kebutuhan bisnis Anda.",
   authorName: "Syahriza",
@@ -37,7 +39,7 @@ const siteConfig = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: siteConfig.url,
+  metadataBase: new URL(siteConfig.url),
   // Title default & template (untuk halaman lain bisa override)
   title: {
     default: siteConfig.name,
@@ -71,6 +73,12 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   creator: siteConfig.authorName,
   publisher: siteConfig.authorName,
+  category: "jobs",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   robots: {
     index: true,
     follow: true,
@@ -190,7 +198,7 @@ export default async function RootLayout({
                 },
                 potentialAction: {
                   "@type": "SearchAction",
-                  target: `${siteConfig.url}/search?q={search_term_string}`,
+                  target: `${siteConfig.url}/jobs?q={search_term_string}`,
                   "query-input": "required name=search_term_string",
                 },
               }),

@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -53,7 +51,6 @@ const EmployerDashboard: React.FC = () => {
   const router = useRouter();
   const [jobs, setJobs] = useState<IJobs[]>([]);
   const [loading, setLoading] = useState(true);
-  const [employerName, setEmployerName] = useState<string>("User");
   const [selectedJob, setSelectedJob] = useState<{
     job: IJobs;
     action: "edit" | "delete";
@@ -93,7 +90,7 @@ const EmployerDashboard: React.FC = () => {
           .single();
         
         if (profile?.full_name) {
-          setEmployerName(profile.full_name);
+          setStats((prev) => ({ ...prev, name: profile.full_name }));
         }
 
         const { data: jobsData, error: jobsError } = await supabase
@@ -128,10 +125,6 @@ const EmployerDashboard: React.FC = () => {
 
     fetchEmployerDashboardData();
   }, [router]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery]);
 
   const filteredJobs = jobs.filter((job) =>
     job.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -190,7 +183,7 @@ const EmployerDashboard: React.FC = () => {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                   placeholder="Cari judul proyek..."
                   className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition bg-gray-50/50 dark:bg-slate-800 text-gray-800 dark:text-slate-100"
                 />

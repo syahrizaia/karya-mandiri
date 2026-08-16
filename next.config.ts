@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  reactCompiler: true,
   images: {
     remotePatterns: [
       {
@@ -26,6 +24,7 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'qnevjjzuwpvekiccokfn.supabase.co',
+        port: '',
         pathname: '/storage/v1/object/public/**',
       },
       {

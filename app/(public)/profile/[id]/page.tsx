@@ -4,16 +4,18 @@
 "use client";
 
 import React, { useEffect, useState, use } from "react";
+import dynamic from "next/dynamic";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
 
-import SubscriptionDialog from "../../../../components/subscription/page";
-import EditProfileDialog from "@/components/profile/edit-profile/page";
-import EditProfilePhotoDialog from "@/components/profile/edit-profile-photo/page";
-import EditProfileBannerDialog from "@/components/profile/edit-profile-banner/page";
 import PerfomanceStatistic from "@/components/profile/perfomance-statistic/page";
 import SkillsAndWallet from "@/components/profile/skills-and-wallet/page";
 import TabPanel from "@/components/profile/tab-panel/page";
+
+const SubscriptionDialog = dynamic(() => import("../../../../components/subscription/page"), { ssr: false });
+const EditProfileDialog = dynamic(() => import("@/components/profile/edit-profile/page"), { ssr: false });
+const EditProfilePhotoDialog = dynamic(() => import("@/components/profile/edit-profile-photo/page"), { ssr: false });
+const EditProfileBannerDialog = dynamic(() => import("@/components/profile/edit-profile-banner/page"), { ssr: false });
 import { ProfileSkeleton } from "@/components/profile/ProfileSkeleton";
 import { ProfileWarningBanner } from "@/components/profile/ProfileWarningBanner";
 import { ProfileHeaderCard } from "@/components/profile/ProfileHeaderCard";
@@ -63,19 +65,18 @@ const Profile: React.FC<ProfileProps> = ({ params }) => {
     try {
       setLoading(true);
 
-      const [profileRes] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", profileId).maybeSingle(),
-        supabase.from("portfolios").select("*").eq("user_id", profileId).order("created_at", { ascending: false }),
-        supabase.from("reviews").select("*").eq("profile_id", profileId).order("created_at", { ascending: false })
-      ]);
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("full_name, phone, email, role, bio, location, skills, is_verified, balance, avatar_url, banner_url, created_at")
+        .eq("id", profileId)
+        .maybeSingle();
 
-      if (profileRes.error && profileRes.error.code !== "PGRST116") {
-        console.error("Profile Fetch Error:", profileRes.error);
+      if (profileError && profileError.code !== "PGRST116") {
+        console.error("Profile Fetch Error:", profileError);
         toast.error("Gagal memuat profil.");
         return;
       }
 
-      const profile = profileRes.data;
       if (!profile) {
         toast.error("Profil tidak ditemukan.");
         return;

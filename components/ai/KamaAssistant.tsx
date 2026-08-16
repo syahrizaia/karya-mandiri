@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable react-hooks/immutability */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -15,101 +13,15 @@ interface KamaAssistantProps {
 export default function KamaAssistant({ userId }: KamaAssistantProps) {
   const router = useRouter();
   const [isListening, setIsListening] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [kamaStatus, setKamaStatus] = useState("Kama siap membantu");
   const recognitionRef = useRef<any>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const userIdRef = useRef(userId);
+  const processingRef = useRef(false);
 
   useEffect(() => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.lang = "id-ID";
-      recognition.interimResults = false;
-
-      recognition.onresult = async (event: any) => {
-        const currentResultIndex = event.resultIndex;
-        const transcript = event.results[currentResultIndex][0].transcript.toLowerCase();
-
-        console.log("Teks yang didengar Google STT:", transcript);
-        setKamaStatus(`Mendengar: "${transcript}"`);
-
-        const wakeWords = ["kama", "kamu", "kamar", "karma", "karna", "sama"];
-        const isWakeWordDetected = wakeWords.some(word => transcript.includes(word));
-
-        if (isWakeWordDetected && !isProcessing) {
-          setIsProcessing(true);
-          toast.loading("Kama sedang memproses perintah Anda...", { id: "kama-voice" });
-          
-          try {
-            const res = await fetch("/api/ai/kama", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ command: transcript }),
-            });
-            
-            if (!res.ok) throw new Error("Server bermasalah");
-            const data = await res.json();
-
-            let finalTargetRoute = data.target;
-
-            // Proteksi rute profil dinamis
-            if (finalTargetRoute && finalTargetRoute.includes("CURRENT_USER")) {
-              if (!userId) {
-                const loginWarning = "Maaf Pak, Anda harus masuk atau login terlebih dahulu untuk mengakses halaman profil.";
-                speakBack(loginWarning);
-                toast.error(loginWarning, { id: "kama-voice" });
-                return;
-              }
-              finalTargetRoute = finalTargetRoute.replace("CURRENT_USER", userId);
-            }
-
-            // Jalankan feedback vokal dari Google Translate Proxy
-            if (data.message && (!data.target || !data.target.includes("CURRENT_USER") || userId)) {
-              speakBack(data.message);
-            }
-
-            // EKSEKUSI AKSI SISTEM (FIXED)
-            if (data.action === "NAVIGATE") {
-              router.push(finalTargetRoute);
-              toast.success(`Kama: ${data.message}`, { id: "kama-voice" });
-              
-            } else if (data.action === "OPEN_MODAL") {
-              if (data.target === "POST_SERVICE") {
-                window.dispatchEvent(new CustomEvent("open-post-service-modal"));
-              } else if (data.target === "POST_PROJECT") {
-                window.dispatchEvent(new CustomEvent("open-post-project-modal"));
-              }
-              toast.success(`Kama: ${data.message}`, { id: "kama-voice" });
-              
-            } else if (data.action === "SPEAK") {
-              toast.info(data.message, { id: "kama-voice" });
-              
-            } else if (data.action === "SEARCH") {
-              const finalPath = data.target || "/services";
-              router.push(`${finalPath}?search=${encodeURIComponent(data.query)}`);
-              window.dispatchEvent(new CustomEvent("kama-trigger-search", { detail: data.query }));
-              toast.success(`Kama: ${data.message}`, { id: "kama-voice" });
-            }
-          } catch (err) {
-            console.error("Frontend Fetch Error:", err);
-            toast.error("Kama kesulitan memahami perintah itu.", { id: "kama-voice" });
-          } finally {
-            setIsProcessing(false);
-          }
-        }
-      };
-
-      recognition.onerror = (event: any) => {
-        console.error("Speech error: ", event.error);
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-    }
-  }, [router, userId, isProcessing]);
+    userIdRef.current = userId;
+  }, [userId]);
 
   const speakBack = async (text: string) => {
     if (audioRef.current) {
@@ -136,14 +48,11 @@ export default function KamaAssistant({ userId }: KamaAssistantProps) {
         audioRef.current = audio;
         audio.playbackRate = 0.95; // Kecepatan ideal untuk asisten formal
         await audio.play();
-        console.log("🔊 Kama Voice: Menggunakan Google Translate Engine (Mulus & Gratis)");
       } else {
         throw new Error("Konten audio kosong");
       }
 
-    } catch (err) {
-      console.error("Proxy TTS gagal, beralih ke Fallback bawaan browser:", err);
-      
+    } catch {
       if (!("speechSynthesis" in window)) return;
 
       const utterance = new SpeechSynthesisUtterance(text);
@@ -172,6 +81,94 @@ export default function KamaAssistant({ userId }: KamaAssistantProps) {
   };
 
   useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.lang = "id-ID";
+      recognition.interimResults = false;
+
+      recognition.onresult = async (event: any) => {
+        const currentResultIndex = event.resultIndex;
+        const transcript = event.results[currentResultIndex][0].transcript.toLowerCase();
+
+        setKamaStatus(`Mendengar: "${transcript}"`);
+
+        const wakeWords = ["kama", "kamu", "kamar", "karma", "karna", "sama"];
+        const isWakeWordDetected = wakeWords.some(word => transcript.includes(word));
+
+        if (isWakeWordDetected && !processingRef.current) {
+          processingRef.current = true;
+          toast.loading("Kama sedang memproses perintah Anda...", { id: "kama-voice" });
+          
+          try {
+            const res = await fetch("/api/ai/kama", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ command: transcript }),
+            });
+            
+            if (!res.ok) throw new Error("Server bermasalah");
+            const data = await res.json();
+
+            let finalTargetRoute = data.target;
+
+            // Proteksi rute profil dinamis
+            if (finalTargetRoute && finalTargetRoute.includes("CURRENT_USER")) {
+              if (!userIdRef.current) {
+                const loginWarning = "Maaf Pak, Anda harus masuk atau login terlebih dahulu untuk mengakses halaman profil.";
+                speakBack(loginWarning);
+                toast.error(loginWarning, { id: "kama-voice" });
+                return;
+              }
+              finalTargetRoute = finalTargetRoute.replace("CURRENT_USER", userIdRef.current);
+            }
+
+            // Jalankan feedback vokal dari Google Translate Proxy
+            if (data.message && (!data.target || !data.target.includes("CURRENT_USER") || userIdRef.current)) {
+              speakBack(data.message);
+            }
+
+            // EKSEKUSI AKSI SISTEM (FIXED)
+            if (data.action === "NAVIGATE") {
+              router.push(finalTargetRoute);
+              toast.success(`Kama: ${data.message}`, { id: "kama-voice" });
+              
+            } else if (data.action === "OPEN_MODAL") {
+              if (data.target === "POST_SERVICE") {
+                window.dispatchEvent(new CustomEvent("open-post-service-modal"));
+              } else if (data.target === "POST_PROJECT") {
+                window.dispatchEvent(new CustomEvent("open-post-project-modal"));
+              }
+              toast.success(`Kama: ${data.message}`, { id: "kama-voice" });
+              
+            } else if (data.action === "SPEAK") {
+              toast.info(data.message, { id: "kama-voice" });
+              
+            } else if (data.action === "SEARCH") {
+              const finalPath = data.target || "/services";
+              router.push(`${finalPath}?search=${encodeURIComponent(data.query)}`);
+              window.dispatchEvent(new CustomEvent("kama-trigger-search", { detail: data.query }));
+              toast.success(`Kama: ${data.message}`, { id: "kama-voice" });
+            }
+          } catch {
+            toast.error("Kama kesulitan memahami perintah itu.", { id: "kama-voice" });
+          } finally {
+            processingRef.current = false;
+          }
+        }
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, [router]);
+
+  useEffect(() => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
       window.speechSynthesis.getVoices();
       window.speechSynthesis.onvoiceschanged = () => {
@@ -194,7 +191,7 @@ export default function KamaAssistant({ userId }: KamaAssistantProps) {
         setIsListening(true);
         setKamaStatus("Kama mendengarkan... (Panggil 'Kama [perintahmu]')");
         toast.info("Mikrofon aktif, silakan berbicara.");
-      } catch (e) {
+      } catch {
         toast.error("Gagal mengaktifkan mikrofon.");
       }
     }
@@ -209,10 +206,11 @@ export default function KamaAssistant({ userId }: KamaAssistantProps) {
       )}
       <button
         onClick={toggleListening}
+        aria-label={isListening ? "Matikan Kama" : "Aktifkan Kama"}
         className={`p-4 rounded-2xl shadow-xl transition-all duration-300 text-white flex items-center justify-center ${
           isListening 
-            ? "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 scale-110 animate-pulse" 
-            : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+            ? "bg-linear-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 scale-110 animate-pulse" 
+            : "bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         }`}
         title="Hubungi Kama (Asisten Suara)"
       >

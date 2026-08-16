@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/immutability */
 "use client";
 
 import { useEffect } from "react";
@@ -16,20 +15,6 @@ function urlBase64ToUint8Array(base64String: string) {
 }
 
 export default function PWALoader() {
-  useEffect(() => {
-    if (typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window) {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker
-          .register("/sw.js")
-          .then(async (registration) => {
-            console.log("PWA Service Worker Aktif.");
-            await dapatkanIzinNotifikasi(registration);
-          })
-          .catch((error) => console.error("SW Gagal:", error));
-      });
-    }
-  }, []);
-
   const dapatkanIzinNotifikasi = async (registration: ServiceWorkerRegistration) => {
     try {
       // 1. Pastikan User sudah login terlebih dahulu
@@ -47,10 +32,7 @@ export default function PWALoader() {
           applicationServerKey: urlBase64ToUint8Array(publicKey),
         });
 
-        console.log("User terdaftar untuk Push Notification HP.");
-
         // 3. SIMPAN / UPDATE KE SUPABASE
-        // Menggunakan upsert agar jika token perangkat yang sama sudah ada, tinggal diupdate
         const { error } = await supabase
           .from("user_push_tokens")
           .upsert(
@@ -64,10 +46,28 @@ export default function PWALoader() {
 
         if (error) throw error;
       }
-    } catch (err) {
-      console.error("Gagal sinkronisasi token push ke Supabase:", err);
+    } catch {
+      // Gagal sinkronisasi token push. Tidak perlu mengganggu UX.
     }
   };
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("serviceWorker" in navigator) || !("PushManager" in window)) return;
+
+    const register = () => {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((registration) => dapatkanIzinNotifikasi(registration))
+        .catch(() => {});
+    };
+
+    if (document.readyState === "complete") {
+      register();
+    } else {
+      window.addEventListener("load", register, { once: true });
+      return () => window.removeEventListener("load", register);
+    }
+  }, []);
 
   return null;
 }

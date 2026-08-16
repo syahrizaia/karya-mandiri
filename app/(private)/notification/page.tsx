@@ -21,7 +21,7 @@ const Notification: React.FC = () => {
 
         const { data, error } = await supabase
           .from('notifications')
-          .select('*')
+          .select('id, title, message, created_at, type, is_read, user_id, sender_id')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
