@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Noto_Sans, Playfair_Display } from "next/font/google";
+import { Outfit, Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -8,25 +8,31 @@ import KamaAssistant from "@/components/ai/KamaAssistant";
 import { createClient } from "@/lib/supabase-server";
 import PWALoader from "@/components/pwa/PWALoader";
 import { ThemeProvider } from "@/components/theme-provider";
+import KaryaMandiriGlobalBackground from "@/components/3d/KaryaMandiriGlobalBackground";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://karya-mandiri.vercel.app";
 
-const playfairDisplayHeading = Playfair_Display({
+const outfitHeading = Outfit({
   subsets: ["latin"],
   variable: "--font-heading",
+  display: "swap",
+  weight: ["500", "600", "700", "800", "900"],
 });
 
-const notoSans = Noto_Sans({ subsets: ["latin"], variable: "--font-sans" });
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
 });
+
 
 // Metadata SEO yang lebih lengkap
 const siteConfig = {
@@ -160,19 +166,19 @@ export default async function RootLayout({
       className={cn(
         "h-full",
         "antialiased",
-        geistSans.variable,
-        geistMono.variable,
-        "font-sans",
-        notoSans.variable,
-        playfairDisplayHeading.variable
+        plusJakartaSans.variable,
+        outfitHeading.variable,
+        jetbrainsMono.variable,
+        "font-sans"
       )}
     >
-      <body className="min-h-full flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50 transition-colors duration-300">
+      <body className="min-h-full flex flex-col bg-slate-50/70 text-slate-900 dark:bg-slate-950/70 dark:text-slate-50 transition-colors duration-300 relative selection:bg-blue-500/20 font-sans">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
         >
+          <KaryaMandiriGlobalBackground />
           <PWALoader />
 
           <ClientDashboardWrapper>{children}</ClientDashboardWrapper>

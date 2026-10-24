@@ -148,18 +148,18 @@ export default function ClientDashboardWrapper({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100 dark:bg-slate-950 relative w-full transition-colors duration-300">
-      <div className="lg:hidden fixed top-0 inset-x-0 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 h-16 px-4 flex items-center justify-between z-40 shadow-sm">
+    <div className="flex min-h-screen bg-slate-50/60 dark:bg-slate-950/65 relative w-full transition-colors duration-300">
+      <div className="lg:hidden fixed top-0 inset-x-0 bg-white/75 dark:bg-slate-900/75 backdrop-blur-2xl border-b border-white/30 dark:border-white/10 h-16 px-4 flex items-center justify-between z-40 shadow-sm">
         <button
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Tutup menu" : "Buka menu"}
           aria-expanded={isOpen}
           aria-controls="mobile-navigation"
-          className="p-2 bg-blue-600 text-white rounded-lg shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+          className="p-2 bg-blue-600/90 hover:bg-blue-600 text-white rounded-xl shadow-md backdrop-blur-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition-all"
         >
           {isOpen ? <FiX size={20} /> : <FiMenu size={20} />}
         </button>
-        <div className="font-bold text-xl text-blue-600 pr-2">
+        <div className="font-black text-xl bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent pr-2">
           {userRole === "employer" || userRole === "worker" ? "KaryaMandiri" : <Link href="/">KaryaMandiri</Link>}
         </div>
         <div className="w-9"></div>
@@ -167,26 +167,26 @@ export default function ClientDashboardWrapper({
 
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsOpen(false)}
           aria-hidden="true"
         />
       )}
 
       <aside id="mobile-navigation" className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col transition-all duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-40 w-64 bg-white/70 dark:bg-slate-900/65 backdrop-blur-2xl border-r border-white/30 dark:border-white/10 flex flex-col transition-all duration-300 ease-in-out shadow-[4px_0_30px_rgba(0,0,0,0.05)]
         lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:block lg:pt-0 pt-10
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
         <div className="p-6 hidden lg:block">
           {userRole === "employer" || userRole === "worker" ? (
-            <p className="text-2xl font-bold text-blue-600">KaryaMandiri</p>
+            <p className="text-2xl font-black bg-linear-to-r from-blue-600 via-teal-500 to-indigo-600 bg-clip-text text-transparent">KaryaMandiri</p>
           ) : (
-            <Link href="/" className="text-2xl font-bold text-blue-600">KaryaMandiri</Link>
+            <Link href="/" className="text-2xl font-black bg-linear-to-r from-blue-600 via-teal-500 to-indigo-600 bg-clip-text text-transparent">KaryaMandiri</Link>
           )}
         </div>
         
-        <nav className="flex-1 px-4 space-y-2 overflow-y-auto pb-6" aria-label="Navigasi utama">
+        <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto pb-6" aria-label="Navigasi utama">
           {filteredLinks.map((link) => {
             const isActive = pathname.startsWith(link.href);
             return (
@@ -195,17 +195,18 @@ export default function ClientDashboardWrapper({
                 href={link.href}
                 onClick={() => setIsOpen(false)}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
+                className={`flex items-center justify-between p-3 rounded-2xl transition-all duration-200 text-sm font-semibold ${
                   isActive 
-                    ? 'bg-blue-600 text-white shadow-md' 
-                    : 'text-gray-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800/60'
+                    ? 'bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-[0_4px_20px_rgba(37,99,235,0.35),inset_0_1px_1px_rgba(255,255,255,0.25)] scale-[1.02]' 
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-white/5 hover:translate-x-0.5'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  {link.icon} {link.label}
+                  <span className="text-lg">{link.icon}</span> 
+                  <span>{link.label}</span>
                 </div>
                 {link.href === "/notification" && unreadCount > 0 && (
-                  <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-bounce">
+                  <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-bounce shadow-md">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
                 )}
@@ -213,25 +214,25 @@ export default function ClientDashboardWrapper({
             )
           })}
 
-          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="mt-4 pt-4 border-t border-white/20 dark:border-white/10">
             <Link
               href="/download"
-              className="flex items-center gap-3 p-3 mb-2 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-3 p-3 mb-2 text-slate-700 dark:text-slate-300 rounded-2xl hover:bg-white/60 dark:hover:bg-white/5 transition-all text-sm font-semibold"
             >
-              <FiDownload />
+              <FiDownload className="text-lg text-blue-500" />
               <span>Unduh Aplikasi</span>
             </Link>
 
             <button 
               onClick={() => setTheme(isDarkMode ? "light" : "dark")}
               aria-label={mounted && isDarkMode ? "Aktifkan mode terang" : "Aktifkan mode gelap"}
-              className="flex w-full items-center justify-between p-3 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="flex w-full items-center justify-between p-3 text-slate-700 dark:text-slate-300 rounded-2xl hover:bg-white/60 dark:hover:bg-white/5 transition-all text-sm font-semibold"
             >
               <div className="flex items-center gap-3">
-                {mounted && isDarkMode ? <FiSun /> : <FiMoon />} 
+                <span className="text-lg text-amber-500">{mounted && isDarkMode ? <FiSun /> : <FiMoon />}</span>
                 <span>{mounted && isDarkMode ? "Mode Terang" : "Mode Gelap"}</span>
               </div>
-              <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors ${mounted && isDarkMode ? 'bg-blue-600' : 'bg-slate-300'}`}>
+              <div className={`w-10 h-5 flex items-center rounded-full p-1 transition-colors ${mounted && isDarkMode ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'}`}>
                 <div className={`bg-white w-3 h-3 rounded-full transition-transform ${mounted && isDarkMode ? 'translate-x-5' : 'translate-x-0'}`} />
               </div>
             </button>
@@ -242,7 +243,7 @@ export default function ClientDashboardWrapper({
             <>
               <Link
                 href="/"
-                className="flex items-center gap-3 p-3 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors mt-2 border border-dashed border-blue-200 dark:border-blue-900/50 font-semibold text-sm"
+                className="flex items-center gap-3 p-3 text-blue-600 dark:text-blue-400 rounded-2xl hover:bg-blue-50/70 dark:hover:bg-slate-800/50 transition-all mt-2 border border-blue-200/50 dark:border-blue-900/50 font-bold text-sm"
               >
                 <FiHome /> Beranda Utama
               </Link>
@@ -250,7 +251,7 @@ export default function ClientDashboardWrapper({
               {/* TOMBOL LOGIN BARU */}
               <Link
                 href="/login"
-                className="flex items-center gap-3 p-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-all mt-2 font-bold text-sm shadow-md shadow-blue-500/10"
+                className="flex items-center justify-center gap-2 p-3 text-white bg-linear-to-r from-blue-600 to-indigo-600 rounded-2xl hover:opacity-95 transition-all mt-2 font-bold text-sm shadow-[0_4px_20px_rgba(37,99,235,0.3),inset_0_1px_1px_rgba(255,255,255,0.3)]"
               >
                 <FiLogIn /> Login / Masuk
               </Link>
@@ -261,9 +262,9 @@ export default function ClientDashboardWrapper({
           {!loading && userId && userProfile && (
             <Link 
               href={`/profile/${userId}`} 
-              className="flex items-center gap-3 p-3 mt-4 mb-2 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-slate-100 dark:border-slate-800"
+              className="flex items-center gap-3 p-3 mt-4 mb-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md rounded-2xl hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all border border-white/40 dark:border-white/10 shadow-sm"
             >
-              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-300 font-bold overflow-hidden border border-blue-100 dark:border-blue-800">
+              <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold overflow-hidden shadow-inner shrink-0">
                 {userProfile.avatar_url ? (
                   <Image src={userProfile.avatar_url} alt={`Foto profil ${userProfile.full_name}`} className="w-full h-full object-cover" width={40} height={40} />
                 ) : (
@@ -271,8 +272,8 @@ export default function ClientDashboardWrapper({
                 )}
               </div>
               <div className="flex flex-col truncate">
-                <span className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate">{userProfile.full_name}</span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 capitalize">{userRole}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm truncate">{userProfile.full_name}</span>
+                <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold capitalize">{userRole}</span>
               </div>
             </Link>
           )}
@@ -280,7 +281,7 @@ export default function ClientDashboardWrapper({
           {!loading && userId && (
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 p-3 w-full text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-950/30 transition-colors mt-2"
+              className="flex items-center gap-3 p-3 w-full text-red-600 dark:text-red-400 rounded-2xl hover:bg-red-500/10 transition-colors mt-2 text-sm font-semibold"
             >
               <FiLogOut /> Keluar
             </button>
@@ -289,14 +290,14 @@ export default function ClientDashboardWrapper({
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0">
-        <div className="p-4 md:p-4 pt-20 lg:pt-4 flex-1">
+        <div className="p-4 md:p-6 pt-20 lg:pt-6 flex-1">
           {!isAuthorized && !loading ? (
-            <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm my-4 max-w-2xl mx-auto text-center h-fit">
+            <div className="flex-1 flex flex-col items-center justify-center glass-panel rounded-3xl p-8 shadow-xl my-4 max-w-2xl mx-auto text-center h-fit">
               <h2 className="text-2xl font-black text-slate-900 dark:text-slate-50 mb-2">Akses Terbatas</h2>
               <p className="text-slate-500 dark:text-slate-400 max-w-sm mb-6 text-sm">
                 Silakan login untuk mengakses halaman ini.
               </p>
-              <Link href="/login" className="px-6 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl shadow-md">
+              <Link href="/login" className="px-6 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold rounded-2xl shadow-lg hover:scale-105 active:scale-95 transition-all">
                 Login Sekarang
               </Link>
             </div>

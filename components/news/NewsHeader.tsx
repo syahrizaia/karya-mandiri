@@ -21,25 +21,28 @@ const NewsHeader: React.FC<NewsHeaderProps> = ({
   setRegion,
 }) => {
   return (
-    <header className="max-w-7xl mx-auto mb-8 space-y-4">
+    <header className="max-w-7xl mx-auto mb-8 space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-2 transition-colors">
-            <FiGlobe className="text-blue-600 dark:text-blue-400 animate-spin-slow" /> Pusat Berita Akurat
+          <span className="glass-capsule text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 px-3 py-1 mb-2 inline-flex items-center gap-1.5">
+            <FiGlobe /> Informasi Terkini & Kebijakan
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            Pusat Berita Akurat
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 transition-colors">
-            Informasi terpercaya dari agensi berita nasional dan internasional terverifikasi.
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+            Informasi terpercaya dari agensi berita nasional dan internasional terverifikasi seputar ketenagakerjaan dan teknologi.
           </p>
         </div>
 
         {/* Navigasi Regional */}
-        <div className="flex bg-white dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div className="glass-capsule p-1.5 flex gap-1 shadow-md">
           <button
             onClick={() => { setRegion("id"); setSearchQuery(""); }}
             className={`px-4 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
               region === "id" 
                 ? "bg-blue-600 text-white shadow-sm" 
-                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                : "text-slate-600 dark:text-slate-300 hover:bg-white/10"
             }`}
           >
             Berita Nasional
@@ -49,7 +52,7 @@ const NewsHeader: React.FC<NewsHeaderProps> = ({
             className={`px-4 py-2 text-xs font-bold rounded-xl transition cursor-pointer ${
               region === "us" 
                 ? "bg-blue-600 text-white shadow-sm" 
-                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                : "text-slate-600 dark:text-slate-300 hover:bg-white/10"
             }`}
           >
             Berita Internasional
@@ -66,10 +69,10 @@ const NewsHeader: React.FC<NewsHeaderProps> = ({
               key={cat}
               disabled={!!searchQuery}
               onClick={() => setCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize border transition shrink-0 cursor-pointer ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold capitalize transition shrink-0 cursor-pointer ${
                 category === cat && !searchQuery
-                  ? "bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border-slate-900 dark:border-slate-100"
-                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-md"
+                  : "glass-card text-slate-600 dark:text-slate-300 hover:bg-blue-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
               }`}
             >
               {cat === "general" ? "Utama" : cat === "business" ? "Bisnis" : cat === "technology" ? "Teknologi" : cat}
@@ -85,7 +88,7 @@ const NewsHeader: React.FC<NewsHeaderProps> = ({
             placeholder="Cari topik berita..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-slate-900 pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-colors"
+            className="glass-input w-full pl-11 pr-4 py-2.5 rounded-2xl text-slate-900 dark:text-white text-sm outline-none transition font-medium"
           />
         </div>
       </div>

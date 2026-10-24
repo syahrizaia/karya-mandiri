@@ -58,7 +58,7 @@ const TrainingCenter: React.FC = () => {
       rating: 4.9,
       level: 'Dasar',
       isCertified: true,
-      imageBg: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+      imageBg: 'bg-gradient-to-br from-blue-600/80 to-indigo-700/80',
       description: 'Pelajari cara melakukan labelling gambar, anotasi teks, dan validasi data secara akurat untuk menyuplai kebutuhan data set kecerdasan buatan.'
     },
     {
@@ -70,7 +70,7 @@ const TrainingCenter: React.FC = () => {
       rating: 4.8,
       level: 'Dasar',
       isCertified: true,
-      imageBg: 'bg-gradient-to-br from-emerald-500 to-teal-600',
+      imageBg: 'bg-gradient-to-br from-emerald-600/80 to-teal-700/80',
       description: 'Kuasai teknik memasukkan data massal secara cepat, meminimalisir eror, serta manipulasi rumus dasar spreadsheet untuk laporan proyek komersial.'
     },
     {
@@ -82,7 +82,7 @@ const TrainingCenter: React.FC = () => {
       rating: 4.9,
       level: 'Menengah',
       isCertified: true,
-      imageBg: 'bg-gradient-to-br from-purple-500 to-pink-600',
+      imageBg: 'bg-gradient-to-br from-purple-600/80 to-pink-700/80',
       description: 'Maksimalkan kamera ponsel Anda untuk mengambil foto produk UMKM yang estetik, pencahayaan mandiri, dan komposisi sudut pandang komersial.'
     },
     {
@@ -94,7 +94,7 @@ const TrainingCenter: React.FC = () => {
       rating: 4.7,
       level: 'Dasar',
       isCertified: false,
-      imageBg: 'bg-gradient-to-br from-amber-500 to-orange-600',
+      imageBg: 'bg-gradient-to-br from-amber-600/80 to-orange-700/80',
       description: 'Panduan bernegosiasi, memahami lembar spesifikasi tugas (RFS), serta etika menjaga komitmen tenggat waktu dengan Employer platform.'
     },
     {
@@ -106,7 +106,7 @@ const TrainingCenter: React.FC = () => {
       rating: 4.6,
       level: 'Menengah',
       isCertified: true,
-      imageBg: 'bg-gradient-to-br from-cyan-500 to-blue-600',
+      imageBg: 'bg-gradient-to-br from-cyan-600/80 to-blue-700/80',
       description: 'Teknik melakukan survei titik lokasi (POI), verifikasi foto ruko fisik, dan pengumpulan kuesioner lapangan yang valid bebas manipulasi.'
     },
     {
@@ -118,7 +118,7 @@ const TrainingCenter: React.FC = () => {
       rating: 4.8,
       level: 'Menengah',
       isCertified: true,
-      imageBg: 'bg-gradient-to-br from-rose-500 to-red-600',
+      imageBg: 'bg-gradient-to-br from-rose-600/80 to-red-700/80',
       description: 'Tulis kalimat penawaran yang memikat untuk portofolio katalog jasa Anda agar menarik minat klik dari para Employer potensial.'
     }
   ];
@@ -131,51 +131,51 @@ const TrainingCenter: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen pb-20 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <div className="min-h-screen pb-24 text-slate-900 dark:text-slate-100 transition-colors">
       
       {/* HERO BANNER SECTION */}
-      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-8 px-6 relative overflow-hidden transition-colors">
+      <section className="py-8 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
-          <div className="lg:col-span-7 space-y-5 text-left">
-            <span className="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
-              <FiAward /> Akademi Mandiri
+          <div className="lg:col-span-7 space-y-4 text-left">
+            <span className="glass-capsule text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 px-3.5 py-1.5 inline-flex items-center gap-2">
+              <FiAward className="text-sm" /> Akademi Pelatihan Mandiri
             </span>
-            <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-              Tingkatkan Keahlian Anda, <br />Dapatkan Proyek Berupah Tinggi!
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight">
+              Tingkatkan Keahlian, <br />Raih Proyek <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400 bg-clip-text text-transparent">Berupah Tinggi</span>
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base leading-relaxed max-w-xl">
-              Akses modul pelatihan gratis yang dirancang khusus untuk sektor informal. Selesaikan kelas, dapatkan lencana sertifikasi, dan jadilah prioritas utama saat melamar kerja crowd.
+            <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base leading-relaxed max-w-xl">
+              Akses modul pelatihan gratis yang dirancang khusus untuk sektor informal. Selesaikan kelas, dapatkan sertifikasi terverifikasi, dan raih prioritas tugas premium.
             </p>
             
             {/* Search Input Bar */}
             <div className="relative max-w-md pt-2">
-              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-lg" />
+              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
               <input 
                 type="text"
                 placeholder="Cari materi pelatihan (misal: Anotasi, Spreadsheet)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition text-sm"
+                className="glass-input w-full pl-12 pr-4 py-3.5 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition font-medium"
               />
             </div>
           </div>
 
           {/* BENEFIT MINI STATS CARD */}
-          <div className="lg:col-span-5 bg-slate-900 dark:bg-slate-800 text-white rounded-3xl p-6 space-y-4 shadow-xl shadow-slate-900/10 dark:shadow-none">
-            <h3 className="font-black text-sm uppercase tracking-wider text-blue-400">Keuntungan Sertifikasi</h3>
+          <div className="lg:col-span-5 glass-panel p-6 sm:p-7 rounded-3xl space-y-4">
+            <h3 className="font-black text-xs uppercase tracking-wider text-blue-600 dark:text-blue-400">Keuntungan Sertifikasi Digital</h3>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <FiCheckCircle className="text-emerald-400 text-lg mt-0.5 shrink-0" />
-                <p className="text-xs text-slate-300 dark:text-slate-400 leading-normal"><span className="font-bold text-white">Prioritas Kuota:</span> Akun bersertifikat otomatis diprioritaskan sistem untuk masuk kuota proyek massal.</p>
+                <FiCheckCircle className="text-emerald-500 text-base mt-0.5 shrink-0" />
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed"><span className="font-bold text-slate-900 dark:text-white">Prioritas Kuota:</span> Akun bersertifikat otomatis diprioritaskan sistem untuk kuota proyek massal.</p>
               </div>
               <div className="flex items-start gap-3">
-                <FiCheckCircle className="text-emerald-400 text-lg mt-0.5 shrink-0" />
-                <p className="text-xs text-slate-300 dark:text-slate-400 leading-normal"><span className="font-bold text-white">Kenaikan Tarif:</span> Akses eksklusif ke tugas mikro premium dengan rate upah 30% lebih tinggi.</p>
+                <FiCheckCircle className="text-emerald-500 text-base mt-0.5 shrink-0" />
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed"><span className="font-bold text-slate-900 dark:text-white">Kenaikan Tarif:</span> Akses eksklusif ke tugas mikro premium dengan rate upah 30% lebih tinggi.</p>
               </div>
               <div className="flex items-start gap-3">
-                <FiCheckCircle className="text-emerald-400 text-lg mt-0.5 shrink-0" />
-                <p className="text-xs text-slate-300 dark:text-slate-400 leading-normal"><span className="font-bold text-white">Lencana Profil:</span> Badge verifikasi kompetensi dipajang langsung di katalog portofolio jasa Anda.</p>
+                <FiCheckCircle className="text-emerald-500 text-base mt-0.5 shrink-0" />
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed"><span className="font-bold text-slate-900 dark:text-white">Lencana Profil:</span> Badge kompetensi dipajang langsung di profil publik dan katalog jasa Anda.</p>
               </div>
             </div>
           </div>
@@ -184,17 +184,17 @@ const TrainingCenter: React.FC = () => {
       </section>
 
       {/* FILTER CATEGORIES */}
-      <main className="max-w-5xl mx-auto mt-8 space-y-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 mt-6 space-y-8">
         
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-xs border transition shrink-0 ${
+              className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-xs transition shrink-0 cursor-pointer ${
                 selectedCategory === cat.id
-                  ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-600/10'
-                  : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-600'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                  : 'glass-card text-slate-600 dark:text-slate-300 hover:bg-blue-500/10'
               }`}
             >
               <span className="text-sm">{cat.icon}</span>
@@ -210,12 +210,12 @@ const TrainingCenter: React.FC = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
             {filteredCourses.length === 0 ? (
-              <div className="col-span-full bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center text-xl">
+              <div className="col-span-full glass-panel rounded-3xl p-12 text-center flex flex-col items-center justify-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl glass-capsule text-slate-400 flex items-center justify-center text-xl">
                   <FiBookOpen />
                 </div>
                 <h4 className="font-bold text-slate-800 dark:text-slate-100 text-base">Modul Tidak Ditemukan</h4>
-                <p className="text-sm text-slate-400 dark:text-slate-500 max-w-xs mx-auto">
+                <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs mx-auto">
                   Maaf, tidak ada silabus materi pelatihan yang sesuai dengan kata kunci pencarian Anda saat ini.
                 </p>
               </div>
@@ -228,16 +228,16 @@ const TrainingCenter: React.FC = () => {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                   key={course.id}
-                  className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xs flex flex-col justify-between hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition duration-200"
+                  className="glass-card rounded-3xl overflow-hidden flex flex-col justify-between group"
                 >
                   {/* Top Color Banner Representation */}
                   <div className={`p-6 ${course.imageBg} text-white space-y-3 relative`}>
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-extrabold uppercase tracking-widest bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-md">
+                      <span className="text-[10px] font-extrabold uppercase tracking-widest glass-capsule text-white px-2.5 py-1">
                         {course.level}
                       </span>
                       {course.isCertified && (
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500 text-white px-2.5 py-1 rounded-md flex items-center gap-1 shadow-sm">
+                        <span className="text-[10px] font-extrabold uppercase tracking-widest bg-emerald-500 text-white px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-sm">
                           <FiAward /> + Sertifikat
                         </span>
                       )}
@@ -249,22 +249,22 @@ const TrainingCenter: React.FC = () => {
 
                   {/* Course Details Description Body */}
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                    <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed line-clamp-3">
+                    <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm leading-relaxed line-clamp-3">
                       {course.description}
                     </p>
 
                     <div className="space-y-3 pt-2">
                       {/* Meta info (Time & Modules) */}
-                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800 pt-3">
-                        <span className="flex items-center gap-1"><FiClock size={13} className="text-slate-400" /> {course.duration}</span>
-                        <span className="flex items-center gap-1"><FiPlayCircle size={13} className="text-slate-400" /> {course.modulesCount} Materi</span>
+                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 dark:text-slate-500 border-t border-slate-200/50 dark:border-white/10 pt-3">
+                        <span className="flex items-center gap-1"><FiClock size={13} /> {course.duration}</span>
+                        <span className="flex items-center gap-1"><FiPlayCircle size={13} /> {course.modulesCount} Materi</span>
                         <span className="flex items-center gap-1 text-amber-500"><FiStar size={13} className="fill-amber-500" /> {course.rating}</span>
                       </div>
 
                       {/* Action Trigger Button */}
                       <button 
                         onClick={() => toast.message(`Memulai pengerjaan kelas: ${course.title}`)}
-                        className="w-full py-3 bg-slate-50 dark:bg-slate-800 hover:bg-blue-600 dark:hover:bg-blue-600 text-slate-700 dark:text-slate-200 hover:text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition duration-200"
+                        className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition duration-200 active:scale-95 shadow-md shadow-blue-500/20 cursor-pointer"
                       >
                         Mulai Belajar Sekarang
                       </button>

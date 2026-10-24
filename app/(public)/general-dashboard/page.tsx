@@ -259,15 +259,15 @@ const GeneralDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in duration-500 md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100">
+    <div className="space-y-6 animate-in fade-in duration-500 md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100">
       {/* Welcome Section */}
       <section className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-50">Ringkasan Platform</h1>
-          <p className="text-slate-500 dark:text-slate-400">Pantau ekosistem inklusi ekonomi KaryaMandiri hari ini.</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white">Ringkasan Platform</h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm mt-1">Pantau ekosistem inklusi ekonomi KaryaMandiri hari ini secara realtime.</p>
         </div>
-        <div className="bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-3 shadow-sm text-green-500 dark:text-green-400 text-sm font-medium">
-          <span className="flex h-3 w-3 rounded-full bg-green-500 animate-caret-blink" />
+        <div className="glass-capsule px-4 py-2 flex items-center gap-3 shadow-sm text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
+          <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse shadow-sm" />
           Sistem Online: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
         </div>
       </section>
@@ -308,37 +308,37 @@ const GeneralDashboard: React.FC = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {loading ? (
           <EcosystemLoading />
         ) : (
           /* Aktivitas Utama Ekosistem */
           <>
-            <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <div className="lg:col-span-2 glass-panel rounded-3xl overflow-hidden shadow-xl">
+              <div className="p-6 border-b border-slate-200/50 dark:border-white/10 flex justify-between items-center">
+                <h3 className="font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   <FiActivity className="text-blue-600 dark:text-blue-400" /> Aktivitas Ekosistem Realtime
                 </h3>
                 <button
-                  className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+                  className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                   onClick={() => setShowAllActivities(true)}
                 >
                   Lihat Semua
                 </button>
               </div>
-              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+              <div className="divide-y divide-slate-100 dark:divide-white/5">
                 {ecosystemActivities.length === 0 ? (
                   <div className="p-8 text-center text-sm text-slate-400 dark:text-slate-500">Belum ada aktivitas baru hari ini.</div>
                 ) : (
                   ecosystemActivities.slice(0, 5).map((ecosystemActivity: IEcosystemActivities) => ( 
-                    <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                    <div key={ecosystemActivity.id} className="p-5 flex items-center justify-between hover:bg-white/40 dark:hover:bg-white/5 transition-all">
                       <div className="flex items-center gap-4">
                         {ecosystemActivity.type === 'project' ? (
-                          <div className="p-3 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 shrink-0">
+                          <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0 border border-blue-500/20">
                             <FiLayers />
                           </div>
                         ) : ecosystemActivity.type === 'payment' ? (
-                          <div className="p-3 rounded-xl bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400 shrink-0">
+                          <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0 border border-emerald-500/20">
                             <FiTrendingUp />
                           </div>
                         ) : (
@@ -347,7 +347,7 @@ const GeneralDashboard: React.FC = () => {
                               <Image
                                 src={(ecosystemActivity.profiles as any).avatar_url} 
                                 alt={ecosystemActivity.profiles?.full_name || 'Avatar'} 
-                                className="w-10 h-10 rounded-xl object-cover border border-slate-100 dark:border-slate-800"
+                                className="w-10 h-10 rounded-2xl object-cover border border-white/40 dark:border-white/10"
                                 onError={(e) => {
                                   (e.target as HTMLElement).style.display = 'none';
                                 }}
@@ -355,7 +355,7 @@ const GeneralDashboard: React.FC = () => {
                                 height={50}
                               />
                             ) : (
-                              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-100 dark:border-purple-900">
+                              <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-500/20">
                                 {ecosystemActivity.profiles?.full_name 
                                   ? ecosystemActivity.profiles.full_name.charAt(0) 
                                   : ecosystemActivity.user 
@@ -366,16 +366,16 @@ const GeneralDashboard: React.FC = () => {
                           </div>
                         )}
                         <div>
-                          <p className="text-sm text-slate-600 dark:text-slate-300">
-                            <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900 dark:text-slate-50">
+                          <p className="text-sm text-slate-700 dark:text-slate-300">
+                            <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900 dark:text-slate-100 hover:text-blue-600">
                               {ecosystemActivity.profiles?.full_name}
                             </Link> {ecosystemActivity.action} 
-                            <span className="font-semibold text-slate-800 dark:text-slate-200"> {ecosystemActivity.target}</span>
+                            <span className="font-semibold text-slate-900 dark:text-slate-100"> {ecosystemActivity.target}</span>
                           </p>
-                          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
                         </div>
                       </div>
-                      <FiArrowUpRight className="text-slate-300 dark:text-slate-600" />
+                      <FiArrowUpRight className="text-slate-400 dark:text-slate-500" />
                     </div>
                   ))
                 )}
@@ -384,7 +384,7 @@ const GeneralDashboard: React.FC = () => {
 
             {/* Modal Dialog: Semua Aktivitas */}
             <Dialog open={showAllActivities} onOpenChange={setShowAllActivities}>
-              <DialogContent className="sm:max-w-xl rounded-3xl p-8 border-none bg-white dark:bg-slate-900 shadow-2xl">
+              <DialogContent className="sm:max-w-xl rounded-3xl p-8 glass-panel shadow-2xl border border-white/30 dark:border-white/10">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-black text-slate-900 dark:text-slate-50 flex items-center gap-2">
                     <FiActivity className="text-blue-600 dark:text-blue-400" /> Semua Aktivitas Ekosistem
@@ -394,19 +394,19 @@ const GeneralDashboard: React.FC = () => {
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="max-h-[60vh] overflow-y-auto pr-2 mt-4 divide-y divide-slate-100 dark:divide-slate-800 min-h-[200px]">
+                <div className="max-h-[60vh] overflow-y-auto pr-2 mt-4 divide-y divide-slate-100 dark:divide-white/5 min-h-[200px]">
                   {ecosystemActivities.length === 0 ? (
                     <div className="py-12 text-center text-sm text-slate-400 dark:text-slate-500">Tidak ada data aktivitas yang tercatat.</div>
                   ) : (
                     ecosystemActivities.map((ecosystemActivity: IEcosystemActivities) => (
-                      <div key={`modal-${ecosystemActivity.id}`} className="py-4 flex items-center justify-between hover:bg-slate-50/50 dark:hover:bg-slate-800/30 px-2 rounded-xl">
+                      <div key={`modal-${ecosystemActivity.id}`} className="py-4 flex items-center justify-between hover:bg-white/40 dark:hover:bg-white/5 px-2 rounded-2xl transition-all">
                         <div className="flex items-center gap-4">
                           {ecosystemActivity.type === 'project' ? (
-                            <div className="p-3 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400 shrink-0">
+                            <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0 border border-blue-500/20">
                               <FiLayers />
                             </div>
                           ) : ecosystemActivity.type === 'payment' ? (
-                            <div className="p-3 rounded-xl bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400 shrink-0">
+                            <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0 border border-emerald-500/20">
                               <FiTrendingUp />
                             </div>
                           ) : (
@@ -415,7 +415,7 @@ const GeneralDashboard: React.FC = () => {
                                 <Image
                                   src={(ecosystemActivity.profiles as any).avatar_url} 
                                   alt={ecosystemActivity.profiles?.full_name || 'Avatar'} 
-                                  className="w-10 h-10 rounded-xl object-cover border border-slate-100 dark:border-slate-800"
+                                  className="w-10 h-10 rounded-2xl object-cover border border-white/30 dark:border-white/10"
                                   onError={(e) => {
                                     (e.target as HTMLElement).style.display = 'none';
                                   }}
@@ -423,7 +423,7 @@ const GeneralDashboard: React.FC = () => {
                                   height={50}
                                 />
                               ) : (
-                                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-100 dark:border-purple-900">
+                                <div className="w-10 h-10 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs font-bold uppercase tracking-wider border border-purple-500/20">
                                   {ecosystemActivity.profiles?.full_name 
                                     ? ecosystemActivity.profiles.full_name.charAt(0) 
                                     : ecosystemActivity.user 
@@ -434,13 +434,13 @@ const GeneralDashboard: React.FC = () => {
                             </div>
                           )}
                           <div>
-                            <p className="text-sm text-slate-600 dark:text-slate-300">
+                            <p className="text-sm text-slate-700 dark:text-slate-300">
                               <Link href={`/profile/${ecosystemActivity.user_id}`} className="font-bold text-slate-900 dark:text-slate-50">
                                 {ecosystemActivity.profiles?.full_name || ecosystemActivity.user || "Pengguna"}
                               </Link> {ecosystemActivity.action} 
-                              <span className="font-semibold text-slate-800 dark:text-slate-200"> {ecosystemActivity.target}</span>
+                              <span className="font-semibold text-slate-900 dark:text-slate-100"> {ecosystemActivity.target}</span>
                             </p>
-                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatRelativeTime(ecosystemActivity.time)}</p>
                           </div>
                         </div>
                       </div>
@@ -448,11 +448,11 @@ const GeneralDashboard: React.FC = () => {
                   )}
                 </div>
 
-                <DialogFooter className="pt-4 border-t border-slate-100 dark:border-slate-800 mt-4">
+                <DialogFooter className="pt-4 border-t border-slate-200/50 dark:border-white/10 mt-4">
                   <button
                     type="button"
                     onClick={() => setShowAllActivities(false)}
-                    className="w-full sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition-colors text-center"
+                    className="w-full sm:w-auto px-6 py-2.5 text-sm font-bold text-slate-600 dark:text-slate-300 hover:bg-white/40 dark:hover:bg-white/5 rounded-2xl transition-colors text-center"
                   >
                     Tutup Halaman
                   </button>
@@ -465,16 +465,16 @@ const GeneralDashboard: React.FC = () => {
         {/* Panel Info Tambahan & Statistik */}
         <div className="space-y-4">
           {/* Target Capaian Strategis */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-4 text-sm flex items-center gap-2">
+          <div className="glass-card rounded-3xl p-6">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-4 text-sm flex items-center gap-2">
               <FiZap className="text-amber-500" /> Target Capaian Strategis
             </h3>
             {loading ? (
               <div className="space-y-4 animate-pulse">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="space-y-2">
-                    <div className="h-3 w-32 bg-slate-100 dark:bg-slate-800 rounded" />
-                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full" />
+                    <div className="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
+                    <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full" />
                   </div>
                 ))}
               </div>
@@ -488,42 +488,42 @@ const GeneralDashboard: React.FC = () => {
           </div>
 
           {/* Alokasi Sektor Jasa Live */}
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-3 text-sm flex items-center gap-2">
+          <div className="glass-card rounded-3xl p-6">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 mb-3 text-sm flex items-center gap-2">
               <FiPieChart className="text-purple-600 dark:text-purple-400" /> Alokasi Sektor Jasa Live
             </h3>
             {loading ? (
               <div className="space-y-3 animate-pulse">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex justify-between items-center">
-                    <div className="h-3 w-28 bg-slate-100 dark:bg-slate-800 rounded" />
-                    <div className="h-3 w-8 bg-slate-100 dark:bg-slate-800 rounded" />
+                    <div className="h-3 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                    <div className="h-3 w-8 bg-slate-200 dark:bg-slate-800 rounded" />
                   </div>
                 ))}
               </div>
             ) : (
               <div className="space-y-2.5">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-medium">
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-500" /> Pengembangan Web & IT
                   </span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">
+                  <span className="font-bold text-slate-900 dark:text-slate-200">
                     {jasaAllocation.webIT}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-medium">
                     <span className="w-2.5 h-2.5 rounded-full bg-purple-500" /> Fotografi & Kreatif
                   </span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">
+                  <span className="font-bold text-slate-900 dark:text-slate-200">
                     {jasaAllocation.fotografi}%
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                  <span className="flex items-center gap-2 text-slate-600 dark:text-slate-400 font-medium">
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Produksi Video & Film
                   </span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">
+                  <span className="font-bold text-slate-900 dark:text-slate-200">
                     {jasaAllocation.videoFilm}%
                   </span>
                 </div>
@@ -532,20 +532,20 @@ const GeneralDashboard: React.FC = () => {
           </div>
 
           {/* Card Informasi Edukasi Inklusi */}
-          <div className="bg-slate-900 dark:bg-slate-950 rounded-3xl p-6 text-white border border-transparent dark:border-slate-800 relative overflow-hidden group">
+          <div className="glass-panel rounded-3xl p-6 relative overflow-hidden group">
             <div className="relative z-10">
-              <h3 className="font-bold text-lg mb-2">Model Crowdsourcing</h3>
-              <p className="text-slate-400 dark:text-slate-400 text-xs leading-relaxed mb-4">
+              <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-2">Model Crowdsourcing</h3>
+              <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed mb-4">
                 Membantu sektor informal mendapatkan upah layak melalui pembagian tugas kolektif yang efisien, transparan, dan terlindungi regulasi data.
               </p>
               <button
-                className="text-xs bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-bold transition"
+                className="text-xs bg-linear-to-r from-blue-600 to-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold transition shadow-md hover:scale-105 active:scale-95"
                 onClick={() => setShowSubModal(true)}
               >
                 Pelajari Inklusi Jasa
               </button>
             </div>
-            <FiLayers className="absolute -right-4 -bottom-4 text-white/10 text-8xl group-hover:scale-110 transition-transform" />
+            <FiLayers className="absolute -right-4 -bottom-4 text-blue-500/10 text-8xl group-hover:scale-110 transition-transform pointer-events-none" />
           </div>
         </div>
       </div>

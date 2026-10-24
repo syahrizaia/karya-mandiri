@@ -15,16 +15,16 @@ import SubscriptionDialog from "../../subscription/page";
 const SettingsItem = ({ label, value, status, onClick }: { label: string; value: string; status: string; onClick?: () => void }) => (
   <div 
     onClick={onClick}
-    className="p-4 sm:p-6 flex justify-between items-center bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition cursor-pointer" 
+    className="p-4 sm:p-5 flex justify-between items-center hover:bg-white/10 transition cursor-pointer" 
   >
     <div className="min-w-0 flex-1 pr-2">
-      <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 truncate">{label}</p>
-      <p className="text-xs text-slate-500 dark:text-slate-500 mt-0.5 truncate">{value}</p>
+      <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{label}</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">{value}</p>
     </div>
     <div className={`px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-widest shrink-0 ${
-      status === 'success' ? 'bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-400' : 
-      status === 'warning' ? 'bg-orange-100 dark:bg-orange-950/50 text-orange-700 dark:text-orange-400' : 
-      'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+      status === 'success' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 
+      status === 'warning' ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30' : 
+      'glass-capsule text-slate-500 dark:text-slate-400'
     }`}>
       {status === 'success' ? 'Aktif' : status === 'warning' ? 'Perlu Tindakan' : 'Atur'}
     </div>
@@ -60,7 +60,7 @@ export default function TabPanel({ params }: ProfileProps) {
     try {
       setLoading(true);
 
-      const [profileRes, portfoliosRes, reviewsRes] = await Promise.all([
+      const [profileRes, portfolioRes, reviewsRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', profileId).maybeSingle(),
         supabase.from('portfolios').select('*').eq('user_id', profileId).order('created_at', { ascending: false }),
         supabase.from('reviews').select('*').eq('profile_id', profileId).order('created_at', { ascending: false })
@@ -87,10 +87,8 @@ export default function TabPanel({ params }: ProfileProps) {
         isVerified: profile?.is_verified || false,
       });
 
-      const fetchedPortfolios = portfoliosRes.data || [];
-      const fetchedReviews = reviewsRes.data || [];
-      setPortfolios(fetchedPortfolios);
-      setReviews(fetchedReviews);
+      setPortfolios(portfolioRes.data || []);
+      setReviews(reviewsRes.data || []);
 
     } catch (err: any) {
       console.error("Error global saat memuat profil:", err.message);
@@ -102,31 +100,27 @@ export default function TabPanel({ params }: ProfileProps) {
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) {
-      toast.error("Silakan tulis komentar ulasan Anda terlebih dahulu.");
+      toast.error("Mohon berikan komentar ulasan.");
       return;
     }
 
-    setIsSubmittingReview(true);
     try {
+      setIsSubmittingReview(true);
       const { data: authData } = await supabase.auth.getUser();
       const currentUser = authData?.user;
 
       if (!currentUser) {
-        toast.error("Anda harus login terlebih dahulu untuk memberikan ulasan.");
+        toast.error("Anda harus masuk terlebih dahulu untuk memberi ulasan.");
         return;
       }
 
-      const { data: reviewerProfile } = await supabase
-        .from("profiles")
-        .select("full_name, name")
-        .eq("id", currentUser.id)
-        .maybeSingle();
+      if (currentUser.id === profileId) {
+        toast.error("Anda tidak dapat memberi ulasan pada profil sendiri.");
+        return;
+      }
 
       const clientName = 
-        reviewerProfile?.full_name || 
-        reviewerProfile?.name || 
         currentUser.user_metadata?.full_name || 
-        currentUser.user_metadata?.name ||      
         currentUser.email?.split('@')[0] ||     
         "Pengguna KaryaMandiri";
 
@@ -164,23 +158,23 @@ export default function TabPanel({ params }: ProfileProps) {
   return (
     <div className="md:col-span-2 space-y-4 w-full min-w-0 text-slate-900 dark:text-slate-100 transition-colors">
       {/* TABS HEADER */}
-      <div className="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-2 pt-4 rounded-t-2xl border border-b-0 scrollbar-none transition-colors">
+      <div className="glass-panel px-3 pt-3 rounded-2xl flex overflow-x-auto whitespace-nowrap scrollbar-none">
         <button
           onClick={() => setActiveTab('portfolio')}
-          className={`pb-3 px-3 sm:px-4 text-xs font-bold tracking-wide uppercase border-b-2 transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
+          className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
             activeTab === 'portfolio' 
-              ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400' 
-              : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400' 
+              : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
           }`}
         >
           <FiFolder /> Portofolio ({portfolios.length})
         </button>
         <button
           onClick={() => setActiveTab('reviews')}
-          className={`pb-3 px-3 sm:px-4 text-xs font-bold tracking-wide uppercase border-b-2 transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
+          className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
             activeTab === 'reviews' 
-              ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400' 
-              : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400' 
+              : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
           }`}
         >
           <FiStar /> Ulasan ({reviews.length})
@@ -188,10 +182,10 @@ export default function TabPanel({ params }: ProfileProps) {
         {isOwnProfile && (
           <button
             onClick={() => setActiveTab('settings')}
-            className={`pb-3 px-3 sm:px-4 text-xs font-bold tracking-wide uppercase border-b-2 transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
+            className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
               activeTab === 'settings' 
-                ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400' 
-                : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400' 
+                : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
             }`}
           >
             <FiShield /> Privasi
@@ -206,34 +200,34 @@ export default function TabPanel({ params }: ProfileProps) {
             <div className="flex justify-end">
               <button
                 onClick={() => setShowManagePortfolio(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-300 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2 glass-capsule text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition cursor-pointer hover:bg-blue-500/10"
               >
                 <FiFolder /> Kelola Portofolio
               </button>
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {portfolios.length > 0 ? (
               portfolios.map((item) => (
-                <div key={item.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden group hover:border-blue-300 dark:hover:border-blue-700 transition-all shadow-2xs w-full">
-                  <div className="relative h-36 bg-slate-100 dark:bg-slate-950 w-full">
+                <div key={item.id} className="glass-card rounded-2xl overflow-hidden group transition-all duration-300 w-full">
+                  <div className="relative h-36 bg-slate-900/20 w-full">
                     {item.image_url ? (
                       <Image src={item.image_url} alt={item.title} fill className="object-cover group-hover:scale-105 transition duration-300" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-300 dark:text-slate-700">
+                      <div className="w-full h-full flex items-center justify-center text-slate-400">
                         <FiFolder size={32}/>
                       </div>
                     )}
                   </div>
                   <div className="p-4 min-w-0">
-                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 mt-2 line-clamp-1 break-words">{item.title}</h4>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 line-clamp-2 break-words">{item.description}</p>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white mt-1 line-clamp-1 break-words">{item.title}</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 break-words">{item.description}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="col-span-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400 dark:text-slate-500 italic transition-colors">
+              <div className="col-span-full glass-panel rounded-2xl p-8 text-center text-xs text-slate-400 italic">
                 Belum ada portofolio karya yang diunggah.
               </div>
             )}
@@ -243,12 +237,12 @@ export default function TabPanel({ params }: ProfileProps) {
 
       {/* PANEL 2: ULASAN */}
       {activeTab === 'reviews' && (
-        <div className="space-y-3 animate-in fade-in duration-200 w-full">
+        <div className="space-y-3 w-full">
           {!isOwnProfile && (
             <div className="flex justify-end">
               <button
                 onClick={() => setShowReviewModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition shadow-xs cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold rounded-xl transition shadow-md shadow-blue-500/20 cursor-pointer"
               >
                 <FiStar /> Beri Ulasan Jasa
               </button>
@@ -257,25 +251,25 @@ export default function TabPanel({ params }: ProfileProps) {
 
           {reviews.length > 0 ? (
             reviews.map((rev) => (
-              <div key={rev.id} className="bg-white dark:bg-slate-900 p-4 sm:p-5 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xs space-y-2 w-full min-w-0 transition-colors">
+              <div key={rev.id} className="glass-card p-4 sm:p-5 rounded-2xl space-y-2 w-full min-w-0">
                 <div className="flex justify-between items-start gap-2">
                   <div className="min-w-0">
-                    <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate">{rev.client_name || "Klien Anonim"}</h4>
-                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate">{rev.client_name || "Klien Anonim"}</h4>
+                    <p className="text-[10px] text-slate-400 font-medium">
                       {rev.created_at ? new Date(rev.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" }) : "Baru saja"}
                     </p>
                   </div>
-                  <div className="flex text-yellow-400 gap-0.5 shrink-0">
+                  <div className="flex text-amber-400 gap-0.5 shrink-0">
                     {Array.from({ length: rev.rating || 5 }).map((_, i) => (
                       <FiStar key={i} size={12} fill="currentColor" />
                     ))}
                   </div>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic break-words">&quot;{rev.comment}&quot;</p>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed italic break-words">&ldquo;{rev.comment}&rdquo;</p>
               </div>
             ))
           ) : (
-            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center text-xs text-slate-400 dark:text-slate-500 italic transition-colors">
+            <div className="glass-panel rounded-2xl p-8 text-center text-xs text-slate-400 italic">
               Belum memiliki riwayat ulasan dari klien.
             </div>
           )}
@@ -284,7 +278,7 @@ export default function TabPanel({ params }: ProfileProps) {
 
       {/* PANEL 3: PENGATURAN PRIVASI */}
       {activeTab === 'settings' && isOwnProfile && (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden animate-in fade-in duration-200 w-full transition-colors">
+        <div className="glass-panel rounded-2xl divide-y divide-slate-200/50 dark:divide-white/10 overflow-hidden w-full">
           <SettingsItem 
             label="Verifikasi Akun" 
             value={userData.isVerified ? "Terverifikasi Resmi" : "Belum Verifikasi"} 
@@ -297,7 +291,7 @@ export default function TabPanel({ params }: ProfileProps) {
             status="default"
             onClick={() => setShowSubModal(true)}
           />
-          <SettingsItem
+          <SettingsItem 
             label="Metode Rekening Utama" 
             value="Bank Central Asia (BCA)" 
             status="success"
@@ -310,7 +304,7 @@ export default function TabPanel({ params }: ProfileProps) {
 
       {/* Dialog Kelola Portofolio */}
       <Dialog open={showManagePortfolio} onOpenChange={setShowManagePortfolio}>
-        <DialogContent className="max-w-2xl rounded-3xl bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-none transition-colors">
+        <DialogContent className="max-w-2xl rounded-3xl glass-panel text-slate-900 dark:text-slate-100 border-none">
           <DialogHeader>
             <DialogTitle className="text-slate-900 dark:text-slate-100">Kelola Portofolio</DialogTitle>
           </DialogHeader>
@@ -322,9 +316,9 @@ export default function TabPanel({ params }: ProfileProps) {
 
       {/* Dialog Beri Ulasan */}
       <Dialog open={showReviewModal} onOpenChange={setShowReviewModal}>
-        <DialogContent className="max-w-md rounded-3xl p-6 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-none transition-colors">
+        <DialogContent className="max-w-md rounded-3xl p-6 glass-panel text-slate-900 dark:text-slate-100 border-none">
           <DialogHeader>
-            <DialogTitle className="text-base font-bold text-slate-800 dark:text-slate-200">Berikan Ulasan Jasa</DialogTitle>
+            <DialogTitle className="text-base font-bold text-slate-900 dark:text-white">Berikan Ulasan Jasa</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmitReview} className="mt-4 space-y-4">
             {/* Input Rating Bintang */}
@@ -339,7 +333,7 @@ export default function TabPanel({ params }: ProfileProps) {
                     className="transition-transform hover:scale-110 active:scale-95 cursor-pointer"
                   >
                     <FiStar
-                      className={star <= newRating ? "text-yellow-400" : "text-slate-200 dark:text-slate-700"}
+                      className={star <= newRating ? "text-amber-400" : "text-slate-300 dark:text-slate-600"}
                       fill={star <= newRating ? "currentColor" : "none"}
                     />
                   </button>
@@ -356,7 +350,7 @@ export default function TabPanel({ params }: ProfileProps) {
                 placeholder="Tuliskan ulasan pengalaman kerja sama Anda dengan freelancer ini..."
                 rows={4}
                 maxLength={300}
-                className="w-full text-xs p-3.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-xl focus:outline-hidden focus:border-blue-500 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition resize-none leading-relaxed"
+                className="glass-input w-full text-xs p-3.5 rounded-xl outline-none transition resize-none leading-relaxed"
               />
             </div>
 
@@ -365,14 +359,14 @@ export default function TabPanel({ params }: ProfileProps) {
               <button
                 type="button"
                 onClick={() => setShowReviewModal(false)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-500 dark:text-slate-400 hover:bg-white/10 transition cursor-pointer"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 disabled={isSubmittingReview}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-800 text-white text-xs font-bold rounded-xl transition shadow-sm cursor-pointer disabled:cursor-not-allowed"
+                className="px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition shadow-md shadow-blue-500/20 cursor-pointer disabled:cursor-not-allowed active:scale-95"
               >
                 {isSubmittingReview ? "Mengirim..." : "Kirim Ulasan"}
               </button>

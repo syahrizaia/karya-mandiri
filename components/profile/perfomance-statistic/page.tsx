@@ -63,47 +63,47 @@ export default function PerfomanceStatistic({ params }: ProfileProps) {
   }, [profileId]);
 
   return (
-    <div className="grid grid-cols-3 gap-2 sm:gap-4 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="grid grid-cols-3 gap-3 sm:gap-4 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Statistik Selesai */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 sm:p-4 rounded-2xl flex items-center gap-3 shadow-xs min-w-0 transition-colors">
-        <div className="p-3 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl hidden sm:block shrink-0">
+      <div className="glass-card p-4 rounded-3xl flex items-center gap-3.5 min-w-0">
+        <div className="p-3 glass-capsule text-blue-600 dark:text-blue-400 rounded-2xl hidden sm:block shrink-0">
           <FiBriefcase size={18} />
         </div>
         <div className="min-w-0">
-          <p className="text-[9px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
+          <p className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
             Selesai
           </p>
-          <p className="text-base sm:text-2xl font-black text-slate-800 dark:text-slate-200 truncate">
+          <p className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white truncate">
             {stats.jobCompleted}
           </p>
         </div>
       </div>
 
       {/* Statistik Sukses */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 sm:p-4 rounded-2xl flex items-center gap-3 shadow-xs min-w-0 transition-colors">
-        <div className="p-3 bg-green-50 dark:bg-green-950/40 text-green-600 dark:text-green-400 rounded-xl hidden sm:block shrink-0">
+      <div className="glass-card p-4 rounded-3xl flex items-center gap-3.5 min-w-0">
+        <div className="p-3 glass-capsule text-emerald-600 dark:text-emerald-400 rounded-2xl hidden sm:block shrink-0">
           <FiCheckCircle size={18} />
         </div>
         <div className="min-w-0">
-          <p className="text-[9px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
+          <p className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
             Sukses
           </p>
-          <p className="text-base sm:text-2xl font-black text-green-600 dark:text-green-400 truncate">
+          <p className="text-lg sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 truncate">
             {stats.successRate}%
           </p>
         </div>
       </div>
 
       {/* Statistik Rating */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 sm:p-4 rounded-2xl flex items-center gap-3 shadow-xs min-w-0 transition-colors">
-        <div className="p-3 bg-yellow-50 dark:bg-yellow-950/30 text-yellow-500 dark:text-yellow-400 rounded-xl hidden sm:block shrink-0">
+      <div className="glass-card p-4 rounded-3xl flex items-center gap-3.5 min-w-0">
+        <div className="p-3 glass-capsule text-amber-500 dark:text-amber-400 rounded-2xl hidden sm:block shrink-0">
           <FiStar size={18} />
         </div>
         <div className="min-w-0">
-          <p className="text-[9px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
+          <p className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">
             Rating
           </p>
-          <p className="text-base sm:text-2xl font-black text-slate-800 dark:text-slate-200 flex items-center gap-1 truncate">
+          <p className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white flex items-center gap-1 truncate">
             {stats.rating > 0 ? stats.rating : "-"} 
             <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal hidden sm:inline">/5.0</span>
           </p>

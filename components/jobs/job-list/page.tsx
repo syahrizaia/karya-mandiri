@@ -30,22 +30,22 @@ const JobCardLoading = () => {
   return (
     <div className="flex flex-col gap-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800/80 animate-pulse transition-colors">
+        <div key={i} className="glass-card p-6 rounded-3xl animate-pulse">
           <div className="md:grid md:grid-cols-3 flex flex-col gap-6">
             <div className="md:col-span-2 space-y-3">
               <div className="flex items-center gap-2">
                 <div className="h-5 w-24 bg-slate-200 dark:bg-slate-700 rounded-full" />
-                <div className="h-4 w-32 bg-slate-100 dark:bg-slate-800 rounded" />
+                <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 rounded" />
               </div>
               <div className="h-7 w-3/4 bg-slate-200 dark:bg-slate-700 rounded-xl" />
               <div className="flex gap-4 pt-1">
-                <div className="h-4 w-28 bg-slate-100 dark:bg-slate-800 rounded" />
-                <div className="h-4 w-24 bg-slate-100 dark:bg-slate-800 rounded" />
+                <div className="h-4 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+                <div className="h-4 w-24 bg-slate-200 dark:bg-slate-800 rounded" />
               </div>
             </div>
             <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
               <div className="text-right w-full space-y-1">
-                <div className="h-3 w-20 bg-slate-100 dark:bg-slate-800 rounded ml-auto" />
+                <div className="h-3 w-20 bg-slate-200 dark:bg-slate-800 rounded ml-auto" />
                 <div className="h-8 w-36 bg-slate-200 dark:bg-slate-700 rounded-xl ml-auto" />
               </div>
               <div className="flex items-center gap-3 w-full md:w-auto">
@@ -54,12 +54,12 @@ const JobCardLoading = () => {
               </div>
             </div>
           </div>
-          <div className="mt-6 pt-4 border-t border-slate-50 dark:border-slate-800 space-y-2">
+          <div className="mt-6 pt-4 border-t border-slate-200/50 dark:border-white/10 space-y-2">
             <div className="flex justify-between">
-              <div className="h-3 w-28 bg-slate-100 dark:bg-slate-800 rounded" />
-              <div className="h-3 w-16 bg-slate-100 dark:bg-slate-800 rounded" />
+              <div className="h-3 w-28 bg-slate-200 dark:bg-slate-800 rounded" />
+              <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded" />
             </div>
-            <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full" />
+            <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full" />
           </div>
         </div>
       ))}
@@ -102,8 +102,8 @@ const JobList: React.FC<JobListProps> = ({
       ) : (
         <>
           {filteredJobs.length === 0 ? (
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-100 dark:border-slate-800 transition-colors">
-              <p className="text-slate-400 dark:text-slate-500 font-medium">Tidak ada lowongan kerja yang cocok dengan filter pencarian Anda.</p>
+            <div className="glass-panel rounded-3xl p-12 text-center transition-colors">
+              <p className="text-slate-500 dark:text-slate-400 font-medium">Tidak ada lowongan kerja yang cocok dengan filter pencarian Anda.</p>
               <button 
                 onClick={onResetFilters} 
                 className="mt-4 text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline dark:hover:text-blue-300 cursor-pointer"
@@ -119,38 +119,38 @@ const JobList: React.FC<JobListProps> = ({
               const avatarUrl = profileData?.avatar_url;
 
               return (
-                <div key={job.id} className="group bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800/80 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-xl transition-all duration-300">
-                  <div className='md:grid md:grid-cols-3 flex flex-col'>
+                <div key={job.id} className="group glass-card p-6 rounded-3xl transition-all duration-300">
+                  <div className='md:grid md:grid-cols-3 flex flex-col gap-6'>
                     <div className="flex flex-col md:flex-row md:col-span-2 justify-between gap-6">
                       <div className="space-y-3 flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span className={`px-3 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                             job.type === 'Crowdsourcing' 
-                              ? 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400' 
-                              : 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400'
+                              ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20' 
+                              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20'
                           }`}>
                             {job.type}
                           </span>
-                          <span className="text-slate-400 dark:text-slate-500 text-xs flex items-center gap-1">
+                          <span className="text-slate-400 dark:text-slate-500 text-xs flex items-center gap-1 font-medium">
                             <FiClock /> {formatRelativeTime(job.posted_at)}
                           </span>
                         </div>
                         <Link 
                           href={`/jobs/${job.id}`} 
-                          className="text-xl font-bold text-slate-800 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
+                          className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors"
                         >
                           {job.title}
                         </Link>
                         <div className="flex flex-wrap gap-4 text-sm text-slate-500 dark:text-slate-400 font-medium">
                           <Link 
-                            href={`profile/${job.user_id}`} 
-                            className="flex items-center gap-1 z-10 text-blue-400 dark:text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors"
+                            href={`/profile/${job.user_id}`} 
+                            className="flex items-center gap-1.5 z-10 text-blue-600 dark:text-blue-400 hover:underline transition-colors"
                           >
                             {(job as any).profiles?.avatar_url ? (
                               <Image
                                 src={avatarUrl} 
                                 alt={employerName || 'Avatar'} 
-                                className="w-5 h-5 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0"
+                                className="w-5 h-5 rounded-full object-cover border border-white/40 dark:border-white/10 shrink-0"
                                 onError={(e) => {
                                   (e.target as HTMLElement).style.display = 'none';
                                 }}
@@ -158,14 +158,14 @@ const JobList: React.FC<JobListProps> = ({
                                 height={50}
                               />
                             ) : (
-                              <div className="w-5 h-5 rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 flex items-center justify-center text-[10px] font-bold shrink-0 uppercase">
+                              <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-bold shrink-0 uppercase">
                                 {employerName.charAt(0)}
                               </div>
                             )}
-                            <span>{employerName}</span>
+                            <span className="font-semibold">{employerName}</span>
                           </Link>
                           <div className="flex items-center gap-1">
-                            <FiMapPin className="text-red-400 dark:text-red-500"/> {job.location}
+                            <FiMapPin className="text-rose-500"/> {job.location}
                           </div>
                         </div>
                       </div>
@@ -173,8 +173,8 @@ const JobList: React.FC<JobListProps> = ({
 
                     <div className="flex flex-col justify-between items-end gap-4 min-w-37.5">
                       <div className="text-right w-full">
-                        <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase">Upah Tugas</p>
-                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Upah Tugas</p>
+                        <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">Rp{(job.reward ?? 0).toLocaleString('id-ID') || "0"}</p>
                       </div>
                       
                       <div className="flex items-center gap-3 w-full md:w-auto">
@@ -182,9 +182,9 @@ const JobList: React.FC<JobListProps> = ({
                           <>
                             <Link
                               href={`/jobs/${job.id}`}
-                              className="text-center w-full px-8 py-3 bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 font-bold rounded-2xl hover:bg-blue-600 dark:hover:bg-blue-600 transition shadow-md whitespace-nowrap"
+                              className="text-center w-full px-7 py-3 bg-linear-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-2xl hover:opacity-95 transition-all shadow-md whitespace-nowrap text-sm"
                             >
-                              Lihat Detail Pekerjaan
+                              Lihat Detail
                             </Link>
                             <SaveJobButton
                               is_saved={isJobSavedByUser} 
@@ -211,7 +211,7 @@ const JobList: React.FC<JobListProps> = ({
                         ) : (
                           <Link
                             href={`/jobs/${job.id}`}
-                            className="text-center w-full px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition whitespace-nowrap"
+                            className="text-center w-full px-6 py-3 bg-white/60 dark:bg-white/10 text-slate-800 dark:text-slate-200 font-bold text-xs rounded-2xl hover:bg-white/90 dark:hover:bg-white/20 transition-all whitespace-nowrap border border-white/30 dark:border-white/10"
                           >
                             Lihat Detail Pekerjaan
                           </Link>
@@ -221,14 +221,14 @@ const JobList: React.FC<JobListProps> = ({
                   </div>
 
                   {job.type === 'Crowdsourcing' && (
-                    <div className="mt-2 pt-4 border-t border-slate-50 dark:border-slate-800/60">
+                    <div className="mt-4 pt-4 border-t border-slate-200/50 dark:border-white/10">
                       <div className="flex justify-between text-xs font-bold mb-2">
-                        <span className="text-slate-500 dark:text-slate-400 uppercase">Kuota Crowdsourcing</span>
+                        <span className="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px]">Kuota Crowdsourcing</span>
                         <span className="text-blue-600 dark:text-blue-400">{job.taken} / {job.total} Pekerja</span>
                       </div>
-                      <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="w-full bg-slate-200 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                         <div 
-                          className="bg-blue-500 dark:bg-blue-600 h-full transition-all duration-500" 
+                          className="bg-linear-to-r from-blue-600 to-indigo-600 h-full transition-all duration-500" 
                           style={{ width: `${(job.taken / job.total) * 100}%` }}
                         />
                       </div>

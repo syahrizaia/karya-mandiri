@@ -8,8 +8,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-mono);
   --font-heading: var(--font-heading);
+  --font-display: var(--font-heading);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -123,16 +124,244 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-sans), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   html {
-    @apply font-sans;
+    font-family: var(--font-sans), sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), sans-serif;
+    letter-spacing: -0.025em;
   }
 }
 
 @layer utilities {
+  .font-heading {
+    font-family: var(--font-heading), sans-serif;
+  }
+
+  .font-sans {
+    font-family: var(--font-sans), sans-serif;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono), monospace;
+  }
+
   .backdrop-blur-xl {
-    -webkit-backdrop-filter: blur(24px);
-    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    backdrop-filter: blur(28px) saturate(200%);
+  }
+
+  .backdrop-blur-2xl {
+    -webkit-backdrop-filter: blur(40px) saturate(220%) contrast(104%);
+    backdrop-filter: blur(40px) saturate(220%) contrast(104%);
+  }
+
+  /* ==========================================================================
+     VISCOUS LIQUID GLASS DESIGN SYSTEM (Dense Optical Fluid Gel + Meniscus Rim)
+     ========================================================================== */
+
+  /* 1. Primary Viscous Glass Panel (Heavy container, modal, drawer, navbar) */
+  .glass-panel {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 250, 252, 0.82) 50%, rgba(241, 245, 249, 0.85) 100%);
+    backdrop-filter: blur(40px) saturate(220%) contrast(104%);
+    -webkit-backdrop-filter: blur(40px) saturate(220%) contrast(104%);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow: 
+      inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.95), 
+      inset 0 -1.5px 2px 0 rgba(203, 213, 225, 0.35), 
+      0 20px 45px -12px rgba(15, 23, 42, 0.08),
+      0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  }
+
+  .dark .glass-panel {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.86) 0%, rgba(15, 23, 42, 0.80) 50%, rgba(30, 41, 59, 0.84) 100%);
+    backdrop-filter: blur(40px) saturate(220%) contrast(104%);
+    -webkit-backdrop-filter: blur(40px) saturate(220%) contrast(104%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 
+      inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.30), 
+      inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.60), 
+      0 24px 55px -12px rgba(0, 0, 0, 0.65),
+      0 6px 16px -2px rgba(0, 0, 0, 0.40);
+  }
+
+  /* 2. Interactive Viscous Glass Card (Cards, widgets, interactive modules) */
+  .glass-card {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.84) 0%, rgba(248, 250, 252, 0.78) 100%);
+    backdrop-filter: blur(32px) saturate(210%) contrast(103%);
+    -webkit-backdrop-filter: blur(32px) saturate(210%) contrast(103%);
+    border: 1px solid rgba(255, 255, 255, 0.60);
+    box-shadow: 
+      inset 0 1.2px 1px 0 rgba(255, 255, 255, 0.90), 
+      inset 0 -1px 1.5px 0 rgba(226, 232, 240, 0.4),
+      0 14px 34px -8px rgba(15, 23, 42, 0.07);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dark .glass-card {
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.82) 0%, rgba(30, 41, 59, 0.78) 100%);
+    backdrop-filter: blur(32px) saturate(210%) contrast(103%);
+    -webkit-backdrop-filter: blur(32px) saturate(210%) contrast(103%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 
+      inset 0 1.2px 1px 0 rgba(255, 255, 255, 0.24), 
+      inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.5),
+      0 18px 44px -10px rgba(0, 0, 0, 0.55);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-card:hover {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.94) 0%, rgba(241, 245, 249, 0.88) 100%);
+    border-color: rgba(255, 255, 255, 0.85);
+    transform: translateY(-3px);
+    box-shadow: 
+      inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1), 
+      0 24px 50px -10px rgba(37, 99, 235, 0.16),
+      0 8px 20px -4px rgba(37, 99, 235, 0.10);
+  }
+
+  .dark .glass-card:hover {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.88) 0%, rgba(15, 23, 42, 0.84) 100%);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px);
+    box-shadow: 
+      inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.36), 
+      0 26px 55px -10px rgba(37, 99, 235, 0.28),
+      0 10px 24px -4px rgba(37, 99, 235, 0.20);
+  }
+
+  /* 3. Viscous Glass Capsule / Pill Badge */
+  .glass-capsule {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 250, 252, 0.80) 100%);
+    backdrop-filter: blur(36px) saturate(220%);
+    -webkit-backdrop-filter: blur(36px) saturate(220%);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 9999px;
+    box-shadow: 
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.95), 
+      0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  }
+
+  .dark .glass-capsule {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.80) 100%);
+    backdrop-filter: blur(36px) saturate(220%);
+    -webkit-backdrop-filter: blur(36px) saturate(220%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 9999px;
+    box-shadow: 
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.25), 
+      0 12px 30px -5px rgba(0, 0, 0, 0.5);
+  }
+
+  /* 4. Viscous Liquid Glass Input Field */
+  .glass-input {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px) saturate(190%);
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    border: 1px solid rgba(203, 213, 225, 0.7);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .dark .glass-input {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(24px) saturate(190%);
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-input:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(37, 99, 235, 0.7);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+    outline: none;
+  }
+
+  .dark .glass-input:focus {
+    background: rgba(15, 23, 42, 0.90);
+    border-color: rgba(59, 130, 246, 0.7);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.30), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+    outline: none;
+  }
+
+  /* 5. Liquid Specular Glow & Sheen Utilities */
+  .liquid-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .liquid-glow::after {
+    content: '';
+    position: absolute;
+    inset: -100%;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .liquid-glow:hover::after {
+    opacity: 1;
+  }
+
+  .viscous-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .viscous-sheen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.18) 50%,
+      transparent 100%
+    );
+    transform: skewX(-20deg);
+    transition: left 0.75s ease;
+    pointer-events: none;
+  }
+
+  .viscous-sheen:hover::before {
+    left: 150%;
+  }
+
+  /* 6. Viscous Liquid Glass Button */
+  .viscous-liquid-button {
+    position: relative;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.92) 0%, rgba(29, 78, 216, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 
+      inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.4), 
+      inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.25), 
+      0 10px 25px -5px rgba(37, 99, 235, 0.35);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .viscous-liquid-button:hover {
+    background: linear-gradient(135deg, rgba(29, 78, 216, 0.96) 0%, rgba(30, 64, 175, 0.98) 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+      inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.55), 
+      0 16px 32px -6px rgba(37, 99, 235, 0.45);
+  }
+
+  .viscous-liquid-button:active {
+    transform: translateY(0) scale(0.98);
   }
 }
 

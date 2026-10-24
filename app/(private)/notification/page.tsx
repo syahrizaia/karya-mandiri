@@ -90,7 +90,7 @@ const Notification: React.FC = () => {
   const hasUnread = notifications.some(n => !n.is_read);
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6 md:pt-12 lg:pt-4 overflow-x-hidden text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="w-full max-w-3xl mx-auto space-y-6 pt-4 pb-14 md:pt-10 overflow-x-hidden text-slate-900 dark:text-slate-100 transition-colors">
       {/* Bagian Header */}
       <NotificationHeader 
         hasUnread={hasUnread} 
@@ -98,8 +98,8 @@ const Notification: React.FC = () => {
         onMarkAllAsRead={markAllAsRead} 
       />
 
-      {/* Bagian List Notifikasi */}
-      <div className="space-y-3">
+      {/* Bagian List Notifikasi Liquid Glass */}
+      <div className="space-y-3.5">
         {loading ? (
           <NotificationSkeleton />
         ) : notifications.length > 0 ? (

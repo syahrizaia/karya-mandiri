@@ -120,11 +120,11 @@ const History: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 md:pt-12 lg:pt-4 overflow-x-hidden text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="w-full max-w-5xl mx-auto space-y-6 pt-4 pb-12 md:pt-10 overflow-x-hidden text-slate-900 dark:text-slate-100 transition-colors">
       {/* Header Utama */}
       <HistoryHeader loading={loading} onDownload={handleDownloadReport} />
 
-      {/* Tabs & Pencarian */}
+      {/* Tabs & Pencarian Liquid Glass */}
       <HistoryFilters 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
@@ -132,7 +132,7 @@ const History: React.FC = () => {
         setSearchQuery={setSearchQuery} 
       />
 
-      {/* Tabel Riwayat */}
+      {/* Tabel Riwayat Liquid Glass */}
       <HistoryTable 
         loading={loading} 
         filteredData={filteredData} 

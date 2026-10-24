@@ -116,19 +116,27 @@ const DetailService: React.FC = () => {
   };
 
   if (loading) return (
-    <div className="flex h-screen items-center justify-center bg-white dark:bg-slate-950 transition-colors">
+    <div className="flex h-screen items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 dark:border-blue-400"></div>
     </div>
   );
 
   if (!service) return (
-    <div className="text-center py-20 font-medium text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-950 min-h-screen transition-colors">
-      Penawaran jasa tidak ditemukan.
+    <div className="min-h-[50vh] flex items-center justify-center">
+      <div className="glass-panel p-8 text-center rounded-3xl max-w-md">
+        <p className="text-slate-600 dark:text-slate-300 font-bold mb-4">Penawaran jasa tidak ditemukan.</p>
+        <button 
+          onClick={() => router.push('/services')}
+          className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold"
+        >
+          Kembali ke Katalog
+        </button>
+      </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-12 transition-colors">
+    <div className="min-h-screen pb-16 text-slate-900 dark:text-slate-100 transition-colors">
       {/* HEADER NAVIGASI */}
       <ServiceDetailHeader 
         serviceId={service.id} 
@@ -136,7 +144,7 @@ const DetailService: React.FC = () => {
         onBack={() => router.back()} 
       />
 
-      <main className="max-w-5xl mx-auto mt-6 flex flex-col gap-6">
+      <main className="max-w-5xl mx-auto px-4 mt-4 flex flex-col gap-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* KOLOM KIRI: DETAIL UTAMA */}
@@ -144,12 +152,12 @@ const DetailService: React.FC = () => {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200/80 dark:border-slate-800/80 shadow-xs transition-colors"
+              className="glass-panel rounded-3xl p-6 sm:p-8"
             >
               {/* Badge Kategori & Waktu */}
               <div className="flex flex-wrap gap-3 mb-4 items-center">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold rounded-lg text-[10px] uppercase tracking-wider transition-colors">
-                  <FiLayers /> {service.category}
+                <span className="glass-capsule text-blue-600 dark:text-blue-400 font-bold px-3 py-1 text-[10px] uppercase tracking-wider">
+                  <FiLayers className="inline mr-1" /> {service.category}
                 </span>
                 <span className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
                   <FiClock /> {formatDistanceToNow(new Date(service.created_at), { addSuffix: true, locale: id })}
@@ -157,33 +165,33 @@ const DetailService: React.FC = () => {
               </div>
 
               {/* Judul Utama */}
-              <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-slate-100 leading-tight mb-6 animate-fade-in">
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white leading-tight mb-6">
                 {service.title}
               </h1>
 
               {/* Garis Pemisah */}
-              <hr className="border-slate-100 dark:border-slate-800 my-6 transition-colors" />
+              <hr className="border-slate-200/50 dark:border-white/10 my-6" />
 
               {/* Konten Deskripsi */}
-              <div className="prose prose-slate max-w-none dark:prose-invert">
-                <h3 className="text-base font-black text-slate-900 dark:text-slate-100 uppercase tracking-wide mb-3">
+              <div>
+                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider mb-3">
                   Deskripsi Jasa & Layanan
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap text-sm md:text-base mt-2">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap text-sm sm:text-base">
                   {service.description}
                 </p>
               </div>
 
               {/* Garis Pemisah */}
-              <hr className="border-slate-100 dark:border-slate-800 my-6 transition-colors" />
+              <hr className="border-slate-200/50 dark:border-white/10 my-6" />
 
               {/* Benefit / Jaminan Sistem */}
-              <div className="bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800 transition-colors">
-                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase mb-2 flex items-center gap-1.5">
-                  <FiCheckCircle className="text-green-500 dark:text-green-400" /> Transaksi Aman & Terverifikasi
+              <div className="glass-card p-4 sm:p-5 rounded-2xl">
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase mb-2 flex items-center gap-2">
+                  <FiCheckCircle className="text-emerald-500 text-sm" /> Transaksi Aman & Terverifikasi
                 </h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal">
-                  Gunakan sistem kontrak kerja mandiri atau mintalah invoice digital resmi melalui platform saat kesepakatan proyek telah dicapai dengan penyedia jasa ini.
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Gunakan kesepakatan tertulis dan mintalah invoice digital resmi melalui platform saat pesanan proyek disetujui bersama mitra terkait.
                 </p>
               </div>
             </motion.div>

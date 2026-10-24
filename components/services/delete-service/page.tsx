@@ -56,37 +56,37 @@ export default function DeleteServiceDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-110 rounded-3xl p-6 bg-white dark:bg-slate-900 border-none transition-colors">
+      <DialogContent className="sm:max-w-110 rounded-3xl p-6 sm:p-7 glass-panel border border-white/20 dark:border-white/10 shadow-2xl">
         <DialogHeader className="flex flex-col items-center text-center">
-          <div className="w-12 h-12 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mb-2">
-            <FiTrash2 size={24} />
+          <div className="w-14 h-14 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-2xl flex items-center justify-center mb-3">
+            <FiTrash2 size={26} />
           </div>
-          <DialogTitle className="text-lg font-black text-slate-900 dark:text-white">
+          <DialogTitle className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
             Hapus Penawaran Jasa?
           </DialogTitle>
-          <DialogDescription className="text-slate-500 dark:text-slate-400 pt-1 text-sm leading-relaxed">
+          <DialogDescription className="text-slate-500 dark:text-slate-400 pt-1 text-xs sm:text-sm leading-relaxed">
             Apakah Anda yakin ingin menghapus jasa{" "}
-            <span className="font-bold text-slate-800 dark:text-slate-200">{serviceTitle}</span>? 
-            Tindakan ini permanen dan tidak bisa dibatalkan.
+            <span className="font-bold text-slate-900 dark:text-white">&quot;{serviceTitle}&quot;</span>? 
+            Tindakan ini permanen dan tidak dapat dibatalkan.
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="grid grid-cols-2 gap-3 pt-4 mt-2 border-t border-slate-100 dark:border-slate-800">
+        <DialogFooter className="grid grid-cols-2 gap-3 pt-4 mt-2 border-t border-white/20 dark:border-white/5">
           <button
             type="button"
             disabled={loading}
             onClick={() => onOpenChange(false)}
-            className="w-full py-3 text-sm font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-2xl transition cursor-pointer"
+            className="w-full py-3 text-xs sm:text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/10 rounded-2xl transition cursor-pointer"
           >
-            Kembali
+            Batal
           </button>
           <button
             type="button"
             disabled={loading}
             onClick={handleDelete}
-            className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white font-bold text-sm rounded-2xl flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
+            className="w-full py-3 bg-linear-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 disabled:opacity-50 text-white font-bold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md shadow-rose-500/20 cursor-pointer"
           >
-            {loading ? <FiLoader className="animate-spin text-lg" /> : "Ya, Hapus Jasa"}
+            {loading ? <FiLoader className="animate-spin text-base" /> : "Ya, Hapus Jasa"}
           </button>
         </DialogFooter>
       </DialogContent>

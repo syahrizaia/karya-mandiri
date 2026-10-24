@@ -7,7 +7,7 @@ import { IJobs } from '@/app/types/jobs';
 import supabase from '@/lib/db';
 import SubscriptionDialog from '../../../components/subscription/page';
 import JobList from '@/components/jobs/job-list/page';
-import { FiFilter, FiSearch, FiUsers } from 'react-icons/fi';
+import { FiFilter, FiSearch, FiCompass, FiBriefcase } from 'react-icons/fi';
 import { JobFilters } from '@/components/jobs/JobFilters';
 
 const Jobs: React.FC = () => {
@@ -142,32 +142,40 @@ const Jobs: React.FC = () => {
   return (
     <div className="space-y-8 md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Search & Hero Section */}
-      <section className="bg-blue-600 dark:bg-blue-700 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden transition-colors">
+      <section className="glass-panel p-6 sm:p-10 rounded-3xl relative overflow-hidden bg-gradient-to-br from-blue-600/90 via-indigo-700/80 to-slate-900/90 text-white shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
         <div className="relative z-10 max-w-2xl">
-          <h1 className="text-3xl font-bold mb-2">Temukan Peluang Kerja</h1>
-          <p className="text-blue-100 dark:text-blue-200 mb-6 transition-colors">Pilih tugas yang sesuai dengan keahlian dan lokasi Anda.</p>
+          <span className="glass-capsule text-xs font-bold uppercase tracking-widest text-sky-300 px-3.5 py-1.5 mb-4 inline-flex items-center gap-2">
+            <FiCompass className="text-sm" /> Eksplorasi Peluang Kerja
+          </span>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight mb-2">
+            Temukan Peluang Kerja & Tugas Mikro
+          </h1>
+          <p className="text-sky-100/90 text-sm sm:text-base mb-6 leading-relaxed">
+            Pilih tugas crowdsourcing dan proyek mandiri yang sesuai dengan keahlian, waktu fleksibel, dan lokasi Anda.
+          </p>
           
-          <div className="flex flex-row gap-3">
-            <div className="flex-1 relative text-slate-800 dark:text-slate-100">
-              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex-1 relative">
+              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
               <input 
                 type="text" 
-                placeholder="Cari posisi atau perusahaan..."
-                className="w-full pl-10 pr-4 py-4 rounded-2xl focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-900/50 text-slate-900 dark:text-white bg-white dark:bg-slate-900 border border-transparent dark:border-slate-800 outline-none transition"
+                placeholder="Cari judul pekerjaan, perusahaan, atau kota..."
+                className="w-full pl-11 pr-4 py-4 rounded-2xl text-slate-900 dark:text-white bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-white/20 dark:border-white/10 shadow-lg focus:ring-4 focus:ring-blue-400/30 outline-none transition placeholder-slate-400 text-sm font-medium"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <button
               onClick={() => setShowFilterDrawer(true)}
-              className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 rounded-2xl font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+              className="bg-amber-400 hover:bg-amber-300 text-slate-950 px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-lg shadow-amber-400/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer shrink-0"
             >
-              <FiFilter /> Filter
+              <FiFilter /> Filter Pencarian
             </button>
           </div>
         </div>
         <div className="absolute right-0 bottom-0 opacity-10 translate-x-1/4 translate-y-1/4 select-none pointer-events-none">
-           <FiUsers size={300} />
+          <FiBriefcase size={360} />
         </div>
       </section>
 

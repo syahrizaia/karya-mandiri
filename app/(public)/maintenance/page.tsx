@@ -9,7 +9,6 @@ export default function MaintenancePage() {
   const handleCheckStatus = () => {
     setIsRefreshing(true);
     
-    // Simulasi pengecekan status ke server/API selama 1.5 detik
     setTimeout(() => {
       setIsRefreshing(false);
       window.location.reload();
@@ -17,57 +16,52 @@ export default function MaintenancePage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 text-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-amber-500 selection:text-slate-900 transition-colors">
+    <div className="min-h-[80vh] flex flex-col items-center justify-center p-6 text-center text-slate-900 dark:text-slate-100 transition-colors">
       
       {/* Kontainer Utama */}
-      <div className="max-w-md w-full space-y-8 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/50 p-8 rounded-3xl backdrop-blur-md shadow-2xl relative overflow-hidden transition-colors">
+      <div className="max-w-md w-full space-y-6 glass-panel p-8 sm:p-10 rounded-3xl relative overflow-hidden shadow-2xl">
         
-        {/* Efek Cahaya Latar Belakang Mendatar */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent shadow-[0_0_20px_rgba(245,158,11,0.5)]" />
-
-        {/* Lingkaran Ikon dengan Animasi Denyut */}
+        {/* Lingkaran Ikon Amber Glass */}
         <div className="flex justify-center">
           <div className="relative">
             <div className="absolute inset-0 bg-amber-500/20 rounded-full blur-xl animate-pulse w-24 h-24" />
-            <div className="relative bg-gradient-to-b from-amber-400 to-amber-600 p-6 rounded-2xl shadow-lg border border-amber-300/30 flex items-center justify-center transform hover:rotate-12 transition-transform duration-300">
-              <Wrench className="w-10 h-10 text-slate-900 animate-bounce [animation-duration:3s]" />
+            <div className="relative glass-capsule bg-amber-500/20 border-amber-500/40 p-5 rounded-3xl flex items-center justify-center transform hover:rotate-12 transition-transform duration-300">
+              <Wrench className="w-10 h-10 text-amber-500 animate-bounce [animation-duration:3s]" />
             </div>
           </div>
         </div>
 
         {/* Teks Informasi */}
         <div className="space-y-3">
-          <span className="px-3 py-1 text-xs font-semibold tracking-wider text-amber-600 dark:text-amber-500 uppercase bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 dark:border-amber-500/40 rounded-full">
-            Sistem Maintenance
+          <span className="glass-capsule text-xs font-bold tracking-wider text-amber-600 dark:text-amber-400 uppercase px-3 py-1 bg-amber-500/10 border-amber-500/30">
+            Sistem Pemeliharaan
           </span>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-            Laman Sedang <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-500">Perbaikan</span>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+            Laman Sedang <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Optimalisasi</span>
           </h1>
-          <p className="text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-            Kami sedang memperbarui sistem dan meningkatkan performa API server agar aplikasi menjadi lebih stabil dan cepat. Kami akan segera kembali!
+          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            Kami sedang memperbarui sistem dan meningkatkan kestabilan server agar pengalaman penggunaan platform KaryaMandiri semakin cepat dan responsif.
           </p>
         </div>
 
         {/* Garis Pembatas */}
-        <hr className="border-slate-200 dark:border-slate-800/60" />
+        <hr className="border-slate-200/50 dark:border-white/10" />
 
         {/* Baris Tombol Aksi */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
           
-          {/* Tombol Cek Status / Muat Ulang */}
           <button
             onClick={handleCheckStatus}
             disabled={isRefreshing}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 active:scale-95 text-slate-950 font-semibold rounded-xl shadow-lg shadow-amber-500/10 dark:shadow-amber-500/20 transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 active:scale-95 text-slate-950 font-bold text-xs rounded-xl shadow-lg shadow-amber-500/20 transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             <RefreshCw className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`} />
             {isRefreshing ? "Memeriksa..." : "Coba Muat Ulang"}
           </button>
 
-          {/* Tombol Kembali */}
           <button 
             onClick={() => window.history.back()}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-200 active:scale-95 cursor-pointer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 glass-card hover:bg-white/10 text-slate-700 dark:text-slate-200 font-bold text-xs rounded-xl transition duration-200 active:scale-95 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             Kembali
@@ -76,9 +70,8 @@ export default function MaintenancePage() {
 
       </div>
 
-      {/* Catatan Kaki Kecil */}
-      <p className="mt-8 text-xs text-slate-400 dark:text-slate-500 tracking-wide uppercase">
-        © {new Date().getFullYear()} • Tim Pengembang Aplikasi
+      <p className="mt-8 text-[11px] text-slate-400 dark:text-slate-500 tracking-wider uppercase font-semibold" suppressHydrationWarning>
+        {`© ${new Date().getFullYear()} • Tim Teknis & Arsitektur KaryaMandiri`}
       </p>
     </div>
   );

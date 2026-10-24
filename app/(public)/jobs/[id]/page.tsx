@@ -216,31 +216,43 @@ const DetailJob: React.FC = () => {
   };
 
   if (loading) return (
-    <div className="flex h-screen items-center justify-center bg-white dark:bg-slate-950 transition-colors">
+    <div className="flex h-screen items-center justify-center">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 dark:border-blue-400"></div>
     </div>
   );
 
-  if (!job) return <div className="text-center py-20 text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-955 transition-colors">Pekerjaan tidak ditemukan.</div>;
+  if (!job) return (
+    <div className="min-h-[50vh] flex items-center justify-center">
+      <div className="glass-panel p-8 text-center rounded-3xl max-w-md">
+        <p className="text-slate-600 dark:text-slate-300 font-bold mb-4">Pekerjaan tidak ditemukan atau telah dihapus.</p>
+        <button 
+          onClick={() => router.push('/jobs')}
+          className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold"
+        >
+          Kembali ke Daftar Pekerjaan
+        </button>
+      </div>
+    </div>
+  );
 
   const jobDetail = { id: job.id, title: job.title };
 
   return (
-    <div className="min-h-screen pb-10 bg-slate-50/30 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
-      {/* Header Navigasi */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-30 py-2 transition-colors">
-        <div className="max-w-5xl mx-auto px-6 py-2 flex justify-between items-center">
+    <div className="min-h-screen pb-16 text-slate-900 dark:text-slate-100 transition-colors">
+      {/* Header Navigasi Glass Dock */}
+      <div className="sticky top-2 z-30 px-4 max-w-5xl mx-auto mb-6">
+        <div className="glass-capsule px-6 py-3 flex justify-between items-center shadow-lg">
           <button 
             onClick={() => router.back()}
-            className="flex items-center gap-2 pl-6 md:pl-8 lg:pl-0 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition cursor-pointer"
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-bold text-sm transition cursor-pointer"
           >
-            <FiChevronLeft /> Kembali
+            <FiChevronLeft size={18} /> Kembali
           </button>
           <ShareJobButton jobId={jobDetail.id} jobTitle={jobDetail.title} />
         </div>
       </div>
 
-      <main className="max-w-5xl mx-auto mt-4 flex flex-col gap-4">
+      <main className="max-w-5xl mx-auto px-4 flex flex-col gap-6">
         <DetailJobContentGrid
           job={job}
           userId={userId}

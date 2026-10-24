@@ -5,7 +5,7 @@
 import React, { useState, useEffect, Suspense } from "react";
 import supabase from "@/lib/db";
 import { toast } from "sonner";
-import { FiSearch, FiLoader } from "react-icons/fi";
+import { FiSearch, FiLoader, FiLayers } from "react-icons/fi";
 import { createClient } from "@/lib/supabase-browser";
 import { useSearchParams } from "next/navigation";
 import { Pagination } from "@/components/ui/pagination";
@@ -170,13 +170,21 @@ function ServicesContent() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100 transition-colors">
+    <div className="max-w-6xl mx-auto space-y-8 md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100 transition-colors">
       {/* HEADER UTAMA */}
-      <div className="bg-linear-to-r from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-800 rounded-3xl p-8 md:p-12 text-white shadow-lg transition-colors">
-        <h1 className="text-3xl md:text-4xl font-black tracking-tight">Katalog Jasa & Keahlian</h1>
-        <p className="text-blue-100 dark:text-blue-200 mt-2 max-w-2xl text-sm md:text-base">
-          Temukan tenaga kerja mandiri, profesional multimedia, desainer, hingga spesialis logistik lokal yang siap membantu operasional bisnis Anda.
-        </p>
+      <div className="glass-panel rounded-3xl p-8 md:p-12 text-white relative overflow-hidden bg-gradient-to-r from-blue-600/90 via-indigo-700/80 to-slate-900/90 shadow-2xl">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="relative z-10 max-w-2xl">
+          <span className="glass-capsule text-xs font-bold uppercase tracking-widest text-sky-300 px-3.5 py-1.5 mb-3 inline-flex items-center gap-2">
+            <FiLayers className="text-sm" /> Etalase Jasa & Keahlian Mandiri
+          </span>
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+            Katalog Jasa & Keahlian
+          </h1>
+          <p className="text-sky-100/90 mt-3 text-sm md:text-base leading-relaxed">
+            Temukan tenaga kerja mandiri, profesional multimedia, desainer, hingga spesialis operasional UMKM yang siap mendukung akselerasi proyek Anda.
+          </p>
+        </div>
       </div>
 
       {/* BILAH PENCARIAN & FILTER */}
@@ -189,7 +197,7 @@ function ServicesContent() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Cari keahlian atau jasa (misal: React, Video, Logistik)..."
-            className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 shadow-sm transition"
+            className="glass-input w-full pl-12 pr-4 py-3.5 rounded-2xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none transition font-medium"
           />
         </div>
 
@@ -198,7 +206,7 @@ function ServicesContent() {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="w-full px-4 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 shadow-sm font-medium text-slate-700 dark:text-slate-300 transition cursor-pointer"
+            className="glass-input w-full px-4 py-3.5 rounded-2xl text-sm outline-none font-medium text-slate-700 dark:text-slate-200 transition cursor-pointer"
           >
             {categories.map((cat) => (
               <option key={cat} value={cat} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
@@ -216,7 +224,7 @@ function ServicesContent() {
           <span>Menyinkronkan etalase jasa KaryaMandiri...</span>
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-16 text-center text-slate-400 dark:text-slate-500 font-medium transition-colors">
+        <div className="glass-panel rounded-3xl p-16 text-center text-slate-400 dark:text-slate-500 font-medium transition-colors">
           Tidak ada penawaran jasa yang cocok dengan kriteria pencarian Anda saat ini.
         </div>
       ) : (
@@ -251,8 +259,8 @@ function ServicesContent() {
 export default function ServicesPage() {
   return (
     <Suspense fallback={
-      <div className="flex min-h-screen items-center justify-center bg-slate-950 text-white">
-        <p className="animate-pulse">Memuat Katalog Jasa KaryaMandiri...</p>
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="animate-pulse text-sm text-slate-500 font-bold">Memuat Katalog Jasa KaryaMandiri...</p>
       </div>
     }>
       <ServicesContent />

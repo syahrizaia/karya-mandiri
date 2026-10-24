@@ -9,7 +9,9 @@ import {
   FiStar, 
   FiArrowRight, 
   FiSearch, 
-  FiPlus
+  FiPlus,
+  FiTrendingUp,
+  FiAward
 } from 'react-icons/fi';
 import SubscriptionDialog from '../../../components/subscription/page';
 import supabase from '@/lib/db';
@@ -113,52 +115,76 @@ const WorkerDashboard: React.FC = () => {
   return (
     <div className="min-h-screen md:pt-12 lg:pt-4 lg:p-4 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Profil Singkat & Level */}
-      <header className="flex flex-col md:flex-row justify-between items-end md:items-end mb-8 gap-4">
-        <div className="flex flex-row justify-between gap-4 w-full">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 w-full md:w-auto">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-50">Halo, {profile.name}!</h1>
-            <p className="text-slate-500 dark:text-slate-400 font-medium italic">Level: {profile.level}</p>
+            <span className="glass-capsule text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 px-3 py-1 mb-2 inline-flex items-center gap-1.5">
+              <FiAward /> Mitra Mandiri Terverifikasi
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              Halo, {profile.name}!
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-0.5">
+              Tingkat Mitra: <span className="font-bold text-slate-700 dark:text-slate-200">{profile.level}</span>
+            </p>
           </div>
-          <div className="flex items-center gap-2 bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-400 h-fit px-4 py-2 rounded-full shadow-sm">
-            <FiStar className="fill-current" />
-            <span className="font-bold">{profile.rating.toFixed(1)} Rating Kerja</span>
+          <div className="flex items-center gap-2 glass-capsule bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 px-4 py-2">
+            <FiStar className="fill-current text-sm" />
+            <span className="font-black text-sm">{profile.rating.toFixed(1)}</span>
+            <span className="text-xs font-semibold opacity-80">Rating Kinerja</span>
           </div>
         </div>
         <button
           onClick={() => setDialogOpen(true)}
-          className="px-6 py-3.5 bg-white dark:bg-slate-800 hover:bg-blue-100 dark:hover:bg-slate-700 text-blue-600 dark:text-blue-400 border border-transparent dark:border-slate-700 font-bold rounded-2xl shadow-md transition flex items-center gap-2 shrink-0"
+          className="w-full md:w-auto px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/20 transition flex items-center justify-center gap-2 shrink-0 cursor-pointer"
         >
-          <FiPlus className="stroke-3" /> Tawarkan Jasaku
+          <FiPlus className="stroke-[3]" /> Tawarkan Jasaku
         </button>
       </header>
 
       {/* Ringkasan Pendapatan & Capaian */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <div className="bg-linear-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 p-6 rounded-2xl text-white shadow-lg">
-          <div className="flex justify-between items-center opacity-80 mb-2">
-            <p className="text-sm uppercase tracking-wider">Total Pendapatan</p>
-            <FiDollarSign />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+        <div className="glass-panel p-6 rounded-3xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition duration-500"></div>
+          <div className="flex justify-between items-center mb-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Total Pendapatan Terverifikasi</p>
+            <div className="p-2.5 glass-capsule text-emerald-600 dark:text-emerald-400 rounded-xl">
+              <FiDollarSign className="text-lg" />
+            </div>
           </div>
-          <h2 className="text-3xl font-bold">Rp{(profile?.totalEarnings ?? 0).toLocaleString("id-ID")}</h2>
+          <h2 className="text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+            Rp{(profile?.totalEarnings ?? 0).toLocaleString("id-ID")}
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            Pencairan otomatis ke rekening melalui sistem Escrow terproteksi.
+          </p>
         </div>
         
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex justify-between items-center transition-colors">
-          <div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 uppercase">Tugas Selesai</p>
-            <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-50">{profile.completedTasks}</h2>
+        <div className="glass-panel p-6 rounded-3xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition duration-500"></div>
+          <div className="flex justify-between items-center mb-3">
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Tugas Mikro Selesai</p>
+            <div className="p-2.5 glass-capsule text-blue-600 dark:text-blue-400 rounded-xl">
+              <FiCheckCircle className="text-lg" />
+            </div>
           </div>
-          <FiCheckCircle className="text-blue-500 dark:text-blue-400 text-4xl" />
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+            {profile.completedTasks}
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+            Tugas tuntas terverifikasi dan mendapat ulasan positif dari pemberi kerja.
+          </p>
         </div>
       </div>
 
       <Services itemsPerPage={5} />
 
       {/* Cari Tugas Baru */}
-      <section className="mb-8">
+      <section className="my-8">
         <div className="flex justify-between items-center mb-4 gap-4">
-          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Tugas Disimpan (Crowdsourcing)</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Tugas Disimpan (Crowdsourcing)</h3>
           <button
-            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-semibold flex items-center gap-1"
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-semibold flex items-center gap-1 cursor-pointer"
             onClick={() => setShowSubModal(true)}
           >
             Lihat Semua <FiArrowRight />
@@ -173,47 +199,60 @@ const WorkerDashboard: React.FC = () => {
               <SavedJobSkeleton />
             </>
           ) : savedJobs.length === 0 ? (
-            <div className="text-center py-10 text-slate-400 dark:text-slate-500 italic bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
-              Belum ada proyek yang disimpan.
+            <div className="glass-panel p-10 text-center rounded-3xl">
+              <p className="text-slate-400 dark:text-slate-500 text-sm italic">
+                Belum ada proyek yang disimpan. Jelajahi katalog pekerjaan untuk menyimpan tugas.
+              </p>
             </div>
           ) : (
             savedJobs.map((job) => (
-              <div key={job.id} className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-500 transition-all shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div 
+                key={job.id} 
+                className="glass-card p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group"
+              >
                 <div className="flex gap-4 items-center">
-                  <div className="bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 p-3 rounded-lg hidden sm:block">
+                  <div className="glass-capsule p-3 text-blue-600 dark:text-blue-400 rounded-xl hidden sm:block">
                     <FiSearch />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-800 dark:text-slate-100">{job.title}</h4>
-                    <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400 mt-1">
-                      <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">{job.category}</span>
-                      <span className="flex items-center gap-1"><FiClock /> {formatRelativeTime(job.deadline)}</span>
+                    <h4 className="font-bold text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {job.title}
+                    </h4>
+                    <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      <span className="glass-capsule px-2.5 py-0.5 rounded-lg font-bold uppercase text-[10px]">
+                        {job.category}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <FiClock /> {formatRelativeTime(job.deadline)}
+                      </span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex flex-col md:flex-row items-start justify-between w-full md:w-auto gap-6">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full md:w-auto gap-4">
                   <div className="text-left md:text-right">
-                    <p className="text-xs text-slate-400 dark:text-slate-500">Upah</p>
-                    <p className="font-bold text-green-600 dark:text-green-400 italic">Rp{job.reward.toLocaleString()}</p>
+                    <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">Upah</p>
+                    <p className="font-black text-green-600 dark:text-green-400 text-base">
+                      Rp{job.reward.toLocaleString('id-ID')}
+                    </p>
                   </div>
-                  <div className="grid grid-cols-4 items-center gap-3 w-full md:w-auto">
+                  <div className="grid grid-cols-4 items-center gap-2.5 w-full md:w-auto">
                     <Link
                       href={`/jobs/${job.id}`}
-                      className={`px-5 py-2 rounded-lg text-center font-bold transition col-span-3 ${
+                      className={`px-4 py-2.5 rounded-xl text-center text-xs font-bold transition col-span-3 ${
                         job.status === 'pending' 
-                          ? 'bg-orange-100 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400 cursor-not-allowed' 
+                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 cursor-not-allowed' 
                           : job.status === 'completed'
-                            ? 'bg-slate-600 text-white dark:bg-slate-800 dark:text-slate-400 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
+                            ? 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20 cursor-not-allowed'
+                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-500/20'
                       }`}
                       onClick={(e) => (job.status === 'pending' || job.status === 'completed') && e.preventDefault()}
                     >
                       {job.status === 'pending' 
-                        ? 'Pekerjaan Sedang Ditunda' 
+                        ? 'Pekerjaan Ditunda' 
                         : job.status === 'completed'
-                          ? 'Pekerjaan Telah Selesai' 
-                          : 'Lihat Detail Pekerjaan'
+                          ? 'Pekerjaan Selesai' 
+                          : 'Detail Pekerjaan'
                       }
                     </Link>
                     <SaveJobButton
@@ -246,18 +285,25 @@ const WorkerDashboard: React.FC = () => {
       </section>
 
       {/* Edukasi Mandiri (Micro-learning) */}
-      <div className="bg-indigo-900 dark:bg-indigo-950 rounded-2xl p-6 text-white overflow-hidden relative transition-colors">
-        <div className="relative z-10">
-          <h3 className="text-lg font-bold mb-2">Tingkatkan Skill-mu! 🚀</h3>
-          <p className="text-indigo-200 dark:text-indigo-300 text-sm mb-4">Ikuti pelatihan singkat gratis untuk mendapatkan akses ke tugas dengan upah lebih tinggi.</p>
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden bg-gradient-to-r from-blue-900/40 via-indigo-900/40 to-slate-900/40 border border-indigo-500/30">
+        <div className="relative z-10 max-w-xl">
+          <span className="glass-capsule text-[10px] font-bold uppercase tracking-wider text-indigo-400 px-2.5 py-1 mb-2 inline-flex items-center gap-1.5">
+            <FiTrendingUp /> Akselerasi Karier
+          </span>
+          <h3 className="text-xl sm:text-2xl font-black text-white mb-2">
+            Tingkatkan Skill dan Pendapatan Anda
+          </h3>
+          <p className="text-indigo-200 dark:text-slate-300 text-xs sm:text-sm mb-6 leading-relaxed">
+            Ikuti modul micro-learning tersertifikasi secara gratis untuk membuka akses ke proyek crowdsourcing berskala enterprise dengan upah lebih tinggi.
+          </p>
           <Link
             href="/training"
-            className="bg-white dark:bg-slate-100 text-indigo-900 dark:text-indigo-950 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-100/90 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs rounded-xl shadow-lg transition active:scale-95"
           >
-            Mulai Belajar
+            Mulai Belajar Sekarang <FiArrowRight />
           </Link>
         </div>
-        <FiStar className="absolute -right-4 -bottom-4 text-indigo-800 dark:text-indigo-900 text-9xl opacity-50" />
+        <FiStar className="absolute -right-4 -bottom-4 text-indigo-500/10 text-9xl pointer-events-none select-none" />
       </div>
       
       <PostServiceDialog 

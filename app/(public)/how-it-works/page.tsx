@@ -80,49 +80,49 @@ const CaraKerjaCrowd: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen pb-20 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <div className="min-h-screen pb-24 text-slate-900 dark:text-slate-100 transition-colors">
       
       {/* HERO SECTION */}
-      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-12 px-6 text-center transition-colors">
+      <section className="py-12 px-6 text-center">
         <div className="max-w-3xl mx-auto space-y-6">
-          <span className="text-xs font-bold uppercase tracking-widest text-blue-600 bg-blue-50 dark:bg-blue-950/30 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
-            <FiCpu /> Model Bisnis Crowdsourcing
+          <span className="glass-capsule text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 px-3.5 py-1.5 inline-flex items-center gap-2">
+            <FiCpu className="text-sm" /> Model Bisnis Crowdsourcing Modern
           </span>
-          <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-            Bagaimana Cara Kerja <br className="hidden md:block"/> Skema Crowdsourcing?
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+            Bagaimana Cara Kerja <br className="hidden md:block"/> Skema <span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400 bg-clip-text text-transparent">Crowdsourcing</span>?
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
-            KaryaMandiri membagi proyek besar menjadi ribuan tugas mikro digital. Pendekatan ini memberikan fleksibilitas kerja bagi sektor informal sekaligus efisiensi biaya yang luar biasa bagi pemberi kerja.
+          <p className="text-slate-600 dark:text-slate-300 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
+            KaryaMandiri membagi proyek besar menjadi ribuan tugas mikro digital terdistribusi. Memberdayakan sektor informal sekaligus memberikan efisiensi biaya dan kecepatan bagi pemberi kerja.
           </p>
 
           {/* INTERACTIVE TAB SWITCHER TOGGLE */}
-          <div className="p-1.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-md mx-auto flex gap-1 mt-6">
+          <div className="glass-capsule p-1.5 w-full max-w-md mx-auto flex gap-1 mt-6 shadow-lg">
             <button
               onClick={() => setActiveTab('worker')}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${
+              className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeTab === 'worker'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-blue-600'
               }`}
             >
-              <FiUser /> Sebagai Pekerja (Crowd)
+              <FiUser /> Sebagai Mitra (Crowd)
             </button>
             <button
               onClick={() => setActiveTab('employer')}
-              className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${
+              className={`flex-1 py-3 px-4 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition cursor-pointer ${
                 activeTab === 'employer'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-blue-600'
               }`}
             >
-              <FiBriefcase /> Sebagai Employer
+              <FiBriefcase /> Sebagai Pemberi Kerja
             </button>
           </div>
         </div>
       </section>
 
       {/* TIMELINE / STEP BY STEP PROCESS SECTION */}
-      <main className="max-w-5xl mx-auto mt-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 mt-4">
         
         <AnimatePresence mode="wait">
           <motion.div
@@ -136,22 +136,22 @@ const CaraKerjaCrowd: React.FC = () => {
             {(activeTab === 'worker' ? workerSteps : employerSteps).map((step, index) => (
               <div 
                 key={index} 
-                className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs relative overflow-hidden flex flex-col justify-between h-[280px] hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition duration-300 group"
+                className="glass-card rounded-3xl p-6 flex flex-col justify-between h-[300px] group transition duration-300"
               >
                 <div>
                   <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 text-blue-600 dark:text-blue-400 text-lg group-hover:bg-blue-600 dark:group-hover:bg-blue-600 group-hover:text-white transition duration-300">
+                    <div className="p-3 glass-capsule text-blue-600 dark:text-blue-400 text-lg group-hover:scale-110 transition duration-300">
                       {step.icon}
                     </div>
-                    <span className="text-3xl font-black text-slate-100 dark:text-slate-800 tracking-wider group-hover:text-blue-50/60 dark:group-hover:text-blue-900/40 transition duration-300">
+                    <span className="text-3xl font-black text-slate-200 dark:text-white/10 tracking-wider">
                       {step.number}
                     </span>
                   </div>
 
-                  <h3 className="font-black text-slate-900 dark:text-slate-100 text-base mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition duration-200">
+                  <h3 className="font-black text-slate-900 dark:text-white text-base mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition duration-200">
                     {step.title}
                   </h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed line-clamp-4">
+                  <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm leading-relaxed line-clamp-4">
                     {step.description}
                   </p>
                 </div>
@@ -161,38 +161,38 @@ const CaraKerjaCrowd: React.FC = () => {
         </AnimatePresence>
 
         {/* CORE FEATURES INFOGRAPHIC CARD */}
-        <section className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 md:p-10 mt-12 shadow-xs transition-colors">
-          <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-8 text-center md:text-left">
+        <section className="glass-panel rounded-3xl p-6 md:p-10 mt-12 shadow-lg">
+          <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-8 text-center md:text-left">
             Tiga Pilar Utama Ekosistem KaryaMandiri
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="space-y-3">
-              <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 font-bold text-sm rounded-xl flex items-center justify-center border border-emerald-100 dark:border-emerald-900/50">
+              <div className="w-10 h-10 glass-capsule bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-black text-sm rounded-xl flex items-center justify-center">
                 01
               </div>
-              <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm md:text-base">Sistem Escrow Terjamin</h4>
-              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed">
+              <h4 className="font-black text-slate-900 dark:text-white text-base">Sistem Escrow Terjamin</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
                 Uang jaminan dari Employer dikunci aman sebelum tugas didistribusikan. Tidak ada lagi risiko kerjaan fiktif bagi pekerja informal maupun risiko hilangnya dana bagi pemberi kerja.
               </p>
             </div>
 
             <div className="space-y-3">
-              <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 font-bold text-sm rounded-xl flex items-center justify-center border border-blue-100 dark:border-blue-900/50">
+              <div className="w-10 h-10 glass-capsule bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 font-black text-sm rounded-xl flex items-center justify-center">
                 02
               </div>
-              <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm md:text-base">Distribusi Massal Instan</h4>
-              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed">
-                Didukung ribuan crowd workers bersertifikasi KYC di seluruh nusantara. Tugas bervolume raksasa dapat dipecah secara merata dan selesai hanya dalam hitungan jam.
+              <h4 className="font-black text-slate-900 dark:text-white text-base">Distribusi Massal Instan</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
+                Didukung ribuan mitra crowdsourcing bersertifikasi KYC di seluruh nusantara. Tugas bervolume raksasa dapat dipecah secara merata dan selesai dalam hitungan jam.
               </p>
             </div>
 
             <div className="space-y-3">
-              <div className="w-10 h-10 bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400 font-bold text-sm rounded-xl flex items-center justify-center border border-purple-100 dark:border-purple-900/50">
+              <div className="w-10 h-10 glass-capsule bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400 font-black text-sm rounded-xl flex items-center justify-center">
                 03
               </div>
-              <h4 className="font-bold text-slate-800 dark:text-slate-100 text-sm md:text-base">Inklusi Finansial Adil</h4>
-              <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed">
+              <h4 className="font-black text-slate-900 dark:text-white text-base">Inklusi Finansial Adil</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
                 Kami berkomitmen memberdayakan pekerja lepas sektor informal dengan model bagi hasil yang transparan, bebas komisi eksploitatif, serta mendukung penarikan e-wallet lokal.
               </p>
             </div>
@@ -200,18 +200,18 @@ const CaraKerjaCrowd: React.FC = () => {
         </section>
 
         {/* DYNAMIC CALL TO ACTION (CTA) */}
-        <section className="bg-slate-900 dark:bg-blue-900 text-white rounded-3xl p-8 md:p-12 mt-12 flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden transition-colors">
+        <section className="glass-panel p-8 md:p-12 mt-12 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden bg-gradient-to-r from-blue-900/60 via-indigo-900/50 to-slate-900/60 shadow-2xl">
           <div className="space-y-3 max-w-xl text-center md:text-left">
-            <h3 className="text-xl md:text-2xl font-black tracking-tight">
+            <h3 className="text-xl md:text-3xl font-black text-white tracking-tight">
               {activeTab === 'worker' 
                 ? 'Siap Menghasilkan Pendapatan Mandiri?' 
                 : 'Mulai Skalakan Operasional Bisnis Anda'
               }
             </h3>
-            <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
+            <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
               {activeTab === 'worker'
-                ? 'Daftar sekarang sebagai Mitra Mandiri terverifikasi, selesaikan tugas mikro digital dari rumah, dan bangun portofolio performa kerja Anda secara transparan.'
-                : 'Gabung bersama ratusan korporasi yang mempercayakan validasi data, input massal, dan crowdsourcing operasionalnya ke jaringan terpercaya KaryaMandiri.'
+                ? 'Daftar sekarang sebagai Mitra Mandiri terverifikasi, selesaikan tugas mikro digital dari rumah, dan bangun reputasi kerja Anda secara transparan.'
+                : 'Bergabung bersama ratusan perusahaan yang mempercayakan validasi data, input massal, dan crowdsourcing operasionalnya ke jaringan terpercaya KaryaMandiri.'
               }
             </p>
           </div>
@@ -220,14 +220,14 @@ const CaraKerjaCrowd: React.FC = () => {
             {activeTab === 'worker' ? (
               <Link
                 href="/jobs"
-                className="px-6 py-4 bg-white dark:bg-blue-600 text-slate-900 dark:text-white font-bold text-sm rounded-xl text-center flex items-center justify-center gap-2 transition"
+                className="px-6 py-4 bg-white hover:bg-slate-100 text-slate-950 font-black text-sm rounded-2xl text-center flex items-center justify-center gap-2 transition active:scale-95 shadow-lg cursor-pointer"
               >
                 Jelajahi Lowongan Kerja <FiArrowRight />
               </Link>
             ) : (
               <Link
                 href="/employer"
-                className="px-6 py-4 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm rounded-xl text-center flex items-center justify-center gap-2 transition"
+                className="px-6 py-4 bg-white hover:bg-slate-100 text-slate-950 font-black text-sm rounded-2xl text-center flex items-center justify-center gap-2 transition active:scale-95 shadow-lg cursor-pointer"
               >
                 Mulai Pasang Lowongan <FiArrowRight />
               </Link>

@@ -198,23 +198,25 @@ export default function KamaAssistant({ userId }: KamaAssistantProps) {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 font-sans">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2.5 font-sans pointer-events-auto">
       {isListening && (
-        <div className="bg-slate-900 text-white text-[11px] px-3 py-1.5 rounded-xl shadow-md animate-bounce font-medium max-w-xs truncate border border-slate-800">
-          <FiCpu className="inline mr-1 text-indigo-400" /> {kamaStatus}
+        <div className="glass-capsule text-slate-800 dark:text-white text-xs px-4 py-2 rounded-2xl shadow-xl animate-bounce font-semibold max-w-xs truncate border border-blue-500/30 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
+          <FiCpu className="text-blue-500 dark:text-blue-400 shrink-0" size={14} />
+          <span className="truncate">{kamaStatus}</span>
         </div>
       )}
       <button
         onClick={toggleListening}
         aria-label={isListening ? "Matikan Kama" : "Aktifkan Kama"}
-        className={`p-4 rounded-2xl shadow-xl transition-all duration-300 text-white flex items-center justify-center ${
+        className={`p-4 rounded-2xl shadow-2xl transition-all duration-300 text-white flex items-center justify-center cursor-pointer border ${
           isListening 
-            ? "bg-linear-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 scale-110 animate-pulse" 
-            : "bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+            ? "bg-linear-to-r from-rose-600 to-red-600 border-rose-400 scale-110 shadow-rose-500/30 animate-pulse" 
+            : "bg-linear-to-r from-blue-600 via-indigo-600 to-violet-600 border-white/30 shadow-blue-500/30 hover:scale-105 active:scale-95"
         }`}
-        title="Hubungi Kama (Asisten Suara)"
+        title="Hubungi Kama (Asisten AI Suara)"
       >
-        {isListening ? <FiMicOff size={20} /> : <FiMic size={20} />}
+        {isListening ? <FiMicOff size={22} /> : <FiMic size={22} />}
       </button>
     </div>
   );

@@ -67,33 +67,27 @@ const DataSecurity: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen pb-20 bg-slate-50 dark:bg-slate-950 transition-colors">
+    <div className="min-h-screen pb-24 text-slate-900 dark:text-slate-100 transition-colors">
       
       {/* HERO SECTION */}
-      <section className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-8 px-6 text-center relative overflow-hidden transition-colors">
+      <section className="py-12 px-6 text-center relative overflow-hidden">
         <div className="max-w-3xl mx-auto space-y-4 relative z-10">
-          <span className="text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 px-3 py-1 rounded-full inline-flex items-center gap-1.5">
-            <FiShield /> Infrastruktur Aman
+          <span className="glass-capsule text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 px-3.5 py-1.5 inline-flex items-center gap-2">
+            <FiShield className="text-sm" /> Infrastruktur Keamanan Terpercaya
           </span>
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-            Komitmen Keamanan & <br />Perlindungan Siber KaryaMandiri
+          <h1 className="text-3xl md:text-5xl font-black tracking-tight leading-tight">
+            Komitmen Keamanan & <br /><span className="bg-gradient-to-r from-blue-600 via-indigo-500 to-sky-400 bg-clip-text text-transparent">Perlindungan Siber</span>
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
-            Kami membangun sistem dengan standar arsitektur bank-grade untuk memastikan seluruh data pribadi, dokumen KYC, dan dana transaksi di platform Anda terlindungi secara menyeluruh.
+          <p className="text-slate-600 dark:text-slate-300 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
+            Kami membangun sistem dengan standar arsitektur bank-grade untuk memastikan seluruh data pribadi, dokumen KYC, dan saldo transaksi di platform Anda terlindungi secara menyeluruh.
           </p>
-        </div>
-        
-        {/* Dekonstruksi Aksen Latar Belakang Geometris */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full opacity-5 pointer-events-none">
-          <div className="absolute top-10 left-10 w-72 h-72 rounded-full bg-indigo-400 blur-3xl"></div>
-          <div className="absolute bottom-5 right-10 w-80 h-80 rounded-full bg-blue-400 blur-3xl"></div>
         </div>
       </section>
 
       {/* CORE INFRASTRUCTURE PILLARS */}
-      <main className="max-w-5xl mx-auto mt-8 space-y-16">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 space-y-12">
         
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {securityPillars.map((pillar, idx) => (
             <motion.div
               key={idx}
@@ -101,11 +95,11 @@ const DataSecurity: React.FC = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 md:p-8 shadow-xs flex flex-col justify-between hover:border-indigo-500/50 transition duration-300"
+              className="glass-card rounded-3xl p-6 md:p-8 flex flex-col justify-between group"
             >
               <div className="space-y-4">
                 {/* Icon Header */}
-                <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/50 rounded-2xl text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl">
+                <div className="w-12 h-12 glass-capsule text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition duration-300">
                   {pillar.icon}
                 </div>
                 
@@ -119,13 +113,13 @@ const DataSecurity: React.FC = () => {
                   </p>
                 </div>
 
-                <hr className="border-slate-100 dark:border-slate-800" />
+                <hr className="border-slate-200/50 dark:border-white/10" />
 
                 {/* Technical Bullet Points */}
                 <ul className="space-y-2.5 pt-1">
                   {pillar.details.map((detail, dIdx) => (
-                    <li key={dIdx} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400 leading-normal">
-                      <FiCheckCircle className="text-emerald-500 dark:text-emerald-400 text-base shrink-0 mt-0.5" />
+                    <li key={dIdx} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-300 leading-normal">
+                      <FiCheckCircle className="text-emerald-500 text-base shrink-0 mt-0.5" />
                       <span>{detail}</span>
                     </li>
                   ))}
@@ -136,38 +130,38 @@ const DataSecurity: React.FC = () => {
         </section>
 
         {/* SECURITY RESPONSIBILITY ADVISORY CARD */}
-        <section className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/50 rounded-3xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <section className="glass-card bg-amber-500/10 border-amber-500/30 rounded-3xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           <div className="md:col-span-2 flex justify-center md:justify-start">
-            <div className="w-14 h-14 bg-amber-100 dark:bg-amber-900/50 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 rounded-2xl flex items-center justify-center text-2xl shadow-xs">
+            <div className="w-14 h-14 glass-capsule bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-2xl">
               <FiAlertTriangle />
             </div>
           </div>
           
-          <div className="md:col-span-10 text-center md:text-left space-y-2">
-            <h4 className="font-black text-amber-900 dark:text-amber-100 text-base">
-              Bagian Penting: Tanggung Jawab Keamanan Akun Anda
+          <div className="md:col-span-10 text-center md:text-left space-y-1">
+            <h4 className="font-black text-amber-700 dark:text-amber-300 text-base">
+              Penting: Tanggung Jawab Keamanan Akun Anda
             </h4>
-            <p className="text-amber-800 dark:text-amber-200 text-xs md:text-sm leading-relaxed">
-              Meskipun platform KaryaMandiri memproteksi server secara maksimal, keamanan akun juga sangat bergantung pada kedisiplinan Anda. Jangan pernah membagikan password, kode OTP, atau token akses kepada pihak lain yang mengaku sebagai tim internal kami. Kami tidak pernah meminta kredensial rahasia Anda demi alasan apa pun.
+            <p className="text-slate-600 dark:text-slate-300 text-xs sm:text-sm leading-relaxed">
+              Meskipun platform KaryaMandiri memproteksi server secara maksimal, keamanan akun juga sangat bergantung pada kedisiplinan Anda. Jangan pernah membagikan password, kode OTP, atau token akses kepada pihak lain. Tim kami tidak pernah meminta kredensial rahasia Anda.
             </p>
           </div>
         </section>
 
         {/* INCIDENT REPORT CALL TO ACTION */}
-        <section className="bg-slate-900 text-white rounded-3xl p-8 md:p-12 flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden">
+        <section className="glass-panel p-8 md:p-12 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden bg-gradient-to-r from-indigo-900/60 to-slate-900/60 shadow-2xl">
           <div className="space-y-3 max-w-xl text-center md:text-left">
-            <h3 className="text-xl md:text-2xl font-black tracking-tight">
-              Menemukan Celah Keamanan (Bug Vulnerability)?
+            <h3 className="text-xl md:text-2xl font-black text-white tracking-tight">
+              Menemukan Celah Keamanan (Vulnerability)?
             </h3>
-            <p className="text-slate-400 text-xs md:text-sm leading-relaxed">
-              Kami sangat mengapresiasi kontribusi para peneliti keamanan siber secara etis (ethical hacking). Jika Anda mendeteksi adanya celah keamanan pada sistem API, otentikasi, atau basis data kami, segera laporkan ke tim tanggap insiden digital.
+            <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
+              Kami sangat mengapresiasi kontribusi para periset keamanan siber secara etis (responsible disclosure). Jika Anda mendeteksi potensi celah pada sistem API atau otentikasi kami, segera laporkan ke tim tanggap insiden.
             </p>
           </div>
 
           <div className="w-full md:w-auto shrink-0">
             <Link
               href="/contact"
-              className="px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl text-center flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-600/10 active:scale-[0.98]"
+              className="px-6 py-4 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-bold text-sm rounded-2xl text-center flex items-center justify-center gap-2 transition shadow-lg shadow-indigo-600/30 active:scale-95 cursor-pointer"
             >
               Laporkan Bug Sistem <FiArrowRight />
             </Link>

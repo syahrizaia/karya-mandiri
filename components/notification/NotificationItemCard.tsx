@@ -7,7 +7,6 @@ import {
   FiDollarSign, 
   FiInfo, 
   FiTrash2, 
-  FiCircle,
   FiUserPlus,
   FiMessageSquare,
 } from 'react-icons/fi';
@@ -21,23 +20,23 @@ interface NotificationItemCardProps {
 
 const getIcon = (type: string) => {
   switch (type) {
-    case 'payment': return <FiDollarSign className="text-green-600 dark:text-green-400" />;
-    case 'job': return <FiCheckCircle className="text-blue-600 dark:text-blue-400" />;
-    case 'system': return <FiInfo className="text-purple-600 dark:text-purple-400" />;
-    case 'applicant': return <FiUserPlus className="text-orange-600 dark:text-orange-400" />;
-    case 'lead': return <FiMessageSquare className="text-teal-600 dark:text-teal-400" />;
-    default: return <FiBell className="text-slate-600 dark:text-slate-400" />;
+    case 'payment': return <FiDollarSign className="text-emerald-500" size={18} />;
+    case 'job': return <FiCheckCircle className="text-blue-500" size={18} />;
+    case 'system': return <FiInfo className="text-indigo-500" size={18} />;
+    case 'applicant': return <FiUserPlus className="text-amber-500" size={18} />;
+    case 'lead': return <FiMessageSquare className="text-teal-500" size={18} />;
+    default: return <FiBell className="text-slate-500" size={18} />;
   }
 };
 
 const getIconBg = (type: string) => {
   switch (type) {
-    case 'payment': return 'bg-green-50 dark:bg-green-950/30';
-    case 'job': return 'bg-blue-50 dark:bg-blue-950/30';
-    case 'system': return 'bg-purple-50 dark:bg-purple-950/30';
-    case 'applicant': return 'bg-orange-50 dark:bg-orange-950/30';
-    case 'lead': return 'bg-teal-50 dark:bg-teal-950/30';
-    default: return 'bg-slate-50 dark:bg-slate-800';
+    case 'payment': return 'bg-emerald-500/10 border-emerald-500/20';
+    case 'job': return 'bg-blue-500/10 border-blue-500/20';
+    case 'system': return 'bg-indigo-500/10 border-indigo-500/20';
+    case 'applicant': return 'bg-amber-500/10 border-amber-500/20';
+    case 'lead': return 'bg-teal-500/10 border-teal-500/20';
+    default: return 'bg-slate-500/10 border-slate-500/20';
   }
 };
 
@@ -136,45 +135,48 @@ export const NotificationItemCard: React.FC<NotificationItemCardProps> = ({
   return (
     <div 
       onClick={() => onMarkAsRead(notif.id, notif.is_read)}
-      className={`group relative p-4 md:p-5 rounded-2xl md:rounded-3xl border transition-all duration-200 flex gap-3 md:gap-4 cursor-pointer ${
+      className={`group relative p-5 md:p-6 rounded-3xl transition-all duration-300 flex gap-4 md:gap-5 cursor-pointer ${
         notif.is_read 
-        ? 'bg-slate-50/60 dark:bg-slate-800/20 border-slate-100 dark:border-slate-800/80 opacity-80 hover:opacity-100' 
-        : 'bg-white dark:bg-slate-900 border-blue-100 dark:border-blue-900/50 shadow-sm ring-1 ring-blue-50/50 dark:ring-blue-950/30 hover:shadow-md'
+        ? 'glass-card opacity-80 hover:opacity-100 hover:border-white/30' 
+        : 'glass-card border-blue-500/40 dark:border-blue-400/30 shadow-lg shadow-blue-500/5 ring-1 ring-blue-500/10'
       }`}
     >
-      {/* Icon Status */}
-      <div className={`p-2.5 md:p-3 h-fit rounded-xl md:rounded-2xl shrink-0 transition-colors ${getIconBg(notif.type)}`}>
+      {/* Icon Status Translucent */}
+      <div className={`p-3.5 h-fit rounded-2xl shrink-0 border transition-transform group-hover:scale-105 ${getIconBg(notif.type)}`}>
         {getIcon(notif.type)}
       </div>
 
       {/* Konten Notifikasi */}
-      <div className="flex-1 min-w-0 space-y-0.5 md:space-y-1">
+      <div className="flex-1 min-w-0 space-y-1">
         <div className="flex justify-between items-center gap-2">
-          <h3 className={`font-bold text-sm md:text-base truncate transition-colors ${notif.is_read ? 'text-slate-600 dark:text-slate-400' : 'text-slate-900 dark:text-slate-100'}`}>
+          <h3 className={`font-bold text-sm md:text-base truncate transition-colors ${
+            notif.is_read ? 'text-slate-700 dark:text-slate-300' : 'text-slate-900 dark:text-white font-extrabold'
+          }`}>
             {notif.title}
           </h3>
           {!notif.is_read && (
-            <span className="shrink-0 flex items-center">
-              <FiCircle className="text-blue-600 dark:text-blue-400 fill-current w-2 h-2" />
+            <span className="shrink-0 flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400 animate-ping" />
+              Baru
             </span>
           )}
         </div>
-        <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed break-words">
+        <div className="text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed break-words">
           {renderMessageContent(notif)}
-        </p>
-        <p className="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pt-0.5">
+        </div>
+        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest pt-1">
           {formatWaktu(notif.created_at)}
         </p>
       </div>
 
-      {/* Tombol Hapus */}
+      {/* Tombol Hapus Glass */}
       <div className="flex items-center justify-center self-center md:self-start">
         <button 
           onClick={(e) => onDelete(e, notif.id)}
-          className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 md:opacity-0 group-hover:opacity-100 rounded-xl transition-all duration-150 cursor-pointer"
+          className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 rounded-xl md:opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
           title="Hapus notifikasi"
         >
-          <FiTrash2 size={16} className="md:w-[18px] md:h-[18px]" />
+          <FiTrash2 size={16} />
         </button>
       </div>
     </div>

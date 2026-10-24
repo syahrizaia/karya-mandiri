@@ -101,26 +101,28 @@ export default function LiveImpactStatistics() {
   ];
 
   return (
-    <section className="py-12 border-b border-slate-900 bg-slate-950/50 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-6">
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
-          >
-            {statItems.map((stat, i) => (
-              <motion.div key={i} variants={fadeInUp} className="space-y-1.5">
+    <section className="py-12 px-6 max-w-6xl mx-auto">
+      <div className="glass-panel rounded-3xl p-8 shadow-xl">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+        >
+          {statItems.map((stat, i) => (
+            <motion.div key={i} variants={fadeInUp} className="space-y-2">
+              <div className="p-3 bg-white/40 dark:bg-slate-800/40 rounded-2xl w-fit mx-auto backdrop-blur-md border border-white/30 dark:border-white/10 shadow-sm">
                 {stat.icon}
-                <h3 className={`text-xl md:text-3xl font-black text-white transition-opacity ${loading ? 'opacity-40 animate-pulse' : 'opacity-100'}`}>
-                  {stat.value}
-                </h3>
-                <p className="text-[11px] md:text-xs text-slate-500 font-bold uppercase tracking-wider">{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
+              </div>
+              <h3 className={`text-2xl md:text-3xl font-black text-slate-900 dark:text-white transition-opacity ${loading ? 'opacity-40 animate-pulse' : 'opacity-100'}`}>
+                {stat.value}
+              </h3>
+              <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">{stat.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
   );
 }

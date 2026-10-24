@@ -7,14 +7,14 @@ interface StatCardProps {
   color: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ icon, title, value, color }) => (
-  <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800 flex items-center gap-4 transition-colors">
-    <div className={`${color} p-4 rounded-lg text-white text-2xl`}>
+const StatCard: React.FC<StatCardProps> = ({ icon, title, value }) => (
+  <div className="glass-panel p-6 rounded-3xl flex items-center gap-4 transition-all duration-300">
+    <div className="p-4 glass-capsule text-blue-600 dark:text-blue-400 text-2xl shrink-0">
       {icon}
     </div>
-    <div>
-      <p className="text-sm text-gray-500 dark:text-slate-400 uppercase tracking-wider">{title}</p>
-      <p className="text-2xl font-bold text-gray-800 dark:text-slate-50">{value}</p>
+    <div className="min-w-0">
+      <p className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider truncate">{title}</p>
+      <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white truncate mt-0.5">{value}</p>
     </div>
   </div>
 );

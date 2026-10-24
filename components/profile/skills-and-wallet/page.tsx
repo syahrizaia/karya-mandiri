@@ -58,6 +58,7 @@ export default function SkillsAndWallet({ params }: ProfileProps) {
         skills: profile?.skills || [],
         balance: profile?.balance || 0,
       });
+
     } catch (err: any) {
       console.error("Error global saat memuat profil:", err.message);
     } finally {
@@ -74,33 +75,33 @@ export default function SkillsAndWallet({ params }: ProfileProps) {
   return (
     <div className="space-y-6 w-full min-w-0 text-slate-900 dark:text-slate-100 transition-colors">
       {/* Box Keahlian */}
-      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+      <div className="glass-panel p-5 sm:p-6 rounded-3xl transition-colors">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
-            <FiAward className="text-blue-600 dark:text-blue-400" /> Keahlian
+          <h2 className="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-slate-800 dark:text-white">
+            <FiAward className="text-blue-600 dark:text-blue-400" /> Keahlian Terdaftar
           </h2>
           {isOwnProfile && (
             <button
               onClick={() => setShowManageSkills(true)}
-              className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline transition-colors flex items-center gap-1 cursor-pointer"
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline transition-colors cursor-pointer"
             >
               Kelola
             </button>
           )}
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {userData.skills.length > 0 ? (
             userData.skills.map((skill) => (
               <span 
                 key={skill} 
-                className="px-2.5 py-1 bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-300 rounded-lg text-xs font-semibold border border-slate-200 dark:border-slate-800 break-words max-w-full transition-colors"
+                className="glass-capsule px-3 py-1 text-slate-700 dark:text-slate-300 text-xs font-semibold"
               >
                 {skill}
               </span>
             ))
           ) : (
             <span className="text-xs text-slate-400 dark:text-slate-500 italic">
-              Belum mengisi keahlian
+              Belum menambahkan keahlian
             </span>
           )}
         </div>
@@ -108,16 +109,16 @@ export default function SkillsAndWallet({ params }: ProfileProps) {
 
       {/* Box Dompet / Saldo */}
       {isOwnProfile && (
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-5 sm:p-6 rounded-2xl shadow-md text-white">
-          <h2 className="text-xs font-semibold opacity-80 mb-1">Saldo Dompet</h2>
+        <div className="glass-panel p-6 rounded-3xl bg-gradient-to-br from-blue-600/90 via-indigo-700/80 to-slate-900/90 text-white shadow-xl relative overflow-hidden">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-sky-200 mb-1">Saldo Dompet Escrow</h2>
           <p className="text-2xl sm:text-3xl font-black truncate">
             Rp{userData.balance.toLocaleString("id-ID")}
           </p>
           <button
             onClick={() => setShowSubModal(true)}
-            className="w-full mt-4 py-2.5 bg-white/20 hover:bg-white/30 text-xs font-bold rounded-xl transition backdrop-blur-xs cursor-pointer"
+            className="w-full mt-4 py-3 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded-xl transition backdrop-blur-md cursor-pointer active:scale-95 border border-white/20 shadow-md"
           >
-            Tarik Tunai Dana
+            Tarik Tunai Saldo
           </button>
         </div>
       )}

@@ -25,7 +25,7 @@ const SocialIcon = ({ icon, href, target }: { icon: React.ReactNode; href: strin
   <Link
     href={href} 
     target={target} 
-    className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white dark:hover:text-white transition-all duration-300"
+    className="w-10 h-10 rounded-2xl glass-card flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-white hover:bg-linear-to-r hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 shadow-sm"
     rel="noopener noreferrer"
   >
     {icon}
@@ -36,24 +36,24 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-16 pb-8 transition-colors duration-300">
+    <footer className="bg-white/50 dark:bg-slate-900/40 backdrop-blur-2xl border-t border-white/30 dark:border-white/10 pt-16 pb-8 transition-colors duration-300 mt-auto">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-12 md:gap-12 mb-12">
           
           {/* Brand & Mission */}
           <div className="space-y-6 col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-[0_4px_20px_rgba(37,99,235,0.35)]">
                 K
               </div>
-              <span className="text-2xl font-bold text-slate-900 dark:text-slate-50 tracking-tight">
+              <span className="text-2xl font-black bg-linear-to-r from-blue-600 via-teal-500 to-indigo-600 bg-clip-text text-transparent tracking-tight">
                 KaryaMandiri
               </span>
             </div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
               Platform inklusi ekonomi pertama di Indonesia yang memberdayakan sektor informal melalui model bisnis crowdsourcing yang transparan dan adil.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <SocialIcon icon={<FiLinkedin />} href="https://www.linkedin.com/in/syahriza-ikhsan-alsistani" target="_blank" />
               <SocialIcon icon={<FiFacebook />} href="#" />
               <SocialIcon icon={<FiInstagram />} href="https://www.instagram.com/syahreza_ia" target="_blank" />
@@ -106,8 +106,10 @@ const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-center font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-            © {currentYear} <span className="text-blue-600 dark:text-blue-400">KaryaMandiri Syahriza</span>. All Rights Reserved.
+          <p className="text-xs text-center font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-widest" suppressHydrationWarning>
+            {`© ${currentYear} `}
+            <span className="text-blue-600 dark:text-blue-400">KaryaMandiri Syahriza</span>
+            {` • All Rights Reserved.`}
           </p>
           <div className="flex items-center gap-6 text-xs font-bold text-slate-400 dark:text-slate-500">
             <span className="flex items-center gap-1">

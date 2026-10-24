@@ -14,7 +14,7 @@ KaryaMandiri adalah platform inklusi ekonomi sektor informal berbasis model bisn
 
 ---
 
-## 🌐 Tautan
+## Tautan
 
 | Jenis | Tautan |
 |---|---|
@@ -23,25 +23,25 @@ KaryaMandiri adalah platform inklusi ekonomi sektor informal berbasis model bisn
 
 ---
 
-## 📖 Daftar Isi
+## Daftar Isi
 
-1. [Tentang Proyek](#-tentang-proyek)
-2. [Masalah yang Diselesaikan](#-masalah-yang-diselesaikan)
-3. [Fitur Utama](#-fitur-utama)
-4. [Arsitektur Sistem](#-arsitektur-sistem)
-5. [Struktur Proyek](#-struktur-proyek)
-6. [Peta Halaman (Rute)](#-peta-halaman-rute)
-7. [Tech Stack](#-tech-stack)
-8. [Alur Kerja Pengguna](#-alur-kerja-pengguna)
-9. [Prasyarat](#-prasyarat)
-10. [Environment Variables](#-environment-variables)
-11. [Menjalankan Proyek](#-menjalankan-proyek)
-12. [Keamanan & Autentikasi](#-keamanan--autentikasi)
-13. [Dokumentasi](#-dokumentasi)
+1. [Tentang Proyek](#tentang-proyek)
+2. [Masalah yang Diselesaikan](#masalah-yang-diselesaikan)
+3. [Fitur Utama](#fitur-utama)
+4. [Arsitektur Sistem](#arsitektur-sistem)
+5. [Struktur Proyek](#struktur-proyek)
+6. [Peta Halaman (Rute)](#peta-halaman-rute)
+7. [Tech Stack](#tech-stack)
+8. [Alur Kerja Pengguna](#alur-kerja-pengguna)
+9. [Prasyarat](#prasyarat)
+10. [Environment Variables](#environment-variables)
+11. [Menjalankan Proyek](#menjalankan-proyek)
+12. [Keamanan & Autentikasi](#keamanan--autentikasi)
+13. [Dokumentasi](#dokumentasi)
 
 ---
 
-## 🎯 Tentang Proyek
+## Tentang Proyek
 
 KaryaMandiri adalah **platform crowdsourcing** yang menghubungkan tiga pihak dalam satu ekosistem ekonomi digital:
 
@@ -53,7 +53,7 @@ Nilai inti platform: **transparansi**, **kepercayaan visual**, dan **pemberdayaa
 
 ---
 
-## ⚡ Masalah yang Diselesaikan
+## Masalah yang Diselesaikan
 
 | Masalah Nyata di Lapangan | Solusi KaryaMandiri |
 |---|---|
@@ -67,7 +67,7 @@ Nilai inti platform: **transparansi**, **kepercayaan visual**, dan **pemberdayaa
 
 ---
 
-## 🚀 Fitur Utama
+## Fitur Utama
 
 ### 1. Crowdsourcing Engine
 Memecah proyek skala besar menjadi **tugas mikro** yang dikerjakan banyak pekerja secara kolaboratif. Setiap tugas memiliki `reward`, `deadline`, dan `status` yang terlacak.
@@ -132,7 +132,7 @@ Halaman unduhan aplikasi dengan review pengguna.
 
 ---
 
-## 🏗 Arsitektur Sistem
+## Arsitektur Sistem
 
 ```mermaid
 flowchart TB
@@ -177,7 +177,7 @@ flowchart TB
 
 ---
 
-## 📋 Struktur Proyek
+## Struktur Proyek
 
 ```text
 karya-mandiri/
@@ -252,7 +252,7 @@ karya-mandiri/
 
 ---
 
-## 🗺 Peta Halaman (Rute)
+## Peta Halaman (Rute)
 
 ### Rute Publik — `(public)`
 
@@ -303,7 +303,7 @@ karya-mandiri/
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Teknologi |
 |---|---|
@@ -323,7 +323,7 @@ karya-mandiri/
 
 ---
 
-## 🔁 Alur Kerja Pengguna
+## Alur Kerja Pengguna
 
 ### Alur Pekerja (Worker)
 
@@ -351,7 +351,7 @@ flowchart LR
 
 ---
 
-## 🚦 Prasyarat
+## Prasyarat
 
 - **Node.js** 20+ (disarankan versi LTS terbaru)
 - **npm** / **pnpm** / **yarn** (package manager)
@@ -361,7 +361,7 @@ flowchart LR
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 Buat file `.env.local` di root proyek:
 
@@ -387,7 +387,7 @@ VAPID_PRIVATE_KEY=
 
 ---
 
-## 🚀 Menjalankan Proyek
+## Menjalankan Proyek
 
 ```bash
 # 1. Install dependensi
@@ -410,7 +410,7 @@ Buka [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 🔐 Keamanan & Autentikasi
+## Keamanan & Autentikasi
 
 - **Proteksi rute** — `middleware.ts` memblokir akses ke rute privat (`/employer`, `/worker`, `/history`, `/notification`, `/settings`) bagi pengguna yang belum login, lalu mengarahkan ke `/login` dengan parameter `next` untuk redirect balik.
 - **Sesi Supabase** — menggunakan `@supabase/ssr` untuk manajemen cookie sesi yang aman (server & browser).
@@ -422,7 +422,7 @@ Buka [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 📚 Dokumentasi
+## Dokumentasi
 
 - [Next.js](https://nextjs.org/docs)
 - [Supabase SSR](https://supabase.com/docs/guides/auth/server-side/nextjs)

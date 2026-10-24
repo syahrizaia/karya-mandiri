@@ -18,65 +18,68 @@ interface SubscriptionDialogProps {
 
 const SubscriptionDialog: React.FC<SubscriptionDialogProps> = ({ open, onOpenChange }) => {
   const benefits = [
-    "Posting proyek tanpa batas",
-    "Akses ke profil pekerja terverifikasi",
-    "Statistik performa proyek mendalam",
-    "Dukungan prioritas 24/7"
+    "Posting proyek dan tugas tanpa batas kuota bulanan",
+    "Akses prioritas ke direktori profil pekerja terverifikasi",
+    "Analitik statistik performa pengerjaan proyek mendalam",
+    "Dukungan teknis dan mediasi sengketa prioritas 24/7"
   ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-112.5 bg-white dark:bg-slate-900 rounded-3xl p-0 overflow-hidden border-none shadow-2xl transition-colors">
-        {/* Header dengan Aksen Warna */}
-        <div className="bg-blue-600 dark:bg-blue-950 p-8 text-white text-center relative transition-colors">
-          <div className="absolute top-4 right-4 opacity-20">
-            <FiStar size={80} />
+      <DialogContent className="sm:max-w-115 glass-panel rounded-3xl p-0 overflow-hidden border border-white/20 dark:border-white/10 shadow-2xl">
+        {/* Header dengan Ambient Glow Liquid */}
+        <div className="relative p-8 text-white overflow-hidden bg-linear-to-br from-blue-600 via-indigo-600 to-violet-700">
+          <div className="absolute -top-12 -right-12 w-44 h-44 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute top-4 right-4 opacity-20 text-white">
+            <FiStar size={72} />
           </div>
-          <DialogHeader>
-            <div className="mx-auto bg-white/20 dark:bg-white/10 p-3 rounded-2xl w-fit mb-4">
-              <FiZap className="text-yellow-300 dark:text-yellow-400 text-3xl" />
+          <DialogHeader className="relative z-10 text-center">
+            <div className="mx-auto p-3.5 rounded-2xl w-fit mb-4 bg-white/20 border border-white/30 backdrop-blur-md shadow-lg">
+              <FiZap className="text-yellow-300 text-3xl" />
             </div>
-            <DialogTitle className="text-2xl font-black">KaryaMandiri Premium</DialogTitle>
-            <DialogDescription className="text-blue-100 dark:text-blue-200 font-medium">
-              Tingkatkan efisiensi bisnis Anda sekarang.
+            <DialogTitle className="text-2xl font-black text-white tracking-tight">KaryaMandiri Premium</DialogTitle>
+            <DialogDescription className="text-blue-100 font-medium text-xs sm:text-sm mt-1">
+              Akselerasi skalabilitas bisnis dan crowdsourcing Anda dengan fasilitas eksklusif.
             </DialogDescription>
           </DialogHeader>
         </div>
 
         {/* Konten Manfaat */}
-        <div className="p-8">
-          <div className="space-y-4 mb-8">
+        <div className="p-7 sm:p-8 space-y-6">
+          <div className="space-y-3.5">
             {benefits.map((benefit, index) => (
-              <div key={index} className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
-                <FiCheckCircle className="text-green-500 dark:text-green-400 shrink-0" />
-                <span className="text-sm font-medium">{benefit}</span>
+              <div key={index} className="flex items-start gap-3 text-slate-700 dark:text-slate-300">
+                <div className="p-0.5 rounded-full bg-emerald-500/10 text-emerald-500 mt-0.5 shrink-0">
+                  <FiCheckCircle size={16} />
+                </div>
+                <span className="text-xs sm:text-sm font-semibold leading-relaxed">{benefit}</span>
               </div>
             ))}
           </div>
 
-          {/* Pricing Card */}
-          <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl mb-8 flex justify-between items-center transition-colors">
+          {/* Pricing Glass Card */}
+          <div className="glass-card p-4.5 rounded-2xl flex justify-between items-center border border-white/20 dark:border-white/10">
             <div>
-              <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Mulai Dari</p>
-              <p className="text-xl font-black text-slate-900 dark:text-slate-100">
-                Rp149.000.000<span className="text-sm font-normal text-slate-500 dark:text-slate-500">/bln</span>
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest">Biaya Investasi</p>
+              <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white mt-0.5">
+                Rp149.000<span className="text-xs font-semibold text-slate-400 dark:text-slate-500"> / bulan</span>
               </p>
             </div>
-            <span className="bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+            <span className="px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400">
               Hemat 20%
             </span>
           </div>
 
-          {/* Aksi / Footer */}
-          <DialogFooter className="flex-col sm:flex-col gap-3">
-            <button className="w-full py-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold rounded-2xl transition shadow-lg shadow-blue-200 dark:shadow-none cursor-pointer">
-              Berlangganan Sekarang
+          {/* Aksi Liquid Glass */}
+          <DialogFooter className="flex-col sm:flex-col gap-2.5 pt-1">
+            <button className="w-full py-4 bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-500/25 cursor-pointer text-sm">
+              Mulai Berlangganan Sekarang
             </button>
             <button 
               onClick={() => onOpenChange(false)}
-              className="w-full py-2 text-slate-400 dark:text-slate-500 text-xs font-semibold hover:text-slate-600 dark:hover:text-slate-300 transition cursor-pointer"
+              className="w-full py-2 text-slate-400 dark:text-slate-500 text-xs font-semibold hover:text-slate-700 dark:hover:text-slate-300 transition cursor-pointer"
             >
-              Mungkin Nanti
+              Nanti Saja
             </button>
           </DialogFooter>
         </div>

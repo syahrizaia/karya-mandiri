@@ -94,34 +94,6 @@ const NewsPage = () => {
         }
       }
 
-      // --- INTEGRASI AMAN MULTI-API ---
-      try {
-        const gnewsUrl = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=id&country=id&apikey=${gnewsApiKey}`;
-        const res = await fetch(gnewsUrl);
-        
-        if (!res.ok) {
-          console.warn(`GNews mengembalikan status ${res.status}. Kuota mungkin habis.`);
-        } else {
-          const data = await res.json();
-          if (data.articles) {
-            const mappedGNews = data.articles
-              .filter((art: any) => art.title && art.image)
-              .map((art: any) => ({
-                title: art.title,
-                description: art.description,
-                url: art.url,
-                urlToImage: art.image,
-                publishedAt: art.publishedAt,
-                source: { name: art.source.name },
-              }));
-
-            combinedArticles = [...combinedArticles, ...mappedGNews];
-          }
-        }
-      } catch (err) {
-        console.error("GNews tidak dapat dijangkau:", err);
-      }
-
       // --- SORTING BERDASARKAN TANGGAL TERBARU ---
       combinedArticles.sort((a, b) => {
         return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
@@ -139,7 +111,7 @@ const NewsPage = () => {
   }, [category, region, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8 lg:pt-12 transition-colors">
+    <div className="min-h-screen p-4 md:p-8 lg:pt-8 transition-colors">
       {/* Bagian Header, Navigasi Regional, Kategori, & Pencarian */}
       <NewsHeader
         searchQuery={searchQuery}
@@ -159,9 +131,9 @@ const NewsPage = () => {
             ))}
           </div>
         ) : articles.length === 0 ? (
-          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-8 transition-colors">
+          <div className="text-center py-20 glass-panel rounded-3xl p-8">
             <p className="text-slate-400 dark:text-slate-500 text-sm">
-              Tidak ada berita yang ditemukan untuk kriteria ini.
+              Tidak ada berita yang ditemukan untuk kriteria pencarian ini.
             </p>
           </div>
         ) : (
